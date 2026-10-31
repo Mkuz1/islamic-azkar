@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Islamic Azkar</string>
+    <string name="w_dhikr_desc">Dhikr of the day · ذكر اليوم</string>
+    <string name="w_quick_desc">Morning, evening &amp; sleep azkar · أذكار سريعة</string>
+    <string name="w_tasbih_desc">Tasbih counter · المسبحة</string>
+    <string name="w_morning_desc">Morning azkar, one at a time through the morning · أذكار الصباح</string>
+    <string name="w_day_desc">Day azkar, changing through the day · أذكار اليوم</string>
+    <string name="w_night_desc">Evening and before-sleep azkar · أذكار الليل</string>
+    <string name="w_timeline_desc">Azkar that follow the time of day: morning, day, evening, night · أذكار حسب الوقت</string>
+    <string name="w_cards_desc">Azkar cards with categories: morning, evening, sleep, prayer, day · بطاقات الأذكار</string>
+    <string name="w_scripture_desc">Quran, hadith, azkar, poetry and wisdom: tap for a new one · قرآن وحديث وشعر وحِكَم</string>
+    <string name="w_counter_desc">Counter with weekly statistics · العدّاد وإحصاء الأسبوع</string>
+    <string name="w_hijri_desc">Hijri date in calligraphy · التاريخ الهجري</string>
+    <string name="w_clock_desc">Islamic clock with an eight-pointed star · الساعة الإسلامية</string>
+    <string name="w_prayer_desc">Prayer times with a countdown to the next prayer · مواقيت الصلاة</string>
+    <string name="w_digital_desc">Digital clock with the Hijri and Gregorian date · الساعة والتاريخ</string>
+    <string name="w_progress_desc">How much of the day, month and year has passed · مضيّ الوقت</string>
+</resources>

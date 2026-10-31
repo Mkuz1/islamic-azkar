@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/k_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_glass"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/k_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#CCE6C676"
+            android:textSize="11.5sp" />
+
+        <TextView
+            android:id="@+id/k_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="serif"
+            android:includeFontPadding="false"
+            android:textColor="#FFFFFFFF"
+            android:textSize="40sp" />
+
+        <TextView
+            android:id="@+id/k_phrase"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="serif"
+            android:maxLines="1"
+            android:textColor="#E6FFFFFF"
+            android:textSize="13sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView android:id="@+id/k_reset" android:layout_width="32dp" android:layout_height="32dp" android:background="@drawable/widget_pill" android:contentDescription="Reset" android:padding="7dp" android:src="@drawable/ic_reset" />
+            <TextView android:id="@+id/k_add" android:layout_width="56dp" android:layout_height="32dp" android:layout_marginStart="8dp" android:background="@drawable/widget_chip_selected" android:contentDescription="Add" android:gravity="center" android:includeFontPadding="false" android:text="+" android:textColor="#FFFFFFFF" android:textSize="22sp" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

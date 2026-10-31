@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The selected glass pill: a warm gold fill with a brighter gold rim. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><shape><corners android:radius="22dp"/>
+        <gradient android:angle="270" android:startColor="#66D6B36A" android:endColor="#33D6B36A"/></shape></item>
+    <item><shape><corners android:radius="22dp"/>
+        <stroke android:width="1dp" android:color="#99F1DBA3"/></shape></item>
+</layer-list>

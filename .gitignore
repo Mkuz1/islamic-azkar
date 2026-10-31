@@ -1,0 +1,24 @@
+# Secrets: the Play upload key and its passwords never leave this Mac.
+upload-key/
+*.jks
+*.keystore
+keystore.properties
+
+# Build output and machine-specific files
+**/build/
+**/.gradle/
+**/.kotlin/
+**/local.properties
+**/.idea/
+*.iml
+.DS_Store
+xcuserdata/
+DerivedData/
+
+# Binaries are attached to GitHub releases instead
+*.apk
+*.aab
+*.ipa
+
+# Published from its own repository (Mkuz1/islamic-azkar-privacy)
+store/privacy/

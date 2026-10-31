@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/c_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_glass"
+    android:orientation="vertical"
+    android:paddingStart="12dp"
+    android:paddingTop="10dp"
+    android:paddingEnd="12dp"
+    android:paddingBottom="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView android:id="@+id/c_cat0" android:layout_width="34dp" android:layout_height="28dp" android:layout_marginEnd="6dp" android:background="@drawable/widget_pill" android:padding="5dp" android:contentDescription="Morning" android:src="@drawable/ic_sun" />
+        <ImageView android:id="@+id/c_cat1" android:layout_width="34dp" android:layout_height="28dp" android:layout_marginEnd="6dp" android:background="@drawable/widget_pill" android:padding="5dp" android:contentDescription="Evening" android:src="@drawable/ic_moon" />
+        <ImageView android:id="@+id/c_cat2" android:layout_width="34dp" android:layout_height="28dp" android:layout_marginEnd="6dp" android:background="@drawable/widget_pill" android:padding="5dp" android:contentDescription="Sleep" android:src="@drawable/ic_bed" />
+        <ImageView android:id="@+id/c_cat3" android:layout_width="34dp" android:layout_height="28dp" android:layout_marginEnd="6dp" android:background="@drawable/widget_pill" android:padding="5dp" android:contentDescription="Prayer" android:src="@drawable/ic_mosque" />
+        <ImageView android:id="@+id/c_cat4" android:layout_width="34dp" android:layout_height="28dp" android:background="@drawable/widget_pill" android:padding="5dp" android:contentDescription="Day" android:src="@drawable/ic_day" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/c_text"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="6dp"
+        android:scaleType="fitCenter" />
+
+    <TextView
+        android:id="@+id/c_meaning"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:maxLines="2"
+        android:textColor="#B8FFFFFF"
+        android:textSize="11.5sp" />
+
+    <TextView
+        android:id="@+id/c_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/widget_chip"
+        android:fontFamily="sans-serif-medium"
+        android:paddingStart="12dp"
+        android:paddingTop="3dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="3dp"
+        android:textColor="#FFE6C676"
+        android:textSize="11.5sp" />
+</LinearLayout>

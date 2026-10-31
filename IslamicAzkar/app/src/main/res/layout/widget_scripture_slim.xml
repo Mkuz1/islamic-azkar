@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/s_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_glass"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp">
+
+    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:layout_marginEnd="6dp" android:src="@drawable/ic_star_gold" />
+    <ImageView android:id="@+id/s_text" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="1" android:paddingTop="8dp" android:paddingBottom="8dp" android:scaleType="fitCenter" />
+    <ImageView android:layout_width="14dp" android:layout_height="14dp" android:layout_marginStart="6dp" android:src="@drawable/ic_star_gold" />
+</LinearLayout>

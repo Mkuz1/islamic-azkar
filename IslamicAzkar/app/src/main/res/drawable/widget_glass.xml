@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Liquid Glass for home-screen widgets: translucent Mushaf green so the wallpaper shows
+     through, a soft sheen from the top, a warm glint at the bottom and a double light rim. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item><shape><corners android:radius="28dp"/>
+        <gradient android:angle="270" android:startColor="#C2295245" android:centerColor="#B0163A2F" android:endColor="#C70B1F19"/></shape></item>
+    <item><shape><corners android:radius="28dp"/>
+        <gradient android:angle="270" android:startColor="#38FFFFFF" android:centerColor="#00FFFFFF" android:endColor="#00FFFFFF"/></shape></item>
+    <item><shape><corners android:radius="28dp"/>
+        <gradient android:angle="45" android:startColor="#22D6B36A" android:centerColor="#00D6B36A" android:endColor="#00FFFFFF"/></shape></item>
+    <item><shape><corners android:radius="28dp"/>
+        <stroke android:width="1dp" android:color="#73FFFFFF"/></shape></item>
+    <item android:left="1.5dp" android:top="1.5dp" android:right="1.5dp" android:bottom="1.5dp"><shape><corners android:radius="26.5dp"/>
+        <stroke android:width="0.8dp" android:color="#1FFFFFFF"/></shape></item>
+</layer-list>

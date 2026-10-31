@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/p_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_glass"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView android:id="@+id/p_title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif-medium" android:maxLines="1" android:textColor="#CCE6C676" android:textSize="11.5sp" />
+    <ImageView android:id="@+id/p_art" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" android:scaleType="fitCenter" />
+    <TextView android:id="@+id/p_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:fontFamily="sans-serif-light" android:includeFontPadding="false" android:maxLines="1" android:textColor="#FFFFFFFF" android:textSize="22sp" />
+    <Chronometer android:id="@+id/p_count" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:background="@drawable/widget_chip" android:paddingStart="10dp" android:paddingTop="2dp" android:paddingEnd="10dp" android:paddingBottom="2dp" android:textColor="#FFE6C676" android:textSize="12sp" />
+</LinearLayout>
