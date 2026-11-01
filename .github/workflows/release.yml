@@ -1,6 +1,7 @@
 # Builds, signs and publishes a release entirely on GitHub (nothing is built on the Mac).
 #
-# Run it by pushing a tag "v<versionName>" (e.g. v1.0.4) to this repository, or from the Actions tab.
+# Run it by writing the new tag ("v" + versionName, e.g. v1.0.4) into the RELEASE file at the repository root
+# and pushing (to main or a main-* branch), by pushing that tag, or from the Actions tab.
 #  - Android "github" APK, signed with the upload key  → public release in Mkuz1/islamic-azkar-releases (IslamicAzkar.apk)
 #  - unsigned iPhone IPA (install with Sideloadly/AltStore) → same public release (IslamicAzkar.ipa)
 #  - Android "play" App Bundle for Google Play          → private release in this repository (IslamicAzkar-play.aab)
@@ -14,6 +15,8 @@ name: Release
 on:
   push:
     tags: ["v*"]
+    branches: [main, "main-*"]
+    paths: ["RELEASE"]
   workflow_dispatch:
 
 permissions:
@@ -50,8 +53,9 @@ jobs:
           V=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)
           echo "version=$V" >> "$GITHUB_OUTPUT"
           echo "versionName $V"
-          if [ "${GITHUB_REF_TYPE}" = tag ] && [ "${GITHUB_REF_NAME}" != "v$V" ]; then
-            echo "::error::Tag ${GITHUB_REF_NAME} does not match versionName $V (expected v$V)"; exit 1
+          if [ "${GITHUB_REF_TYPE}" = tag ]; then WANT="${GITHUB_REF_NAME}"; else WANT=$(tr -d '[:space:]' < ../RELEASE); fi
+          if [ "$WANT" != "v$V" ]; then
+            echo "::error::Release $WANT does not match versionName $V (expected v$V)"; exit 1
           fi
       - name: Upload key
         env:
