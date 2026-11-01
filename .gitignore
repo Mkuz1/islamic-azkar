@@ -29,3 +29,4 @@ IslamicAzkar/ios/build/
 IslamicAzkar/ios/shots/
 IslamicAzkar/ios/Payload/
 *.ipa.zip
+.hadith-cache/
