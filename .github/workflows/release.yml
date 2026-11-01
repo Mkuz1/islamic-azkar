@@ -1,0 +1,185 @@
+# Builds, signs and publishes a release entirely on GitHub (nothing is built on the Mac).
+#
+# Run it by pushing a tag "v<versionName>" (e.g. v1.0.4) to this repository, or from the Actions tab.
+#  - Android "github" APK, signed with the upload key  → public release in Mkuz1/islamic-azkar-releases (IslamicAzkar.apk)
+#  - unsigned iPhone IPA (install with Sideloadly/AltStore) → same public release (IslamicAzkar.ipa)
+#  - Android "play" App Bundle for Google Play          → private release in this repository (IslamicAzkar-play.aab)
+#
+# Repository secrets (Settings → Secrets and variables → Actions):
+#   UPLOAD_KEYSTORE_BASE64   the upload keystore file, base64-encoded
+#   UPLOAD_KEYSTORE_PASSWORD UPLOAD_KEY_ALIAS  UPLOAD_KEY_PASSWORD
+#   RELEASES_TOKEN           fine-grained token with Contents: read & write on Mkuz1/islamic-azkar-releases
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  # SHA-256 of the upload certificate (CN=Mohamad Koussa) that signed every published APK so far.
+  # An APK signed with any other key could not update installed copies, so the build stops instead.
+  UPLOAD_CERT_SHA256: 25f7c4e6493965e99e62586e699bff3727da15d431ca7119671b33c90bd24eee
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    defaults:
+      run:
+        working-directory: IslamicAzkar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - name: Version
+        id: version
+        run: |
+          V=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          echo "versionName $V"
+          if [ "${GITHUB_REF_TYPE}" = tag ] && [ "${GITHUB_REF_NAME}" != "v$V" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match versionName $V (expected v$V)"; exit 1
+          fi
+      - name: Upload key
+        env:
+          KS: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KS" ] || [ -z "$KS_PASS" ] || [ -z "$ALIAS" ] || [ -z "$KEY_PASS" ]; then
+            echo "::error::Add the UPLOAD_KEYSTORE_BASE64, UPLOAD_KEYSTORE_PASSWORD, UPLOAD_KEY_ALIAS and UPLOAD_KEY_PASSWORD secrets."; exit 1
+          fi
+          mkdir -p ../upload-key
+          echo "$KS" | base64 -d > ../upload-key/upload.jks
+          {
+            echo "storeFile=$(cd ../upload-key && pwd)/upload.jks"
+            echo "storePassword=$KS_PASS"
+            echo "keyAlias=$ALIAS"
+            echo "keyPassword=$KEY_PASS"
+          } > ../upload-key/keystore.properties
+      - name: SDK packages
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34-ext12" "build-tools;35.0.1" > /dev/null
+      - name: Build
+        run: ./gradlew --no-daemon assembleGithubRelease bundlePlayRelease
+      - name: Check signature, version and permissions
+        run: |
+          BT="$ANDROID_HOME/build-tools/35.0.1"
+          APK=app/build/outputs/apk/github/release/app-github-release.apk
+          "$BT/apksigner" verify --print-certs "$APK" | tee certs.txt
+          grep -qi "SHA-256 digest: $UPLOAD_CERT_SHA256" certs.txt || { echo "::error::APK is not signed with the upload key"; exit 1; }
+          "$BT/aapt2" dump badging "$APK" | head -1
+          "$BT/aapt2" dump badging "$APK" | head -1 | grep -q "versionName='${{ steps.version.outputs.version }}'"
+          "$BT/aapt2" dump permissions "$APK" | grep -q REQUEST_INSTALL_PACKAGES
+          keytool -printcert -jarfile app/build/outputs/bundle/playRelease/app-play-release.aab | tr -d ':' | grep -qi "$UPLOAD_CERT_SHA256" \
+            || { echo "::error::App Bundle is not signed with the upload key"; exit 1; }
+          mkdir -p ../out
+          cp "$APK" ../out/IslamicAzkar.apk
+          cp app/build/outputs/bundle/playRelease/app-play-release.aab ../out/IslamicAzkar-play.aab
+      - name: Remove the key
+        if: always()
+        run: rm -rf ../upload-key
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: out/
+
+  ios:
+    runs-on: macos-26
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: IslamicAzkar/ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+      - name: Build unsigned IPA
+        run: |
+          set -o pipefail
+          xcodebuild -project IslamicAzkar.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | xcbeautify --renderer github-actions
+          rm -rf Payload && mkdir Payload
+          cp -R build/device/Build/Products/Release-iphoneos/IslamicAzkar.app Payload/
+          /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Payload/IslamicAzkar.app/Info.plist
+          mkdir -p ../../out && zip -qry ../../out/IslamicAzkar.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: out/
+
+  publish:
+    needs: [android, ios]
+    runs-on: ubuntu-latest
+    env:
+      V: ${{ needs.android.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: Release notes
+        run: |
+          cat > notes.md <<NOTES
+          **Islamic Azkar $V**
+
+          - 24 new duas from Sahih al-Bukhari, Sahih Muslim, Abu Dawud, al-Tirmidhi, al-Nasa'i and Ibn Majah, each with its reference
+          - Step-by-step ʿUmrah guide and new ʿUmrah duas
+          - The Android app now updates itself from this page
+
+          - ٢٤ دعاءً جديدًا من كتب السنة مع ذكر مصدر كل دعاء
+          - دليل العمرة خطوة بخطوة وأدعية جديدة للعمرة
+          - تطبيق أندرويد يتحدّث تلقائيًا من هذه الصفحة
+
+          - 24 nouvelles invocations des recueils de hadiths, chacune avec sa référence
+          - La ʿOumra pas à pas et de nouvelles invocations de la ʿOumra
+          - L'application Android se met désormais à jour d'elle-même
+
+          **Android:** install \`IslamicAzkar.apk\` (Android 8 or later).
+          **iPhone:** \`IslamicAzkar.ipa\` is unsigned; install it with Sideloadly or AltStore.
+          NOTES
+          sed -i 's/^          //' notes.md
+          ls -la dist
+      - name: Public release (APK + IPA)
+        env:
+          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+        run: |
+          [ -n "$GH_TOKEN" ] || { echo "::error::Add the RELEASES_TOKEN secret."; exit 1; }
+          R=Mkuz1/islamic-azkar-releases
+          if gh release view "v$V" -R $R >/dev/null 2>&1; then
+            gh release upload "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa -R $R --clobber
+          else
+            gh release create "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa -R $R --title "Islamic Azkar $V" --notes-file notes.md --latest
+          fi
+      - name: Private release (Play bundle)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "v$V" >/dev/null 2>&1; then
+            gh release upload "v$V" dist/IslamicAzkar-play.aab dist/IslamicAzkar.apk dist/IslamicAzkar.ipa --clobber
+          else
+            gh release create "v$V" dist/IslamicAzkar-play.aab dist/IslamicAzkar.apk dist/IslamicAzkar.ipa --title "Islamic Azkar $V" --notes-file notes.md --target "$GITHUB_SHA"
+          fi
+      - name: Check the public download
+        run: |
+          sleep 10
+          curl -fsSL -o /tmp/latest.apk https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.apk
+          cmp /tmp/latest.apk dist/IslamicAzkar.apk && echo "latest/download serves $V"
