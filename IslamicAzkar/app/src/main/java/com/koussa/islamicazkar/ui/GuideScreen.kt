@@ -1,6 +1,8 @@
 package com.koussa.islamicazkar.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,9 +20,11 @@ import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -32,6 +36,7 @@ import com.koussa.islamicazkar.data.AzkarRepository
 import com.koussa.islamicazkar.data.Guide
 import com.koussa.islamicazkar.data.Lang
 import com.koussa.islamicazkar.data.Reading
+import com.koussa.islamicazkar.i18n.num
 import com.koussa.islamicazkar.ui.glass.ArabicFont
 import com.koussa.islamicazkar.ui.glass.Glass
 import com.koussa.islamicazkar.ui.glass.pressable
@@ -47,11 +52,16 @@ fun GuideRow(guide: Guide) {
     )
 }
 
-/** The step-by-step guide: each step's explanation, the duas to say there, and its hadith sources. */
+/**
+ * The step-by-step guide, in the reader's card system: each step is a numbered card (title,
+ * explanation, sources) followed by its duas as full [ZikrCard]s with counters, favourite,
+ * copy and share. A progress bar counts the guide's duas like any reading.
+ */
 @Composable
 fun GuideScreen(key: String) {
-    val app = LocalApp.current
     val ctx = LocalContext.current
+    val view = androidx.compose.ui.platform.LocalView.current
+    val app = LocalApp.current
     val data = remember { AzkarRepository.get(ctx) }
     val g = Glass.colors
     val s = Glass.s
@@ -60,49 +70,77 @@ fun GuideScreen(key: String) {
     val listState = rememberLazyListState()
     CollapsingTitle(guide.title[lang], listState)
 
+    val steps = remember(guide) { guide.steps.map { st -> st to st.zikr.mapNotNull { data.zikrById[it] } } }
+    val all = remember(steps) { steps.flatMap { it.second } }
+    val remaining = remember(key) { androidx.compose.runtime.mutableStateMapOf<Int, Int>() }
+    fun left(z: com.koussa.islamicazkar.data.Zikr) = remaining[z.id] ?: z.repeat
+    val total = all.sumOf { it.repeat }
+    val done = all.sumOf { it.repeat - left(it) }
+    val progress by androidx.compose.animation.core.animateFloatAsState(if (total == 0) 0f else done / total.toFloat(), label = "guide")
+
     LazyColumn(
         Modifier.fillMaxSize(), state = listState,
         contentPadding = screenPadding(hasBack = true), verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item { LargeTitle(guide.title[lang], guide.intro[lang]) }
-        items(guide.steps, key = { it.title.en }) { step ->
-            Card(Modifier.fillMaxWidth()) {
-                Text(step.title[lang], color = g.text, fontSize = 19.sp, fontWeight = FontWeight.SemiBold)
-                Text(step.text[lang], color = g.text2, fontSize = 16.sp, lineHeight = 23.sp, modifier = Modifier.padding(top = 8.dp))
-                val duas = step.zikr.mapNotNull { id -> data.zikrById[id]?.let { it to data.chapterOfZikr[id] } }
-                if (duas.isNotEmpty()) {
-                    SectionHeader(s.wordsToSay, Modifier.padding(top = 10.dp))
-                    InsetGroup {
-                        duas.forEachIndexed { i, (z, chapter) ->
-                            if (i > 0) RowDivider(16.dp)
-                            Column(
-                                Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp)
-                                    .then(if (chapter != null && chapter > 0) Modifier.pressable(onClick = { app.push(Route.Reader(Reading.OfChapter(chapter), z.id)) }) else Modifier),
-                            ) {
-                                Text(
-                                    z.ar, fontFamily = ArabicFont, fontSize = 19.sp, lineHeight = 32.sp, color = g.text,
-                                    textAlign = TextAlign.Center, maxLines = 3, overflow = TextOverflow.Ellipsis, modifier = Modifier.fillMaxWidth(),
-                                )
-                                val m = z.meaning(lang)
-                                if (m.isNotBlank()) Text(m, color = g.text2, fontSize = 13.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-                            }
-                        }
-                    }
-                }
-                if (step.ref[lang].isNotBlank()) {
-                    Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.AutoMirrored.Rounded.MenuBook, null, tint = g.text3, modifier = Modifier.size(14.dp))
-                        Spacer(Modifier.width(6.dp))
-                        Text(step.ref[lang], color = g.text3, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold)
-                    }
+        item {
+            Column {
+                LargeTitle(guide.title[lang], guide.intro[lang])
+                androidx.compose.material3.LinearProgressIndicator(
+                    progress = { progress }, color = g.accent, trackColor = g.fillGray, drawStopIndicator = {},
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp).height(4.dp),
+                )
+            }
+        }
+        var index = 0
+        steps.forEachIndexed { si, (step, duas) ->
+            item(key = "step$si") { StepCard(si + 1, guide.steps.size, step) }
+            duas.forEach { z ->
+                val number = ++index
+                item(key = "z${z.id}") {
+                    ZikrCard(
+                        z = z, index = number, total = all.size, remaining = left(z), chapterTitle = guide.title[lang],
+                        onCount = { remaining[z.id] = left(z) - 1; if (left(z) == 0) view.tick(app.settings, strong = true) },
+                        onDone = { remaining[z.id] = 0 },
+                    )
                 }
             }
+            item(key = "gap$si") { Spacer(Modifier.height(10.dp)) }
         }
         item {
             Text(
                 guide.note[lang], color = g.text3, fontSize = 13.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
             )
+        }
+    }
+}
+
+/** A numbered step: gold number badge, "3 of 9", title, explanation and hadith sources. */
+@Composable
+private fun StepCard(number: Int, count: Int, step: com.koussa.islamicazkar.data.GuideStep) {
+    val g = Glass.colors
+    val lang = Glass.lang
+    val gold = Color(0xFFB8913F)
+    Card(Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            androidx.compose.foundation.layout.Box(
+                Modifier.size(36.dp).clip(androidx.compose.foundation.shape.CircleShape).background(gold.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center,
+            ) { Text(lang.num(number), color = gold, fontWeight = FontWeight.Bold, fontSize = 17.sp) }
+            Spacer(Modifier.width(10.dp))
+            Capsule("${lang.num(number)} ${Glass.s.ofTarget(lang.num(count))}")
+        }
+        Text(
+            step.title[lang].replace(Regex("^[0-9٠-٩]+\\.\\s*"), ""),
+            color = g.text, fontSize = 19.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 10.dp),
+        )
+        Text(step.text[lang], color = g.text2, fontSize = 16.sp, lineHeight = 23.sp, modifier = Modifier.padding(top = 8.dp))
+        if (step.ref[lang].isNotBlank()) {
+            Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.AutoMirrored.Rounded.MenuBook, null, tint = g.text3, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(step.ref[lang], color = g.text3, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

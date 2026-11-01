@@ -36,6 +36,7 @@ import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.IosShare
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.AutoStories
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Cottage
@@ -108,6 +109,7 @@ fun categoryIcon(key: String): ImageVector = when (key) {
     "nature" -> Icons.Rounded.Thunderstorm
     "hajj" -> Icons.Rounded.Explore
     "sunnah" -> Icons.AutoMirrored.Rounded.MenuBook
+    "quran" -> Icons.Rounded.AutoStories
     else -> Icons.Rounded.AutoAwesome
 }
 
@@ -124,6 +126,7 @@ fun categoryHue(key: String): Color = when (key) {
     "nature" -> Color(0xFF00C7BE)
     "hajj" -> Color(0xFFA2845E)
     "sunnah" -> Color(0xFF0A84FF)
+    "quran" -> Color(0xFF1E6B52)
     else -> Color(0xFFFF2D55)
 }
 

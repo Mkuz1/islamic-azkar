@@ -57,7 +57,7 @@ struct L10n {
         noFavorites: "لا توجد أذكار مفضلة بعد", noFavoritesHint: "اضغط على القلب في أي ذكر لحفظه هنا",
         catNames: ["prayer": "الصلاة والمسجد", "sleep": "النوم والاستيقاظ", "home": "البيت والطهارة", "hardship": "الكرب والحماية",
                    "illness": "المرض والجنائز", "food": "الطعام والصيام", "family": "الأسرة والمعاملات", "travel": "السفر",
-                   "nature": "الطبيعة والأحوال", "hajj": "الحج والعمرة", "sunnah": "أدعية من السنة", "praise": "الذكر والاستغفار"],
+                   "nature": "الطبيعة والأحوال", "hajj": "الحج والعمرة", "quran": "أدعية من القرآن", "sunnah": "أدعية من السنة", "praise": "الذكر والاستغفار"],
         tasbih: "المسبحة", target: "الهدف", total: "المجموع", reset: "تصفير", tapAnywhere: "اضغط على الدائرة للتسبيح",
         settings: "الإعدادات", language: "اللغة", appearance: "المظهر", themeSystem: "تلقائي", themeLight: "فاتح", themeDark: "داكن",
         reading: "القراءة", textSize: "حجم الخط", showTranslit: "إظهار النطق اللاتيني", showMeaning: "إظهار الترجمة", haptics: "الاهتزاز عند العدّ",
@@ -90,7 +90,7 @@ struct L10n {
         noFavorites: "No favorites yet", noFavoritesHint: "Tap the heart on any dhikr to keep it here",
         catNames: ["prayer": "Prayer & Mosque", "sleep": "Sleep & Waking", "home": "Home & Purity", "hardship": "Distress & Protection",
                    "illness": "Illness & Funerals", "food": "Food & Fasting", "family": "Family & Social", "travel": "Travel",
-                   "nature": "Nature & Weather", "hajj": "Hajj & Umrah", "sunnah": "Duas from the Sunnah", "praise": "Praise & Forgiveness"],
+                   "nature": "Nature & Weather", "hajj": "Hajj & Umrah", "quran": "Duas from the Quran", "sunnah": "Duas from the Sunnah", "praise": "Praise & Forgiveness"],
         tasbih: "Tasbih", target: "Target", total: "Total", reset: "Reset", tapAnywhere: "Tap the bead to count",
         settings: "Settings", language: "Language", appearance: "Appearance", themeSystem: "Auto", themeLight: "Light", themeDark: "Dark",
         reading: "Reading", textSize: "Text size", showTranslit: "Show transliteration", showMeaning: "Show translation", haptics: "Haptic feedback",
@@ -123,7 +123,7 @@ struct L10n {
         noFavorites: "Aucun favori pour l'instant", noFavoritesHint: "Touchez le cœur d'une invocation pour la garder ici",
         catNames: ["prayer": "Prière & mosquée", "sleep": "Sommeil & réveil", "home": "Maison & purification", "hardship": "Détresse & protection",
                    "illness": "Maladie & funérailles", "food": "Repas & jeûne", "family": "Famille & société", "travel": "Voyage",
-                   "nature": "Nature & météo", "hajj": "Hajj & Omra", "sunnah": "Invocations de la Sunna", "praise": "Louange & pardon"],
+                   "nature": "Nature & météo", "hajj": "Hajj & Omra", "quran": "Invocations du Coran", "sunnah": "Invocations de la Sunna", "praise": "Louange & pardon"],
         tasbih: "Tasbih", target: "Objectif", total: "Total", reset: "Remettre à zéro", tapAnywhere: "Touchez la perle pour compter",
         settings: "Réglages", language: "Langue", appearance: "Apparence", themeSystem: "Auto", themeLight: "Clair", themeDark: "Sombre",
         reading: "Lecture", textSize: "Taille du texte", showTranslit: "Afficher la translittération", showMeaning: "Afficher la traduction", haptics: "Retour haptique",
@@ -158,6 +158,7 @@ func categorySymbol(_ key: String) -> String {
     case "nature": return "cloud.bolt.rain.fill"
     case "hajj": return "location.north.circle.fill"
     case "sunnah": return "book.closed.fill"
+    case "quran": return "book.fill"
     default: return "sparkles"
     }
 }

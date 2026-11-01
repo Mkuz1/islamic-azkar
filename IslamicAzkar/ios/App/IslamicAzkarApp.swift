@@ -119,6 +119,7 @@ final class AppModel {
         case "reader", "celebration": homePath = [.reader(.morning, focus: nil)]
         case "guide": homePath = [.guide("umrah")]
         case "sunnah": homePath = [.reader(.chapter(134), focus: nil)]
+        case "quran": homePath = [.reader(.chapter(137), focus: nil)]
         default: tab = .home
         }
     }

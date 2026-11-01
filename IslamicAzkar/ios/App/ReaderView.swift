@@ -17,7 +17,10 @@ struct ReaderView: View {
         let data = AzkarData.shared
         let items = data.items(reading)
         let title = data.title(reading, model.s, model.lang)
-        let source = items.contains { $0.ref != nil } ? GuideTexts.of(model.lang).fromSunnah : model.s.book
+        let source: String = {
+            if !items.isEmpty, items.allSatisfy({ $0.ref?.en.hasPrefix("Quran") == true }) { return GuideTexts.of(model.lang).fromQuran }
+            return items.contains { $0.ref != nil } ? GuideTexts.of(model.lang).fromSunnah : model.s.book
+        }()
         let subtitle: String = {
             if case .chapter(let id) = reading, model.lang != .ar { return data.chapterById[id]?.ar ?? source }
             return source

@@ -35,4 +35,6 @@ shot 20-guide-en guide en 0
 shot 21-guide-ar-dark guide ar 1
 shot 22-sunnah-fr sunnah fr 0
 shot 23-sunnah-ar-dark sunnah ar 1
+shot 24-quran-ar quran ar 0
+shot 25-quran-en-dark quran en 1
 exit 0

@@ -49,6 +49,8 @@ class Strings(
     val catNature: String,
     val catHajj: String,
     val catSunnah: String,
+    val catQuran: String,
+    val fromQuran: String,
     /** Subtitle of chapters taken from the hadith collections. */
     val fromSunnah: String,
     val guide: String,
@@ -180,6 +182,8 @@ val AR = Strings(
     catNature = "الطبيعة والأحوال",
     catHajj = "الحج والعمرة",
     catSunnah = "أدعية من السنة",
+    catQuran = "أدعية من القرآن",
+    fromQuran = "من القرآن الكريم",
     fromSunnah = "من كتب السنة",
     guide = "الدليل",
     guideCta = "خطوات العمرة من الإحرام إلى التقصير",
@@ -303,6 +307,8 @@ val EN = Strings(
     catNature = "Nature & Weather",
     catHajj = "Hajj & Umrah",
     catSunnah = "Duas from the Sunnah",
+    catQuran = "Duas from the Quran",
+    fromQuran = "From the Holy Quran",
     fromSunnah = "From the hadith collections",
     guide = "Guide",
     guideCta = "Every step from iḥrām to the haircut",
@@ -426,6 +432,8 @@ val FR = Strings(
     catNature = "Nature & météo",
     catHajj = "Hajj & Omra",
     catSunnah = "Invocations de la Sunna",
+    catQuran = "Invocations du Coran",
+    fromQuran = "Du Saint Coran",
     fromSunnah = "Des recueils de hadiths",
     guide = "Guide",
     guideCta = "Chaque étape, de l'iḥrām à la coupe des cheveux",
@@ -521,6 +529,7 @@ fun Strings.category(key: String): String = when (key) {
     "nature" -> catNature
     "hajj" -> catHajj
     "sunnah" -> catSunnah
+    "quran" -> catQuran
     else -> catPraise
 }
 

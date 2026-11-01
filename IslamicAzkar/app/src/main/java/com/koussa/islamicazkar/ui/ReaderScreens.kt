@@ -97,7 +97,11 @@ fun ReaderScreen(reading: Reading, focus: Int?) {
         Reading.Morning -> Triple(s.morningAzkar, s.book, data.morning)
         Reading.Evening -> Triple(s.eveningAzkar, s.book, data.evening)
         is Reading.OfChapter -> data.chapterById.getValue(reading.id).let {
-            val source = if (it.items.any { z -> z.ref != null }) s.fromSunnah else s.book
+            val source = when {
+                it.items.isNotEmpty() && it.items.all { z -> z.ref?.en?.startsWith("Quran") == true } -> s.fromQuran
+                it.items.any { z -> z.ref != null } -> s.fromSunnah
+                else -> s.book
+            }
             Triple(it.title(lang), if (lang == Lang.AR) source else it.ar, it.items)
         }
     }
