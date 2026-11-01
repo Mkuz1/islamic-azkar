@@ -6,7 +6,7 @@ Opening page: the same sadaqa jariyah dedication as the Mushaf app.
 ## Android
 - **IslamicAzkar.apk** – install this one (release, 2.4 MB).
 - **IslamicAzkar-debug.apk** – fallback if the release build misbehaves.
-- Source: Android Studio project in this folder (`app/`). Build: `./gradlew assembleRelease`.
+- Source: Android Studio project in this folder (`app/`). Build: `./gradlew bundlePlayRelease` (Google Play) or `./gradlew assembleGithubRelease` (APK for GitHub, updates itself in the app). See the main README.
 - Adapts to phones, foldables and tablets: one full-width page on every screen (content centred when unfolded), tabletop posture for the tasbih.
 - Design: Apple's iOS style — grouped backgrounds, inset lists, iOS switches; Liquid Glass only on the tab bar, back button and sheets.
 - Opening page: the Mushaf app's dark green sadaqa jariyah card, in English, French and Arabic.
