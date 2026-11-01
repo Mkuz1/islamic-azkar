@@ -145,17 +145,7 @@ jobs:
           cat > notes.md <<NOTES
           **Islamic Azkar $V**
 
-          - 24 new duas from Sahih al-Bukhari, Sahih Muslim, Abu Dawud, al-Tirmidhi, al-Nasa'i and Ibn Majah, each with its reference
-          - Step-by-step ʿUmrah guide and new ʿUmrah duas
-          - The Android app now updates itself from this page
-
-          - ٢٤ دعاءً جديدًا من كتب السنة مع ذكر مصدر كل دعاء
-          - دليل العمرة خطوة بخطوة وأدعية جديدة للعمرة
-          - تطبيق أندرويد يتحدّث تلقائيًا من هذه الصفحة
-
-          - 24 nouvelles invocations des recueils de hadiths, chacune avec sa référence
-          - La ʿOumra pas à pas et de nouvelles invocations de la ʿOumra
-          - L'application Android se met désormais à jour d'elle-même
+          $(cat RELEASE_NOTES.md)
 
           **Android:** install \`IslamicAzkar.apk\` (Android 8 or later).
           **iPhone:** \`IslamicAzkar.ipa\` is unsigned; install it with Sideloadly or AltStore.

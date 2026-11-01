@@ -17,9 +17,9 @@ android {
         applicationId = "com.koussa.islamicazkar"
         minSdk = 26
         targetSdk = 36
-        // The GitHub release tag must be "v" + versionName (e.g. v1.0.4): the github build compares them.
-        versionCode = 4
-        versionName = "1.0.4"
+        // The GitHub release tag must be "v" + versionName (e.g. v1.0.5): the github build compares them.
+        versionCode = 5
+        versionName = "1.0.5"
         vectorDrawables { useSupportLibrary = true }
     }
 
