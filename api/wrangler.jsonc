@@ -1,0 +1,23 @@
+{
+  // Website API for islamicazkar.net: tester sign-ups (POST /api/register).
+  "name": "islamic-azkar-api",
+  "main": "src/index.js",
+  "compatibility_date": "2026-06-01",
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "islamicazkar.net/api/*", "zone_name": "islamicazkar.net" },
+    { "pattern": "www.islamicazkar.net/api/*", "zone_name": "islamicazkar.net" }
+  ],
+  "kv_namespaces": [
+    { "binding": "TESTERS", "id": "efa3e078b0b14d4792ccd43944982756" }
+  ],
+  // Only ever mails the developer; the address must be a verified Email Routing destination.
+  "send_email": [
+    { "name": "EMAIL", "destination_address": "mohamad@koussa.org", "allowed_sender_addresses": ["testers@islamicazkar.net"] }
+  ],
+  "vars": {
+    "FROM_ADDRESS": "testers@islamicazkar.net",
+    "NOTIFY_ADDRESS": "mohamad@koussa.org"
+  },
+  "observability": { "enabled": true }
+}

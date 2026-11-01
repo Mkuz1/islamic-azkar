@@ -23,3 +23,5 @@ DerivedData/
 # Published from its own repository (Mkuz1/islamic-azkar-privacy)
 store/privacy/
 .wrangler/
+api/.wrangler/
+api/node_modules/

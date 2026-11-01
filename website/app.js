@@ -19,8 +19,12 @@
       reps: n => arCount(n, "تكرار واحد", "تكراران", "تكرارات", "تكرارًا"),
       textSize: "حجم الخط", showTr: "إظهار النطق", showMean: "إظهار المعنى", theme: "المظهر", system: "تلقائي", light: "فاتح", dark: "داكن", close: "إغلاق",
       tapCount: "اضغط للعدّ", reset: "تصفير", total: n => `المجموع: ${num(n)}`, target: "العدد",
-      getApp: "تطبيق أندرويد", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات ومسبحة. قريبًا على Google Play.",
-      soon: "قريبًا على Google Play", mushaf: "تطبيق المصحف", mushafText: "اقرأ القرآن الكريم بخط المصحف الشريف، صدقة جارية من فريقنا.", mushafCta: "حمّله من mushafapp.com",
+      getApp: "تطبيق أندرويد", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات ومسبحة.",
+      apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", join: "انضم إلى المختبِرين",
+      joinText: "التطبيق في مرحلة الاختبار على Google Play. سجّل بريد Gmail المرتبط بمتجرك لنضيفك إلى المختبِرين ونرسل لك رابط التثبيت.",
+      emailPh: "name@gmail.com", send: "سجّلني", sending: "جارٍ الإرسال…", badEmail: "أدخل عنوان بريد صحيحًا",
+      thanks: "جزاك الله خيرًا! وصلنا بريدك وسنضيفك إلى المختبِرين قريبًا إن شاء الله.", failed: "تعذّر الإرسال، حاول مرة أخرى.",
+      mushaf: "تطبيق المصحف", mushafText: "اقرأ القرآن الكريم بخط المصحف الشريف، صدقة جارية من فريقنا.", mushafCta: "حمّله من mushafapp.com",
       privacy: "سياسة الخصوصية", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
       cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", praise: "الذكر والاستغفار" },
     },
@@ -39,8 +43,12 @@
       reps: n => n === 1 ? "1 repetition" : `${n} repetitions`,
       textSize: "Text size", showTr: "Show transliteration", showMean: "Show meaning", theme: "Appearance", system: "Auto", light: "Light", dark: "Dark", close: "Close",
       tapCount: "Tap to count", reset: "Reset", total: n => `Total: ${n}`, target: "Target",
-      getApp: "Android app", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders and a tasbih. Coming soon to Google Play.",
-      soon: "Coming soon to Google Play", mushaf: "Mushaf app", mushafText: "Read the Holy Quran in the script of the printed Mushaf, a sadaqa jariyah from our team.", mushafCta: "Download from mushafapp.com",
+      getApp: "Android app", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders and a tasbih.",
+      apk: "Download the app", apkNote: "APK file · Android 8 or later", join: "Join the testers",
+      joinText: "The app is in testing on Google Play. Leave the Gmail address you use on the Play Store and we’ll add you as a tester and send you the install link.",
+      emailPh: "name@gmail.com", send: "Sign me up", sending: "Sending…", badEmail: "Enter a valid email address",
+      thanks: "Jazak Allah khayran! We got your address and will add you to the testers soon, in sha Allah.", failed: "Couldn’t send it. Please try again.",
+      mushaf: "Mushaf app", mushafText: "Read the Holy Quran in the script of the printed Mushaf, a sadaqa jariyah from our team.", mushafCta: "Download from mushafapp.com",
       privacy: "Privacy policy", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
       cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", praise: "Praise & Forgiveness" },
     },
@@ -59,8 +67,12 @@
       reps: n => n === 1 ? "1 répétition" : `${n} répétitions`,
       textSize: "Taille du texte", showTr: "Afficher la translittération", showMean: "Afficher la traduction", theme: "Apparence", system: "Auto", light: "Clair", dark: "Sombre", close: "Fermer",
       tapCount: "Touchez pour compter", reset: "Remettre à zéro", total: n => `Total : ${n}`, target: "Objectif",
-      getApp: "Application Android", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels et un chapelet. Bientôt sur Google Play.",
-      soon: "Bientôt sur Google Play", mushaf: "Application Mushaf", mushafText: "Lisez le Saint Coran dans l’écriture du Mushaf imprimé, une sadaqa jariya de notre équipe.", mushafCta: "Télécharger sur mushafapp.com",
+      getApp: "Application Android", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels et un chapelet.",
+      apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", join: "Devenir testeur",
+      joinText: "L’application est en test sur Google Play. Laissez l’adresse Gmail de votre Play Store : nous vous ajouterons aux testeurs et vous enverrons le lien d’installation.",
+      emailPh: "nom@gmail.com", send: "M’inscrire", sending: "Envoi…", badEmail: "Saisissez une adresse e-mail valide",
+      thanks: "Jazak Allah khayran ! Nous avons bien reçu votre adresse et vous ajouterons aux testeurs très bientôt, in shâ Allah.", failed: "Échec de l’envoi. Réessayez.",
+      mushaf: "Application Mushaf", mushafText: "Lisez le Saint Coran dans l’écriture du Mushaf imprimé, une sadaqa jariya de notre équipe.", mushafCta: "Télécharger sur mushafapp.com",
       privacy: "Confidentialité", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
       cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", praise: "Louange & pardon" },
     },
@@ -100,7 +112,12 @@
     text: '<path d="M4 7V5h16v2M9 19h6M12 5v14"/>',
     reset: '<path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/>',
     spark: '<path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6z"/>',
+    download: '<path d="M12 3v12M7 10l5 5 5-5M5 19h14"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
   };
+  // Always the newest APK: GitHub redirects /releases/latest/download/<asset> to the latest release's file.
+  const APK_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.apk";
+  const REGISTER_URL = /(^|\.)islamicazkar\.net$/.test(location.hostname) ? "/api/register" : "https://islamicazkar.net/api/register";
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
   const CAT_STYLE = {
     prayer: ["mosque", "#34c759"], sleep: ["bed", "#5856d6"], home: ["home", "#ff9500"], hardship: ["heart", "#ff3b30"], illness: ["spark", "#30b0c7"],
@@ -216,7 +233,23 @@
         <div class="cols"><div class="group glass">${cats.slice(0, half).join("")}</div><div class="group glass">${cats.slice(half).join("")}</div></div>
         <div class="section">${t.getApp}</div>
         <div class="cols">
-          <div class="promo glass"><img src="img/icon.png" alt=""><div><b>Islamic Azkar</b><p>${t.appText}</p><span class="streak">${t.soon}</span></div></div>
+          <div class="promo glass app-card">
+            <div class="app-head"><img src="img/icon.png" alt=""><div><b>Islamic Azkar</b><p>${t.appText}</p></div></div>
+            <div class="app-acts">
+              <a class="pill primary press" href="${APK_URL}" rel="noopener">${svg("download")}${t.apk}</a>
+              <button class="pill press" id="join-toggle" aria-expanded="false" aria-controls="join">${svg("mail")}${t.join}</button>
+            </div>
+            <small class="apk-note">${t.apkNote}</small>
+            <form id="join" class="join" hidden novalidate>
+              <p>${t.joinText}</p>
+              <div class="join-row">
+                <input type="email" name="email" required autocomplete="email" inputmode="email" dir="ltr" placeholder="${t.emailPh}" aria-label="Gmail">
+                <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+                <button class="pill primary press" type="submit">${t.send}</button>
+              </div>
+              <small class="join-msg" role="status"></small>
+            </form>
+          </div>
           <a class="promo glass press" href="https://www.mushafapp.com" target="_blank" rel="noopener"><span class="mushaf">مصحف</span><div><b style="color:var(--text)">${t.mushaf}</b><p>${t.mushafText}</p><span style="font-weight:650">${t.mushafCta}</span></div></a>
         </div>
       </div>`);
@@ -421,6 +454,12 @@
     const langBtn = ev.target.closest("[data-lang]");
     if (langBtn) { lang = langBtn.dataset.lang; applyLang(); route(); return; }
     if (btn && btn.id === "open-settings") return openSettings();
+    if (btn && btn.id === "join-toggle") {
+      const form = document.getElementById("join"), open = form.hidden;
+      form.hidden = !open; btn.setAttribute("aria-expanded", open); btn.classList.toggle("on", open);
+      if (open) form.querySelector("input[name=email]").focus();
+      return;
+    }
 
     const card = ev.target.closest(".zikr");
     if (card) {
@@ -457,6 +496,21 @@
     }
   });
   app.addEventListener("input", ev => { if (ev.target.id === "q") search(ev.target.value); });
+  app.addEventListener("submit", async ev => {
+    if (ev.target.id !== "join") return;
+    ev.preventDefault();
+    const form = ev.target, t = s(), msg = form.querySelector(".join-msg"), send = form.querySelector("button[type=submit]");
+    const email = form.email.value.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { msg.textContent = t.badEmail; msg.className = "join-msg err"; form.email.focus(); return; }
+    send.disabled = true; send.textContent = t.sending; msg.textContent = ""; msg.className = "join-msg";
+    try {
+      const r = await fetch(REGISTER_URL, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email, lang, website: form.website.value }) });
+      if (!r.ok) throw new Error(r.status);
+      form.innerHTML = `<p class="join-done">${svg("check")}<span>${t.thanks}</span></p>`;
+    } catch {
+      msg.textContent = t.failed; msg.className = "join-msg err"; send.disabled = false; send.textContent = t.send;
+    }
+  });
   window.addEventListener("hashchange", route);
 
   // ───────────── Boot ─────────────
