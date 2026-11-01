@@ -25,8 +25,8 @@
       emailPh: "name@gmail.com", send: "سجّلني", sending: "جارٍ الإرسال…", badEmail: "أدخل عنوان بريد صحيحًا",
       thanks: "جزاك الله خيرًا! وصلنا بريدك وسنضيفك إلى المختبِرين قريبًا إن شاء الله.", failed: "تعذّر الإرسال، حاول مرة أخرى.",
       mushaf: "تطبيق المصحف", mushafText: "اقرأ القرآن الكريم بخط المصحف الشريف، صدقة جارية من فريقنا.", mushafCta: "حمّله من mushafapp.com",
-      privacy: "سياسة الخصوصية", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
-      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", praise: "الذكر والاستغفار" },
+      privacy: "سياسة الخصوصية", sunnahSrc: "من كتب السنة", guide: "الدليل", guideCta: "خطوات العمرة من الإحرام إلى التقصير", readDuas: "أذكار هذه الخطوة", sources: "المصادر", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
+      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", sunnah: "أدعية من السنة", praise: "الذكر والاستغفار" },
     },
     en: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "Hisn al-Muslim in a calm, elegant design: the daily azkar with a counter, transliteration and meaning.",
@@ -49,8 +49,8 @@
       emailPh: "name@gmail.com", send: "Sign me up", sending: "Sending…", badEmail: "Enter a valid email address",
       thanks: "Jazak Allah khayran! We got your address and will add you to the testers soon, in sha Allah.", failed: "Couldn’t send it. Please try again.",
       mushaf: "Mushaf app", mushafText: "Read the Holy Quran in the script of the printed Mushaf, a sadaqa jariyah from our team.", mushafCta: "Download from mushafapp.com",
-      privacy: "Privacy policy", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
-      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", praise: "Praise & Forgiveness" },
+      privacy: "Privacy policy", sunnahSrc: "From the hadith collections", guide: "Guide", guideCta: "Every step from iḥrām to the haircut", readDuas: "Words to say", sources: "Sources", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
+      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", sunnah: "Duas from the Sunnah", praise: "Praise & Forgiveness" },
     },
     fr: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "La Citadelle du musulman dans un design apaisant : les adhkar du quotidien avec compteur, translittération et traduction.",
@@ -73,8 +73,8 @@
       emailPh: "nom@gmail.com", send: "M’inscrire", sending: "Envoi…", badEmail: "Saisissez une adresse e-mail valide",
       thanks: "Jazak Allah khayran ! Nous avons bien reçu votre adresse et vous ajouterons aux testeurs très bientôt, in shâ Allah.", failed: "Échec de l’envoi. Réessayez.",
       mushaf: "Application Mushaf", mushafText: "Lisez le Saint Coran dans l’écriture du Mushaf imprimé, une sadaqa jariya de notre équipe.", mushafCta: "Télécharger sur mushafapp.com",
-      privacy: "Confidentialité", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
-      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", praise: "Louange & pardon" },
+      privacy: "Confidentialité", sunnahSrc: "Des recueils de hadiths", guide: "Guide", guideCta: "Chaque étape, de l’iḥrām à la coupe des cheveux", readDuas: "Paroles à dire", sources: "Sources", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
+      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", sunnah: "Invocations de la Sunna", praise: "Louange & pardon" },
     },
   };
 
@@ -113,6 +113,8 @@
     reset: '<path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/>',
     spark: '<path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6z"/>',
     download: '<path d="M12 3v12M7 10l5 5 5-5M5 19h14"/>',
+    book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>',
+    kaaba: '<path d="M4 7.5 12 4l8 3.5v10L12 21l-8-3.5zM4 7.5l8 3.5 8-3.5M12 11v10M4 11l8 3.5 8-3.5"/>',
     mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
   };
   // Always the newest APK: GitHub redirects /releases/latest/download/<asset> to the latest release's file.
@@ -121,7 +123,7 @@
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
   const CAT_STYLE = {
     prayer: ["mosque", "#34c759"], sleep: ["bed", "#5856d6"], home: ["home", "#ff9500"], hardship: ["heart", "#ff3b30"], illness: ["spark", "#30b0c7"],
-    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], praise: ["beads", "#1e6b52"],
+    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], sunnah: ["book", "#0a84ff"], praise: ["beads", "#1e6b52"],
   };
 
   // ───────────── State ─────────────
@@ -231,6 +233,7 @@
         <div class="tiles">${tiles}</div>
         <div class="section">${t.categories}</div>
         <div class="cols"><div class="group glass">${cats.slice(0, half).join("")}</div><div class="group glass">${cats.slice(half).join("")}</div></div>
+        ${umrah() ? `<div class="section">${t.guide}</div><div class="group glass">${guideRow()}</div>` : ""}
         <div class="section">${t.getApp}</div>
         <div class="cols">
           <div class="promo glass app-card">
@@ -263,7 +266,28 @@
       const sub = lang === "ar" ? c.en : `<span class="ar-sub">${esc(c.ar)}</span>`;
       return `<a class="row press" href="#/read/c${id}"><span class="num">${num(i + 1)}</span><span class="t"><b>${esc(chapterTitle(c))}</b><small>${sub}</small></span><span class="meta">${num(c.items.length)}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>`;
     }).join("");
-    return shell("home", `<a class="back" href="#/">${svg("back")}${t.back}</a><h1 class="large">${t.cat[key]}</h1><p class="sub">${t.chapters(cat.chapters.length)}</p><div class="group glass">${rows}</div>`);
+    const g = key === "hajj" && guideRow();
+    return shell("home", `<a class="back" href="#/">${svg("back")}${t.back}</a><h1 class="large">${t.cat[key]}</h1><p class="sub">${t.chapters(cat.chapters.length)}</p>${g ? `<div class="group glass" style="margin-bottom:14px">${g}</div>` : ""}<div class="group glass">${rows}</div>`);
+  }
+
+  const umrah = () => (data.guides || []).find(g => g.key === "umrah");
+  function guideRow() {
+    const g = umrah();
+    return g ? `<a class="row press" href="#/umrah"><span class="sym" style="background:#a2845e">${svg("kaaba")}</span><span class="t"><b>${esc(g.title[lang])}</b><small>${s().guideCta}</small></span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>` : "";
+  }
+
+  function guide() {
+    const t = s(), g = umrah();
+    if (!g) return notFound();
+    const steps = g.steps.map(st => {
+      const duas = st.zikr.map(id => index.items.get(id)).filter(Boolean).map(({ z, key }) =>
+        `<a class="row press" href="#/read/${key}/${z.id}"><span class="t"><b class="ar-row">${esc(z.ar.length > 120 ? z.ar.slice(0, 120) + "…" : z.ar)}</b>${lang === "ar" ? "" : `<small>${esc((meaning(z) || "").slice(0, 110))}${(meaning(z) || "").length > 110 ? "…" : ""}</small>`}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>`).join("");
+      return `<article class="glass card step"><h2>${esc(st.title[lang])}</h2><p>${esc(st.text[lang])}</p>
+        ${duas ? `<div class="section" style="margin:14px 0 6px">${t.readDuas}</div><div class="group">${duas}</div>` : ""}
+        <p class="ref">${svg("book")}<span>${esc(st.ref[lang])}</span></p></article>`;
+    }).join("");
+    return shell("read", `<a class="back" href="#/cat/hajj">${svg("back")}${t.back}</a><h1 class="large">${esc(g.title[lang])}</h1><p class="sub">${esc(g.intro[lang])}</p>
+      <div class="steps">${steps}</div><p class="guide-note">${esc(g.note[lang])}</p>`);
   }
 
   function progressOf(key) { const p = store.get("progress", {}); return (p.day === today() && p[key]) || {}; }
@@ -276,7 +300,7 @@
       <header><span class="chip">${t.of(i + 1, total)}</span>${n > 1 ? `<span class="chip">× ${num(n)}</span>` : ""}
         <span class="acts"><button class="fav ${favs.has(z.id) ? "on" : ""}" data-act="fav" aria-label="${t.favorites}">${svg("heart", favs.has(z.id))}</button>
         <button data-act="copy" aria-label="copy">${svg("copy")}</button><button data-act="share" aria-label="share">${svg("share")}</button></span></header>
-      <p class="ar">${esc(z.ar)}</p>${tr}${m}
+      <p class="ar">${esc(z.ar)}</p>${tr}${m}${z.ref ? `<p class="ref">${svg("book")}<span>${esc(z.ref[lang] || z.ref.en)}</span></p>` : ""}
       <footer>${counterHtml(n, c)}</footer></article>`;
   }
   function counterHtml(n, c) {
@@ -297,7 +321,7 @@
     const backHref = r.chapter ? `#/cat/${(data.categories.find(c => c.chapters.includes(r.chapter.id)) || {}).key}` : "#/";
     return shell("read", `
       <div class="reader-head glass"><a class="back" href="${backHref}">${svg("back")}${t.back}</a><span class="progress"><i id="prog"></i></span><span class="prog-label" id="prog-label"></span></div>
-      <h1 class="large">${esc(r.title)}</h1><p class="sub">${t.hisn} · ${t.azkar(r.items.length)}</p>
+      <h1 class="large">${esc(r.title)}</h1><p class="sub">${r.items.some(z => z.ref) ? t.sunnahSrc : t.hisn} · ${t.azkar(r.items.length)}</p>
       <div id="cards" data-key="${key}" data-focus="${focus || ""}">${cards}</div>`);
   }
 
@@ -419,7 +443,7 @@
     const items = [];
     for (const [id, it] of index.items) {
       const z = it.z;
-      if ([z.ar, z.en, z.fr, z.tr].some(x => x && normalize(x).includes(nq))) items.push(it);
+      if ([z.ar, z.en, z.fr, z.tr, z.ref && z.ref[lang]].some(x => x && normalize(x).includes(nq))) items.push(it);
       if (items.length >= 40) break;
     }
     if (!chapters.length && !items.length) { box.innerHTML = `<div class="empty">${t.noResults}</div>`; return; }
@@ -443,6 +467,7 @@
       };
     } else if (parts[0] === "fav") html = favorites();
     else if (parts[0] === "tasbih") html = tasbih();
+    else if (parts[0] === "umrah") html = guide();
     else html = notFound();
     app.innerHTML = html;
     if (!parts[2]) window.scrollTo(0, 0);
