@@ -7,7 +7,7 @@ prayer times and home-screen widgets in Arabic calligraphy.
 
 | Folder | What it holds |
 | --- | --- |
-| `IslamicAzkar/` | The Android app (Kotlin, Jetpack Compose). `ios/` holds an earlier SwiftUI version. See its README. |
+| `IslamicAzkar/` | The Android app (Kotlin, Jetpack Compose), and the iPhone/iPad app in `IslamicAzkar/ios/` (SwiftUI + WidgetKit). |
 | `website/` | The website: plain HTML/CSS/JS reading the same azkar data, deployed on Cloudflare Pages. |
 | `api/` | Cloudflare Worker on `islamicazkar.net/api/*`: tester sign-ups from the website, saved in KV and emailed to mohamad@koussa.org. Deploy with `cd api && wrangler deploy`. |
 | `store/` | Google Play listing: icon, feature graphics and captioned screenshots per language, and the store text (`listing.md`). |
@@ -22,6 +22,17 @@ cd IslamicAzkar
 
 Release builds are signed with an upload key kept outside this repository
 (`../upload-key/keystore.properties`); without it they fall back to the debug key.
+
+## iPhone
+
+The iOS app mirrors the Android one: the same screens, the Widgets tab and 14 widgets (Home Screen and Lock Screen).
+This Mac has no Xcode, so it builds on GitHub Actions (`.github/workflows/ios.yml`) on every push that touches
+`IslamicAzkar/ios/`, or by hand from the Actions tab (iOS → Run workflow). Each run uploads:
+
+- `IslamicAzkar-ipa`: an unsigned `IslamicAzkar.ipa`. Install it with Sideloadly or AltStore, which sign it with your Apple ID.
+- `screenshots`: Simulator screenshots of each screen in Arabic, English and French.
+
+`IslamicAzkar/ios/typecheck.sh` gives a quick local check against the macOS SDK before pushing.
 
 ## Website
 

@@ -338,5 +338,6 @@ struct CategoryView: View {
         }
         .background(Backdrop())
         .navigationTitle(model.s.category(key))
+        .navigationBarTitleDisplayModeLarge()
     }
 }

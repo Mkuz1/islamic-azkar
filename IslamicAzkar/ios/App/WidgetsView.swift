@@ -9,6 +9,7 @@ struct WidgetsView: View {
 
     var body: some View {
         let m = model.m
+        ScrollViewReader { proxy in
         ScrollView {
             VStack(spacing: 0) {
                 Text(m.widgetsHint).font(.subheadline).foregroundStyle(.secondary)
@@ -18,19 +19,26 @@ struct WidgetsView: View {
                     SectionLabel(text: m.groups[g]).padding(.top, 8)
                     VStack(spacing: 14) {
                         ForEach(GalleryItem.all.filter { $0.group == g }) { item in
-                            WidgetCard(item: item) { adding = item }
+                            WidgetCard(item: item) { adding = item }.id(item.id)
                         }
                     }
                     .padding(.horizontal, 16).padding(.top, 6)
                 }
 
-                SectionLabel(text: lockTitle).padding(.top, 8)
+                SectionLabel(text: lockTitle).padding(.top, 8).id("lock")
                 LockScreenStrip().padding(.horizontal, 16).padding(.top, 6)
 
-                SectionLabel(text: m.widgetStyle).padding(.top, 8)
+                SectionLabel(text: m.widgetStyle).padding(.top, 8).id("style")
                 WidgetStyleSettings().padding(.horizontal, 16).padding(.top, 6).padding(.bottom, 40)
             }
             .frame(maxWidth: 760).frame(maxWidth: .infinity)
+        }
+        .onAppear {
+            // CI screenshots: -ciScroll <widget id | lock | style>
+            if let target = UserDefaults.standard.string(forKey: "ciScroll") {
+                Task { try? await Task.sleep(for: .milliseconds(600)); proxy.scrollTo(target, anchor: .top) }
+            }
+        }
         }
         .background(Backdrop())
         .navigationTitle(m.widgetsTitle)
@@ -272,6 +280,16 @@ struct WidgetStyleSettings: View {
 }
 
 extension View {
+    /// Large navigation title on iOS (no-op elsewhere).
+    @ViewBuilder
+    func navigationBarTitleDisplayModeLarge() -> some View {
+        #if os(iOS)
+        self.navigationBarTitleDisplayMode(.large)
+        #else
+        self
+        #endif
+    }
+
     /// Inline navigation title on iOS (no-op elsewhere).
     @ViewBuilder
     func navigationBarTitleDisplayModeInline() -> some View {

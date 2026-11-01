@@ -77,6 +77,7 @@ struct ReaderView: View {
             }
             .background(Backdrop())
             .navigationTitle(title)
+            .navigationBarTitleDisplayModeLarge()
             .onAppear {
                 if let focus { proxy.scrollTo(focus, anchor: .top) }
                 if model.ciScreen == "celebration" {

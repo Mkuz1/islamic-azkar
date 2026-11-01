@@ -236,7 +236,7 @@ struct HijriWidgetView: View {
                 Text(Lang.ar.num(h.day)).font(.system(size: 58, weight: .bold)).foregroundStyle(.white).minimumScaleFactor(0.6)
                 Text(Hijri.monthsAr[h.month]).font(script.font(26)).foregroundStyle(gold).lineLimit(1).minimumScaleFactor(0.6)
                 if lang != .ar {
-                    Text("\(Hijri.month(lang, h.month)) \(h.year)").font(.caption2).foregroundStyle(.white.opacity(0.75)).lineLimit(1)
+                    Text(verbatim: "\(Hijri.month(lang, h.month)) \(h.year)").font(.caption2).foregroundStyle(.white.opacity(0.75)).lineLimit(1)
                 } else {
                     Text("\(Lang.ar.num(h.year)) هـ").font(.caption).foregroundStyle(.white.opacity(0.75))
                 }
