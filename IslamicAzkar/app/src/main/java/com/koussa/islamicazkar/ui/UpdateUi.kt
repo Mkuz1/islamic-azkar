@@ -99,7 +99,8 @@ fun UpdateHost(modifier: Modifier = Modifier) {
     val state by UpdateBus.current.collectAsState()
     LaunchedEffect(Unit) { checkForUpdate(ctx, scope, manual = false) }
     val g = Glass.colors
-    val t = updateTexts(Glass.lang)
+    val lang = Glass.lang
+    val t = updateTexts(lang)
     var shownFor by remember { mutableStateOf<Release?>(null) }
     val release = when (val s = state) {
         is UpdateState.Available -> s.release
@@ -138,7 +139,7 @@ fun UpdateHost(modifier: Modifier = Modifier) {
                         }).padding(horizontal = 12.dp, vertical = 10.dp),
                     )
                     Box(Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
-                        AccentButton(t.install, icon = Icons.Rounded.SystemUpdate) { startUpdate(ctx, scope, r, Glass.lang) }
+                        AccentButton(t.install, icon = Icons.Rounded.SystemUpdate) { startUpdate(ctx, scope, r, lang) }
                     }
                 }
             }
