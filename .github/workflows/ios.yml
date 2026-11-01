@@ -1,0 +1,80 @@
+# Builds the iPhone app on a GitHub-hosted Mac (this Mac has no Xcode):
+#  - an unsigned IslamicAzkar.ipa (install with Sideloadly/AltStore, which sign it with your Apple ID)
+#  - Simulator screenshots of each screen, to check the design.
+name: iOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ["IslamicAzkar/ios/**", ".github/workflows/ios.yml"]
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: macos-26
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: IslamicAzkar/ios
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          XCODE=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$XCODE"
+          xcodebuild -version
+          xcrun simctl list runtimes | grep iOS
+
+      - name: Build for the Simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project IslamicAzkar.xcodeproj -scheme IslamicAzkar -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build/sim CODE_SIGNING_ALLOWED=NO build | xcbeautify --renderer github-actions
+
+      - name: Simulator screenshots
+        run: |
+          set -euo pipefail
+          DEVICE=$(xcrun simctl list devices available -j | python3 -c '
+          import json,sys
+          d=json.load(sys.stdin)["devices"]
+          ios=sorted([k for k in d if "iOS" in k], key=lambda k: [int(x) for x in k.split("iOS-")[1].split("-")])
+          phones=[x for x in d[ios[-1]] if x["name"].startswith("iPhone") and "Pro Max" not in x["name"]]
+          pro=[x for x in phones if x["name"].endswith("Pro")]
+          print((pro or phones)[-1]["udid"])')
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl status_bar "$DEVICE" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 || true
+          APP=$(ls -d build/sim/Build/Products/Debug-iphonesimulator/IslamicAzkar.app)
+          xcrun simctl install "$DEVICE" "$APP"
+          mkdir -p shots
+          ./ci_screens.sh "$DEVICE" shots
+
+      - name: Build unsigned IPA
+        run: |
+          set -o pipefail
+          xcodebuild -project IslamicAzkar.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | xcbeautify --renderer github-actions
+          rm -rf Payload && mkdir Payload
+          cp -R build/device/Build/Products/Release-iphoneos/IslamicAzkar.app Payload/
+          zip -qry IslamicAzkar.ipa Payload
+          ls -lh IslamicAzkar.ipa
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots
+          path: IslamicAzkar/ios/shots
+          if-no-files-found: ignore
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: IslamicAzkar-ipa
+          path: IslamicAzkar/ios/IslamicAzkar.ipa
