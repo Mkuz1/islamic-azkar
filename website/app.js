@@ -25,8 +25,8 @@
       emailPh: "name@gmail.com", send: "سجّلني", sending: "جارٍ الإرسال…", badEmail: "أدخل عنوان بريد صحيحًا",
       thanks: "جزاك الله خيرًا! وصلنا بريدك وسنضيفك إلى المختبِرين قريبًا إن شاء الله.", failed: "تعذّر الإرسال، حاول مرة أخرى.",
       mushaf: "تطبيق المصحف", mushafText: "اقرأ القرآن الكريم بخط المصحف الشريف، صدقة جارية من فريقنا.", mushafCta: "حمّله من mushafapp.com",
-      privacy: "سياسة الخصوصية", sunnahSrc: "من كتب السنة", guide: "الدليل", guideCta: "خطوات العمرة من الإحرام إلى التقصير", readDuas: "أذكار هذه الخطوة", sources: "المصادر", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
-      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", sunnah: "أدعية من السنة", praise: "الذكر والاستغفار" },
+      privacy: "سياسة الخصوصية", sunnahSrc: "من كتب السنة", quranSrc: "من القرآن الكريم", guide: "الدليل", guideCta: "خطوات العمرة من الإحرام إلى التقصير", readDuas: "أذكار هذه الخطوة", sources: "المصادر", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
+      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", quran: "أدعية من القرآن", sunnah: "أدعية من السنة", praise: "الذكر والاستغفار" },
     },
     en: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "Hisn al-Muslim in a calm, elegant design: the daily azkar with a counter, transliteration and meaning.",
@@ -49,8 +49,8 @@
       emailPh: "name@gmail.com", send: "Sign me up", sending: "Sending…", badEmail: "Enter a valid email address",
       thanks: "Jazak Allah khayran! We got your address and will add you to the testers soon, in sha Allah.", failed: "Couldn’t send it. Please try again.",
       mushaf: "Mushaf app", mushafText: "Read the Holy Quran in the script of the printed Mushaf, a sadaqa jariyah from our team.", mushafCta: "Download from mushafapp.com",
-      privacy: "Privacy policy", sunnahSrc: "From the hadith collections", guide: "Guide", guideCta: "Every step from iḥrām to the haircut", readDuas: "Words to say", sources: "Sources", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
-      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", sunnah: "Duas from the Sunnah", praise: "Praise & Forgiveness" },
+      privacy: "Privacy policy", sunnahSrc: "From the hadith collections", quranSrc: "From the Holy Quran", guide: "Guide", guideCta: "Every step from iḥrām to the haircut", readDuas: "Words to say", sources: "Sources", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
+      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", quran: "Duas from the Quran", sunnah: "Duas from the Sunnah", praise: "Praise & Forgiveness" },
     },
     fr: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "La Citadelle du musulman dans un design apaisant : les adhkar du quotidien avec compteur, translittération et traduction.",
@@ -73,8 +73,8 @@
       emailPh: "nom@gmail.com", send: "M’inscrire", sending: "Envoi…", badEmail: "Saisissez une adresse e-mail valide",
       thanks: "Jazak Allah khayran ! Nous avons bien reçu votre adresse et vous ajouterons aux testeurs très bientôt, in shâ Allah.", failed: "Échec de l’envoi. Réessayez.",
       mushaf: "Application Mushaf", mushafText: "Lisez le Saint Coran dans l’écriture du Mushaf imprimé, une sadaqa jariya de notre équipe.", mushafCta: "Télécharger sur mushafapp.com",
-      privacy: "Confidentialité", sunnahSrc: "Des recueils de hadiths", guide: "Guide", guideCta: "Chaque étape, de l’iḥrām à la coupe des cheveux", readDuas: "Paroles à dire", sources: "Sources", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
-      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", sunnah: "Invocations de la Sunna", praise: "Louange & pardon" },
+      privacy: "Confidentialité", sunnahSrc: "Des recueils de hadiths", quranSrc: "Du Saint Coran", guide: "Guide", guideCta: "Chaque étape, de l’iḥrām à la coupe des cheveux", readDuas: "Paroles à dire", sources: "Sources", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
+      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", quran: "Invocations du Coran", sunnah: "Invocations de la Sunna", praise: "Louange & pardon" },
     },
   };
 
@@ -123,7 +123,7 @@
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
   const CAT_STYLE = {
     prayer: ["mosque", "#34c759"], sleep: ["bed", "#5856d6"], home: ["home", "#ff9500"], hardship: ["heart", "#ff3b30"], illness: ["spark", "#30b0c7"],
-    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], sunnah: ["book", "#0a84ff"], praise: ["beads", "#1e6b52"],
+    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], quran: ["book", "#1e6b52"], sunnah: ["book", "#0a84ff"], praise: ["beads", "#1e6b52"],
   };
 
   // ───────────── State ─────────────
@@ -150,6 +150,10 @@
   function readingOf(key) {
     if (key === "morning") return { key, title: s().morning, items: data.morning };
     if (key === "evening") return { key, title: s().evening, items: data.evening };
+    if (key === "umrah") {
+      const g = umrah();
+      return g ? { key, title: g.title[lang], items: g.steps.flatMap(st => st.zikr).map(id => index.items.get(id)?.z).filter(Boolean) } : null;
+    }
     const id = +key.replace(/^c/, "");
     const c = index.chapters.get(id);
     return c ? { key, title: chapterTitle(c), items: c.items, chapter: c } : null;
@@ -276,18 +280,30 @@
     return g ? `<a class="row press" href="#/umrah"><span class="sym" style="background:#a2845e">${svg("kaaba")}</span><span class="t"><b>${esc(g.title[lang])}</b><small>${s().guideCta}</small></span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>` : "";
   }
 
+  // The ʿUmrah guide uses the reader's cards: a numbered step card, then each of its duas as a full
+  // dhikr card (counter, favourite, copy, share). Counting them fills the progress bar like any reading.
   function guide() {
-    const t = s(), g = umrah();
-    if (!g) return notFound();
-    const steps = g.steps.map(st => {
-      const duas = st.zikr.map(id => index.items.get(id)).filter(Boolean).map(({ z, key }) =>
-        `<a class="row press" href="#/read/${key}/${z.id}"><span class="t"><b class="ar-row">${esc(z.ar.length > 120 ? z.ar.slice(0, 120) + "…" : z.ar)}</b>${lang === "ar" ? "" : `<small>${esc((meaning(z) || "").slice(0, 110))}${(meaning(z) || "").length > 110 ? "…" : ""}</small>`}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>`).join("");
-      return `<article class="glass card step"><h2>${esc(st.title[lang])}</h2><p>${esc(st.text[lang])}</p>
-        ${duas ? `<div class="section" style="margin:14px 0 6px">${t.readDuas}</div><div class="group">${duas}</div>` : ""}
-        <p class="ref">${svg("book")}<span>${esc(st.ref[lang])}</span></p></article>`;
+    const t = s(), g = umrah(), r = readingOf("umrah");
+    if (!g || !r) return notFound();
+    const counts = progressOf("umrah");
+    let n = 0;
+    const steps = g.steps.map((st, si) => {
+      const title = st.title[lang].replace(/^[\d٠-٩]+\.\s*/, "");
+      const cards = st.zikr.map(id => index.items.get(id)?.z).filter(Boolean).map(z => zikrCard(z, n++, r.items.length, counts)).join("");
+      return `<section class="step-block" id="step-${si + 1}">
+        <article class="glass card step">
+          <header><span class="step-num">${num(si + 1)}</span><span class="chip">${t.of(si + 1, g.steps.length)}</span></header>
+          <h2>${esc(title)}</h2><p>${esc(st.text[lang])}</p>
+          <p class="ref">${svg("book")}<span>${esc(st.ref[lang])}</span></p>
+        </article>${cards}</section>`;
     }).join("");
-    return shell("read", `<a class="back" href="#/cat/hajj">${svg("back")}${t.back}</a><h1 class="large">${esc(g.title[lang])}</h1><p class="sub">${esc(g.intro[lang])}</p>
-      <div class="steps">${steps}</div><p class="guide-note">${esc(g.note[lang])}</p>`);
+    const nav = g.steps.map((st, si) => `<a class="press" href="#/umrah" data-step="${si + 1}">${num(si + 1)}</a>`).join("");
+    return shell("read", `
+      <div class="reader-head glass"><a class="back" href="#/cat/hajj">${svg("back")}${t.back}</a><span class="progress"><i id="prog"></i></span><span class="prog-label" id="prog-label"></span></div>
+      <h1 class="large">${esc(g.title[lang])}</h1><p class="sub">${esc(g.intro[lang])}</p>
+      <nav class="step-nav glass">${nav}</nav>
+      <div id="cards" data-key="umrah">${steps}</div>
+      <p class="guide-note">${esc(g.note[lang])}</p>`);
   }
 
   function progressOf(key) { const p = store.get("progress", {}); return (p.day === today() && p[key]) || {}; }
@@ -321,7 +337,7 @@
     const backHref = r.chapter ? `#/cat/${(data.categories.find(c => c.chapters.includes(r.chapter.id)) || {}).key}` : "#/";
     return shell("read", `
       <div class="reader-head glass"><a class="back" href="${backHref}">${svg("back")}${t.back}</a><span class="progress"><i id="prog"></i></span><span class="prog-label" id="prog-label"></span></div>
-      <h1 class="large">${esc(r.title)}</h1><p class="sub">${r.items.some(z => z.ref) ? t.sunnahSrc : t.hisn} · ${t.azkar(r.items.length)}</p>
+      <h1 class="large">${esc(r.title)}</h1><p class="sub">${r.items.length && r.items.every(z => z.ref && /^Quran/.test(z.ref.en)) ? t.quranSrc : r.items.some(z => z.ref) ? t.sunnahSrc : t.hisn} · ${t.azkar(r.items.length)}</p>
       <div id="cards" data-key="${key}" data-focus="${focus || ""}">${cards}</div>`);
   }
 
@@ -467,7 +483,7 @@
       };
     } else if (parts[0] === "fav") html = favorites();
     else if (parts[0] === "tasbih") html = tasbih();
-    else if (parts[0] === "umrah") html = guide();
+    else if (parts[0] === "umrah") { html = guide(); after = () => updateProgress("umrah"); }
     else html = notFound();
     app.innerHTML = html;
     if (!parts[2]) window.scrollTo(0, 0);
@@ -479,6 +495,8 @@
     const langBtn = ev.target.closest("[data-lang]");
     if (langBtn) { lang = langBtn.dataset.lang; applyLang(); route(); return; }
     if (btn && btn.id === "open-settings") return openSettings();
+    const stepLink = ev.target.closest("[data-step]");
+    if (stepLink) { ev.preventDefault(); document.getElementById(`step-${stepLink.dataset.step}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
     if (btn && btn.id === "join-toggle") {
       const form = document.getElementById("join"), open = form.hidden;
       form.hidden = !open; btn.setAttribute("aria-expanded", open); btn.classList.toggle("on", open);
@@ -541,7 +559,7 @@
   // ───────────── Boot ─────────────
   applyLang(); applyPrefs();
   app.innerHTML = `<div class="loading">…</div>`;
-  fetch("data/azkar.json?v=2026-11-01") /* bump when the data changes: browsers cache data/ for a day */.then(r => r.json()).then(d => {
+  fetch("data/azkar.json?v=2026-11-01b") /* bump when the data changes: browsers cache data/ for a day */.then(r => r.json()).then(d => {
     data = d;
     index = { chapters: new Map(d.chapters.map(c => [c.id, c])), items: new Map() };
     const add = (z, key, title) => index.items.set(z.id, { z, key, title });
