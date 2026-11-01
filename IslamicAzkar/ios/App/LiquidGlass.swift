@@ -91,6 +91,7 @@ func categoryHue(_ key: String) -> Color {
     case "travel": return .teal
     case "nature": return .mint
     case "hajj": return .brown
+    case "sunnah": return .blue
     default: return .pink
     }
 }

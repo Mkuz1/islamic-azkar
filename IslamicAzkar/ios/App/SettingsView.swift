@@ -128,6 +128,7 @@ struct SettingsView: View {
             }
 
             Section(s.about) {
+                UpdateSettingsRow()
                 Text(s.aboutText).font(.callout)
                 if lang != .en { Text(s.translationNote).font(.footnote).foregroundStyle(.secondary) }
                 VStack(spacing: 2) {

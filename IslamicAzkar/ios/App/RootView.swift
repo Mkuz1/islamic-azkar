@@ -93,6 +93,7 @@ struct HomeTab: View {
         switch route {
         case .category(let key): CategoryView(key: key)
         case .reader(let r, let focus): ReaderView(reading: r, focus: focus)
+        case .guide(let key): GuideView(key: key)
         }
     }
 }

@@ -17,9 +17,10 @@ struct ReaderView: View {
         let data = AzkarData.shared
         let items = data.items(reading)
         let title = data.title(reading, model.s, model.lang)
+        let source = items.contains { $0.ref != nil } ? GuideTexts.of(model.lang).fromSunnah : model.s.book
         let subtitle: String = {
-            if case .chapter(let id) = reading, model.lang != .ar { return data.chapterById[id]?.ar ?? model.s.book }
-            return model.s.book
+            if case .chapter(let id) = reading, model.lang != .ar { return data.chapterById[id]?.ar ?? source }
+            return source
         }()
         let total = items.reduce(0) { $0 + $1.repeatCount }
         let done = items.reduce(0) { $0 + ($1.repeatCount - left($1)) }
@@ -161,6 +162,14 @@ struct ZikrCard: View {
                 }
             }
             .opacity(done ? 0.5 : 1)
+
+            if let ref = zikr.ref {
+                Label(ref(lang), systemImage: "book.closed")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+                    .opacity(done ? 0.5 : 1)
+            }
 
             if zikr.repeatCount >= 100 && !done {
                 Button { onCount(true) } label: {

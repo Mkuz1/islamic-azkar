@@ -31,4 +31,8 @@ shot 16-w-scripture-ar widgets ar 0 scripture
 shot 17-w-counter-en widgets en 1 counter
 shot 18-w-lock-ar widgets ar 0 lock
 shot 19-w-style-en widgets en 0 style
+shot 20-guide-en guide en 0
+shot 21-guide-ar-dark guide ar 1
+shot 22-sunnah-fr sunnah fr 0
+shot 23-sunnah-ar-dark sunnah ar 1
 exit 0

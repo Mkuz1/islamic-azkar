@@ -13,6 +13,7 @@ enum AppTab: Hashable { case home, favorites, tasbih, widgets, settings }
 enum Route: Hashable {
     case category(String)
     case reader(Reading, focus: Int?)
+    case guide(String)
 }
 
 /// App-wide state: preferences (persisted in the shared App Group so widgets agree) and navigation.
@@ -116,6 +117,8 @@ final class AppModel {
         case "widgets": tab = .widgets
         case "settings": tab = .settings
         case "reader", "celebration": homePath = [.reader(.morning, focus: nil)]
+        case "guide": homePath = [.guide("umrah")]
+        case "sunnah": homePath = [.reader(.chapter(134), focus: nil)]
         default: tab = .home
         }
     }

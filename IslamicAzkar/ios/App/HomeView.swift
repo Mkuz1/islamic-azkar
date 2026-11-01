@@ -16,6 +16,7 @@ struct HomeView: View {
                 SearchField(text: $query, prompt: s.searchHint).padding(.horizontal, 16).padding(.top, 14)
 
                 if query.trimmingCharacters(in: .whitespaces).isEmpty {
+                    UpdateBanner().padding(.horizontal, 16).padding(.top, 16)
                     NextPrayerCard().padding(.horizontal, 16).padding(.top, 16)
 
                     SectionLabel(text: s.recommendedNow).padding(.top, 8)
@@ -44,6 +45,11 @@ struct HomeView: View {
                         }
                     }
                     .padding(.horizontal, 16).padding(.top, 6)
+
+                    if let guide = data.umrahGuide {
+                        SectionLabel(text: GuideTexts.of(model.lang).guide).padding(.top, 10)
+                        GlassGroup { GuideLinkRow(guide: guide) }.padding(.horizontal, 16).padding(.top, 6)
+                    }
 
                     VStack(spacing: 4) {
                         Text(dedicationAr).font(.amiri(17)).foregroundStyle(.secondary)
@@ -324,6 +330,9 @@ struct CategoryView: View {
         let chapters = (data.categories.first { $0.key == key }?.chapters ?? []).compactMap { data.chapterById[$0] }
         ScrollView {
             VStack(spacing: 0) {
+                if key == "hajj", let guide = data.umrahGuide {
+                    GlassGroup { GuideLinkRow(guide: guide) }.padding(.horizontal, 16).padding(.top, 8)
+                }
                 SectionLabel(text: model.s.chapters(chapters.count))
                 GlassGroup {
                     ForEach(Array(chapters.enumerated()), id: \.element.id) { i, c in

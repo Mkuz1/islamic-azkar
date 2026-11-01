@@ -31,6 +31,8 @@ struct Zikr: Codable, Identifiable, Hashable {
     let en: String
     let fr: String
     let n: Int
+    /// Hadith reference (book and number) on the duas added from the hadith collections.
+    var ref: LocalizedText? = nil
 
     var repeatCount: Int { max(1, n) }
 
@@ -41,6 +43,39 @@ struct Zikr: Codable, Identifiable, Hashable {
         case .fr: return fr
         }
     }
+}
+
+/// A text in the three languages.
+struct LocalizedText: Codable, Hashable {
+    let ar: String
+    let en: String
+    let fr: String
+
+    func callAsFunction(_ lang: Lang) -> String {
+        switch lang {
+        case .ar: return ar
+        case .en: return en
+        case .fr: return fr
+        }
+    }
+}
+
+/// A step-by-step guide (the ʿUmrah guide): each step links duas and cites its hadiths.
+struct Guide: Codable, Hashable, Identifiable {
+    struct Step: Codable, Hashable {
+        let icon: String
+        let title: LocalizedText
+        let text: LocalizedText
+        let zikr: [Int]
+        let ref: LocalizedText
+    }
+    let key: String
+    let title: LocalizedText
+    let intro: LocalizedText
+    let note: LocalizedText
+    let chapter: Int
+    let steps: [Step]
+    var id: String { key }
 }
 
 struct Chapter: Codable, Identifiable, Hashable {
@@ -114,12 +149,15 @@ final class AzkarData {
     let zikrById: [Int: Zikr]
     /// Chapter id of each dhikr (-1 morning list, -2 evening list).
     let chapterOfZikr: [Int: Int]
+    let guides: [Guide]
+    var umrahGuide: Guide? { guides.first { $0.key == "umrah" } }
 
     private struct File: Codable {
         let categories: [Category]
         let chapters: [Chapter]
         let morning: [Zikr]
         let evening: [Zikr]
+        let guides: [Guide]?
     }
 
     private init() {
@@ -129,6 +167,7 @@ final class AzkarData {
         chapters = file.chapters
         morning = file.morning
         evening = file.evening
+        guides = file.guides ?? []
         chapterById = Dictionary(uniqueKeysWithValues: chapters.map { ($0.id, $0) })
         var byId: [Int: Zikr] = [:]
         var of: [Int: Int] = [:]
