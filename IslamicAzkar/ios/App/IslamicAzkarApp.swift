@@ -7,7 +7,7 @@ import UIKit
 
 enum ThemeMode: String, CaseIterable { case system, light, dark }
 
-enum AppTab: Hashable { case home, favorites, tasbih, settings }
+enum AppTab: Hashable { case home, favorites, tasbih, widgets, settings }
 
 /// Navigation destinations inside the Home tab.
 enum Route: Hashable {
@@ -44,6 +44,19 @@ final class AppModel {
     var tasbihPhrase: Int { didSet { d.set(tasbihPhrase, forKey: SharedStore.Key.tasbihPhrase); reloadTasbihWidget() } }
     var tasbihTotal: Int { didSet { d.set(tasbihTotal, forKey: SharedStore.Key.tasbihTotal) } }
 
+    // Widgets, calendar and prayer times (read by the widget extension too).
+    var palette: Int { didSet { d.set(palette, forKey: SharedStore.Key.palette); WidgetCenter.shared.reloadAllTimelines() } }
+    var script: Int { didSet { d.set(script, forKey: SharedStore.Key.script); WidgetCenter.shared.reloadAllTimelines() } }
+    var hijriOffset: Int { didSet { d.set(hijriOffset, forKey: SharedStore.Key.hijriOffset); WidgetCenter.shared.reloadAllTimelines() } }
+    var place: Place? {
+        didSet {
+            if let place { place.write(d) } else { Place.clear(d) }
+            WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+    var method: Int { didSet { d.set(method, forKey: SharedStore.Key.method); WidgetCenter.shared.reloadAllTimelines() } }
+    var asrHanafi: Bool { didSet { d.set(asrHanafi, forKey: SharedStore.Key.asrHanafi); WidgetCenter.shared.reloadAllTimelines() } }
+
     // Navigation
     var tab: AppTab = .home
     var homePath: [Route] = []
@@ -55,6 +68,7 @@ final class AppModel {
     var toast: String?
 
     var s: L10n { L10n.of(lang) }
+    var m: More { More.of(lang) }
 
     init() {
         let d = SharedStore.defaults
@@ -75,6 +89,35 @@ final class AppModel {
         tasbihTarget = int(SharedStore.Key.tasbihTarget, 33)
         tasbihPhrase = int(SharedStore.Key.tasbihPhrase, 0)
         tasbihTotal = int(SharedStore.Key.tasbihTotal, 0)
+        palette = int(SharedStore.Key.palette, 0)
+        script = int(SharedStore.Key.script, 0)
+        hijriOffset = int(SharedStore.Key.hijriOffset, 0)
+        place = Place.read(d)
+        method = int(SharedStore.Key.method, 0)
+        asrHanafi = bool(SharedStore.Key.asrHanafi, false)
+        applyLaunchArguments()
+    }
+
+    /// CI screenshots: `-ciScreen home|reader|celebration|tasbih|widgets|settings|favorites|dedication -ciLang ar -ciDark 1`.
+    var ciScreen: String?
+    private func applyLaunchArguments() {
+        let args = UserDefaults.standard
+        guard let screen = args.string(forKey: "ciScreen") else { return }
+        ciScreen = screen
+        if let l = args.string(forKey: "ciLang").flatMap(Lang.init(rawValue:)) { lang = l }
+        theme = args.bool(forKey: "ciDark") ? .dark : .light
+        if place == nil { place = Cities.all[3] }
+        if favorites.isEmpty { favorites = [AzkarData.shared.morning[1].id, AzkarData.shared.evening[3].id, AzkarData.shared.morning[6].id] }
+        if tasbihTotal == 0 { tasbihCount = 21; tasbihTotal = 722; for _ in 0..<39 { TasbihHistory.add() } }
+        showDedication = screen == "dedication"
+        switch screen {
+        case "favorites": tab = .favorites
+        case "tasbih": tab = .tasbih
+        case "widgets": tab = .widgets
+        case "settings": tab = .settings
+        case "reader", "celebration": homePath = [.reader(.morning, focus: nil)]
+        default: tab = .home
+        }
     }
 
     private func save(_ key: String, _ value: Any) {
@@ -165,7 +208,7 @@ struct IslamicAzkarApp: App {
             .environment(\.layoutDirection, model.lang.isRTL ? .rightToLeft : .leftToRight)
             .environment(\.locale, model.lang.locale)
             .preferredColorScheme(model.theme == .light ? .light : model.theme == .dark ? .dark : nil)
-            .tint(Brand.tint)
+            .tint(Theme.accent)
             .onOpenURL { model.handle(url: $0) }
             .onAppear {
                 #if os(iOS)

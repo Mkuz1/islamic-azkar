@@ -29,7 +29,7 @@ struct DedicationView: View {
                         Text("بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ")
                             .font(.quran(24 * k)).foregroundStyle(gold)
                             .environment(\.layoutDirection, .rightToLeft)
-                        Ornament().padding(.vertical, 14 * k)
+                        Ornament(color: gold).padding(.vertical, 14 * k)
 
                         Text("صدقة جارية")
                             .font(.ruqaa(66 * k))
@@ -40,11 +40,20 @@ struct DedicationView: View {
                             Text(t).font(.system(size: 13, weight: .semibold, design: .serif)).tracking(6)
                                 .foregroundStyle(gold.opacity(0.85)).padding(.top, 4)
                         }
-                        Text(text.names)
-                            .font(lang == .ar ? .system(size: 28 * k, weight: .bold) : .system(size: 26 * k, weight: .bold, design: .serif))
+                        // The Arabic dedication appears in every language…
+                        Text(dedicationNamesAr)
+                            .font(.system(size: 27 * k, weight: .bold))
                             .foregroundStyle(.white).multilineTextAlignment(.center)
+                            .environment(\.layoutDirection, .rightToLeft)
                             .padding(.top, 18 * k)
-                        Ornament().padding(.vertical, 16 * k)
+                        // …with its translation underneath in English and French.
+                        if let names = text.names {
+                            Text(names)
+                                .font(.system(size: 19 * k, weight: .semibold, design: .serif))
+                                .foregroundStyle(.white.opacity(0.85)).multilineTextAlignment(.center)
+                                .padding(.top, 4)
+                        }
+                        Ornament(color: gold).padding(.vertical, 16 * k)
 
                         Text("اللَّهُمَّ اجْعَلْهُ فِي مِيزَانِ حَسَنَاتِهِمْ").font(.amiri(22 * k, bold: true)).foregroundStyle(gold)
                         if let m = text.duaMeaning {
@@ -110,7 +119,7 @@ struct DedicationView: View {
 
 private struct DedicationText {
     let transliteration: String?
-    let names: String
+    let names: String?
     let duaMeaning: String?
     let hadithMeaning: String?
     let begin: String
@@ -118,28 +127,17 @@ private struct DedicationText {
     static func of(_ lang: Lang) -> DedicationText {
         switch lang {
         case .en:
-            return DedicationText(transliteration: "SADAQA JARIYAH", names: "On behalf of Mohamad Koussa and Dima Ghannoum…",
+            return DedicationText(transliteration: "SADAQA JARIYAH", names: dedicationTranslation(.en),
                                   duaMeaning: "O Allah, place it in the scale of their good deeds.",
                                   hadithMeaning: "“When a person dies, their deeds end except for three: an ongoing charity…” — Muslim",
                                   begin: "Begin")
         case .fr:
-            return DedicationText(transliteration: "SADAQA JARIYA", names: "Au nom de Mohamad Koussa et Dima Ghannoum…",
+            return DedicationText(transliteration: "SADAQA JARIYA", names: dedicationTranslation(.fr),
                                   duaMeaning: "Ô Allah, place-la dans la balance de leurs bonnes actions.",
                                   hadithMeaning: "« Quand l'homme meurt, ses œuvres cessent sauf trois : une aumône continue… » — Muslim",
                                   begin: "Commencer")
         case .ar:
-            return DedicationText(transliteration: nil, names: "عن محمد كوسا وديما غنوم…", duaMeaning: nil, hadithMeaning: nil, begin: "ابدأ")
-        }
-    }
-}
-
-/// Thin gold rule with a small rosette.
-private struct Ornament: View {
-    var body: some View {
-        HStack(spacing: 10) {
-            LinearGradient(colors: [.clear, Brand.mushafGold.opacity(0.8)], startPoint: .leading, endPoint: .trailing).frame(width: 110, height: 1)
-            EightPointStar(inner: 0.72).fill(Brand.mushafGold).frame(width: 10, height: 10)
-            LinearGradient(colors: [Brand.mushafGold.opacity(0.8), .clear], startPoint: .leading, endPoint: .trailing).frame(width: 110, height: 1)
+            return DedicationText(transliteration: nil, names: nil, duaMeaning: nil, hadithMeaning: nil, begin: "ابدأ")
         }
     }
 }

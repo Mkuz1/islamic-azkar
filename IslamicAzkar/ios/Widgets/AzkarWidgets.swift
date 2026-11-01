@@ -5,182 +5,307 @@ import AppIntents
 @main
 struct AzkarWidgets: WidgetBundle {
     var body: some Widget {
+        PrayerWidget()
+        HijriWidget()
+        ClockWidget()
+        DigitalClockWidget()
+        ProgressRingsWidget()
+        TimelineAzkarWidget()
+        MorningAzkarWidget()
+        DayAzkarWidget()
+        NightAzkarWidget()
         DhikrWidget()
         QuickAzkarWidget()
+        ScriptureWidget()
         TasbihWidget()
+        CounterWidget()
     }
 }
 
-// MARK: - Dhikr of the day
+// MARK: - Timelines
 
-struct DhikrEntry: TimelineEntry {
+struct DateEntry: TimelineEntry {
     let date: Date
-    let zikr: Zikr
     let lang: Lang
 }
 
-struct DhikrProvider: TimelineProvider {
-    private func zikr(for date: Date) -> Zikr {
-        let pool = AzkarData.shared.shortAzkar
-        let hours = Int(date.timeIntervalSince1970 / 3600)
-        return pool[hours % pool.count]
-    }
+/// Entries every `step` minutes for the next `count` steps, starting on a step boundary.
+struct SteppedProvider: TimelineProvider {
+    var step: Int = 15
+    var count: Int = 16
 
-    func placeholder(in context: Context) -> DhikrEntry {
-        DhikrEntry(date: .now, zikr: AzkarData.shared.morning[13], lang: SharedStore.lang)
-    }
-
-    func getSnapshot(in context: Context, completion: @escaping (DhikrEntry) -> Void) {
-        completion(DhikrEntry(date: .now, zikr: zikr(for: .now), lang: SharedStore.lang))
-    }
-
-    func getTimeline(in context: Context, completion: @escaping (Timeline<DhikrEntry>) -> Void) {
-        // A new dhikr every hour for the next 12 hours.
-        let start = Calendar.current.dateInterval(of: .hour, for: .now)?.start ?? .now
-        let entries = (0..<12).map { h -> DhikrEntry in
-            let d = start.addingTimeInterval(Double(h) * 3600)
-            return DhikrEntry(date: d, zikr: zikr(for: d), lang: SharedStore.lang)
-        }
+    func placeholder(in context: Context) -> DateEntry { DateEntry(date: .now, lang: SharedStore.lang) }
+    func getSnapshot(in context: Context, completion: @escaping (DateEntry) -> Void) { completion(placeholder(in: context)) }
+    func getTimeline(in context: Context, completion: @escaping (Timeline<DateEntry>) -> Void) {
+        let lang = SharedStore.lang
+        let s = Double(step * 60)
+        let start = Date(timeIntervalSince1970: (Date.now.timeIntervalSince1970 / s).rounded(.down) * s)
+        var entries = [DateEntry(date: .now, lang: lang)]
+        entries += (1...count).map { DateEntry(date: start.addingTimeInterval(Double($0) * s), lang: lang) }
         completion(Timeline(entries: entries, policy: .atEnd))
     }
 }
 
-struct DhikrWidgetView: View {
-    @Environment(\.widgetFamily) private var family
-    let entry: DhikrEntry
-
-    var body: some View {
-        let s = L10n.of(entry.lang)
-        let link = AzkarData.shared.reading(ofZikr: entry.zikr.id).map { DeepLink.url($0, focus: entry.zikr.id) }
-        switch family {
-        #if os(iOS)
-        case .accessoryRectangular:
-            VStack(alignment: .leading, spacing: 2) {
-                Label(s.widgetDhikr, systemImage: "sparkles").font(.caption2.weight(.semibold)).widgetAccentable()
-                Text(entry.zikr.ar).font(.amiri(14)).lineLimit(3)
-            }
-            .widgetURL(link)
-        case .accessoryInline:
-            Text(entry.zikr.ar).widgetURL(link)
-        #endif
-        default:
-            VStack(spacing: 6) {
-                HStack {
-                    EightPointStar().fill(Brand.mushafGold).frame(width: 12, height: 12)
-                    Text(s.widgetDhikr).font(.caption.weight(.semibold)).foregroundStyle(.white.opacity(0.85))
-                    Spacer()
-                }
-                Text(entry.zikr.ar)
-                    .font(.amiri(family == .systemSmall ? 17 : 21))
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                    .minimumScaleFactor(0.5)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .environment(\.layoutDirection, .rightToLeft)
-                let meaning = entry.zikr.meaning(entry.lang)
-                if family != .systemSmall, !meaning.isEmpty {
-                    Text(meaning).font(.caption).foregroundStyle(.white.opacity(0.75))
-                        .lineLimit(family == .systemLarge ? 6 : 2).multilineTextAlignment(.center)
-                }
-                Text("ISLAMIC AZKAR · أذكار إسلامية").font(.system(size: 9, weight: .semibold)).tracking(0.8).foregroundStyle(Brand.mushafGold)
-            }
-            .widgetURL(link)
+/// Prayer widgets refresh at every prayer time, and every 15 minutes for the countdown ring.
+struct PrayerProvider: TimelineProvider {
+    func placeholder(in context: Context) -> DateEntry { DateEntry(date: .now, lang: SharedStore.lang) }
+    func getSnapshot(in context: Context, completion: @escaping (DateEntry) -> Void) { completion(placeholder(in: context)) }
+    func getTimeline(in context: Context, completion: @escaping (Timeline<DateEntry>) -> Void) {
+        let lang = SharedStore.lang
+        var dates: [Date] = [.now]
+        for i in 1...24 { dates.append(Date.now.addingTimeInterval(Double(i) * 900)) }
+        if let place = SharedStore.place {
+            dates += (Prayers.times(place) + Prayers.times(place, day: .now.addingTimeInterval(86_400))).filter { $0 > .now }
         }
+        let entries = Array(Set(dates)).sorted().prefix(40).map { DateEntry(date: $0, lang: lang) }
+        completion(Timeline(entries: entries, policy: .atEnd))
+    }
+}
+
+private extension View {
+    func widgetGlass() -> some View {
+        containerBackground(for: .widget) { WidgetGlass() }
+    }
+}
+
+private var homeFamilies: [WidgetFamily] { [.systemSmall, .systemMedium, .systemLarge] }
+
+private func families(_ home: [WidgetFamily], lock: Bool) -> [WidgetFamily] {
+    #if os(iOS)
+    lock ? home + [.accessoryCircular, .accessoryRectangular, .accessoryInline] : home
+    #else
+    home
+    #endif
+}
+
+// MARK: - Prayer & time
+
+struct PrayerWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "PrayerWidget", provider: PrayerProvider()) { e in
+            PrayerEntryView(entry: e).widgetGlass()
+        }
+        .configurationDisplayName("مواقيت الصلاة · Prayer times")
+        .description("The next prayer with a countdown, and today’s times.")
+        .supportedFamilies(families(homeFamilies, lock: true))
+    }
+}
+
+private struct PrayerEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: DateEntry
+    var body: some View {
+        PrayerWidgetView(size: WidgetSize(family), place: SharedStore.place, now: entry.date, lang: entry.lang)
+    }
+}
+
+struct HijriWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "HijriWidget", provider: SteppedProvider(step: 60, count: 24)) { e in
+            HijriEntryView(entry: e).widgetGlass()
+        }
+        .configurationDisplayName("التاريخ الهجري · Hijri date")
+        .description("The Hijri day and month in classical calligraphy.")
+        .supportedFamilies(families([.systemSmall, .systemMedium], lock: true))
+    }
+}
+
+private struct HijriEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: DateEntry
+    var body: some View { HijriWidgetView(size: WidgetSize(family), now: entry.date, lang: entry.lang) }
+}
+
+struct ClockWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "ClockWidget", provider: SteppedProvider(step: 1, count: 60)) { e in
+            IslamicClockFace(date: e.date).padding(-6).containerBackground(for: .widget) { Color.clear }
+        }
+        .configurationDisplayName("الساعة الإسلامية · Islamic clock")
+        .description("An analog clock with an eight-pointed star and Arabic numerals.")
+        .supportedFamilies([.systemSmall])
+        .contentMarginsDisabled()
+    }
+}
+
+struct DigitalClockWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "DigitalWidget", provider: SteppedProvider(step: 60, count: 24)) { e in
+            DigitalEntryView(entry: e).widgetGlass()
+        }
+        .configurationDisplayName("الساعة الرقمية · Digital clock")
+        .description("The time with the Hijri and Gregorian dates.")
+        .supportedFamilies([.systemSmall, .systemMedium])
+    }
+}
+
+private struct DigitalEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: DateEntry
+    var body: some View { DigitalClockWidgetView(size: WidgetSize(family), now: entry.date, lang: entry.lang) }
+}
+
+struct ProgressRingsWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "ProgressWidget", provider: SteppedProvider(step: 15, count: 16)) { e in
+            ProgressEntryView(entry: e).widgetGlass()
+        }
+        .configurationDisplayName("مضيّ الوقت · Day & year progress")
+        .description("Rings for how much of the day, month and years has passed.")
+        .supportedFamilies(families([.systemSmall, .systemMedium], lock: false) + lockCircular)
+    }
+
+    private var lockCircular: [WidgetFamily] {
+        #if os(iOS)
+        [.accessoryCircular]
+        #else
+        []
+        #endif
+    }
+}
+
+private struct ProgressEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: DateEntry
+    var body: some View { ProgressWidgetView(size: WidgetSize(family), now: entry.date, lang: entry.lang) }
+}
+
+// MARK: - Azkar
+
+private struct AzkarListEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let set: AzkarSet
+    let entry: DateEntry
+    var body: some View { AzkarListWidgetView(size: WidgetSize(family), set: set, now: entry.date, lang: entry.lang) }
+}
+
+private func azkarListConfiguration(_ kind: String, _ set: AzkarSet, _ name: String, _ description: String) -> some WidgetConfiguration {
+    StaticConfiguration(kind: kind, provider: SteppedProvider(step: AzkarSet.slotMinutes, count: 18)) { e in
+        AzkarListEntryView(set: set, entry: e).widgetGlass()
+    }
+    .configurationDisplayName(name)
+    .description(description)
+    .supportedFamilies(families([.systemSmall, .systemMedium, .systemLarge], lock: false) + rectangular)
+}
+
+private var rectangular: [WidgetFamily] {
+    #if os(iOS)
+    [.accessoryRectangular]
+    #else
+    []
+    #endif
+}
+
+struct TimelineAzkarWidget: Widget {
+    var body: some WidgetConfiguration {
+        azkarListConfiguration("TimelineAzkarWidget", .timeline, "أذكار حسب الوقت · Azkar through the day",
+                               "Azkar that change with the time of day: morning, day, evening and night.")
+    }
+}
+
+struct MorningAzkarWidget: Widget {
+    var body: some WidgetConfiguration {
+        azkarListConfiguration("MorningAzkarWidget", .morning, "أذكار الصباح · Morning Azkar", "The morning azkar, one after another.")
+    }
+}
+
+struct DayAzkarWidget: Widget {
+    var body: some WidgetConfiguration {
+        azkarListConfiguration("DayAzkarWidget", .day, "أذكار اليوم · Day Azkar", "Azkar for the day, one after another.")
+    }
+}
+
+struct NightAzkarWidget: Widget {
+    var body: some WidgetConfiguration {
+        azkarListConfiguration("NightAzkarWidget", .night, "أذكار الليل · Night Azkar", "Evening and bedtime azkar.")
     }
 }
 
 struct DhikrWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "DhikrWidget", provider: DhikrProvider()) { entry in
-            DhikrWidgetView(entry: entry)
-                .containerBackground(for: .widget) { Brand.widgetGradient }
+        StaticConfiguration(kind: "DhikrWidget", provider: SteppedProvider(step: 60, count: 12)) { e in
+            DhikrEntryView(entry: e).widgetGlass()
         }
-        .configurationDisplayName("Dhikr of the day · ذكر اليوم")
+        .configurationDisplayName("ذكر اليوم · Dhikr of the day")
         .description("A short dhikr from Hisn Al Muslim, refreshed every hour.")
-        .supportedFamilies(Self.families)
-    }
-
-    private static var families: [WidgetFamily] {
-        #if os(iOS)
-        [.systemSmall, .systemMedium, .systemLarge, .accessoryRectangular, .accessoryInline]
-        #else
-        [.systemSmall, .systemMedium, .systemLarge]
-        #endif
+        .supportedFamilies(families(homeFamilies, lock: true))
     }
 }
 
-// MARK: - Quick azkar
-
-struct SimpleEntry: TimelineEntry {
-    let date: Date
-    let lang: Lang
-}
-
-struct SimpleProvider: TimelineProvider {
-    func placeholder(in context: Context) -> SimpleEntry { SimpleEntry(date: .now, lang: SharedStore.lang) }
-    func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> Void) { completion(placeholder(in: context)) }
-    func getTimeline(in context: Context, completion: @escaping (Timeline<SimpleEntry>) -> Void) {
-        completion(Timeline(entries: [placeholder(in: context)], policy: .after(.now.addingTimeInterval(3600))))
-    }
-}
-
-struct QuickAzkarView: View {
+private struct DhikrEntryView: View {
     @Environment(\.widgetFamily) private var family
-    let entry: SimpleEntry
-
-    var body: some View {
-        let s = L10n.of(entry.lang)
-        if family == .systemSmall {
-            let r = Reading.recommended()
-            VStack(alignment: .leading, spacing: 6) {
-                Image(systemName: symbol(r)).font(.title2).foregroundStyle(Brand.mushafGold)
-                Spacer()
-                Text(s.recommendedNow).font(.caption2).foregroundStyle(.white.opacity(0.7))
-                Text(AzkarData.shared.title(r, s, entry.lang)).font(.headline).foregroundStyle(.white).lineLimit(2)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .widgetURL(DeepLink.url(r))
-        } else {
-            HStack(spacing: 8) {
-                tile(.morning, "sun.max.fill", s.morningAzkar, .orange)
-                tile(.evening, "moon.stars.fill", s.eveningAzkar, .purple)
-                tile(.chapter(28), "bed.double.fill", s.sleepAzkar, .cyan)
-            }
-        }
-    }
-
-    private func symbol(_ r: Reading) -> String {
-        switch r {
-        case .morning: return "sun.max.fill"
-        case .evening: return "sun.horizon.fill"
-        case .chapter(28): return "moon.stars.fill"
-        default: return "hands.and.sparkles.fill"
-        }
-    }
-
-    private func tile(_ r: Reading, _ symbol: String, _ title: String, _ hue: Color) -> some View {
-        Link(destination: DeepLink.url(r)) {
-            VStack(spacing: 6) {
-                Image(systemName: symbol).font(.title2).foregroundStyle(hue).symbolRenderingMode(.hierarchical)
-                Text(title).font(.caption.weight(.semibold)).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.7)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(.white.opacity(0.12), in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(.white.opacity(0.25), lineWidth: 0.8))
-        }
-    }
+    let entry: DateEntry
+    var body: some View { DhikrWidgetView(size: WidgetSize(family), zikr: DhikrWidgetView.zikr(at: entry.date), lang: entry.lang) }
 }
 
 struct QuickAzkarWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "QuickAzkarWidget", provider: SimpleProvider()) { entry in
-            QuickAzkarView(entry: entry)
-                .containerBackground(for: .widget) { Brand.widgetGradient }
+        StaticConfiguration(kind: "QuickAzkarWidget", provider: SteppedProvider(step: 60, count: 12)) { e in
+            QuickEntryView(entry: e).widgetGlass()
         }
-        .configurationDisplayName("Quick azkar · أذكار سريعة")
+        .configurationDisplayName("أذكار سريعة · Quick azkar")
         .description("Jump straight into morning, evening or sleep azkar.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies(homeFamilies)
     }
+}
+
+private struct QuickEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: DateEntry
+    var body: some View { QuickAzkarWidgetView(size: WidgetSize(family), lang: entry.lang, now: entry.date) }
+}
+
+// MARK: - Quran, hadith, poetry and wisdom (configurable)
+
+enum QuoteSourceOption: Int, AppEnum {
+    case mixed, quran, hadith, azkar, poetry, wisdom
+
+    static var typeDisplayRepresentation: TypeDisplayRepresentation = "Source"
+    static var caseDisplayRepresentations: [QuoteSourceOption: DisplayRepresentation] = [
+        .mixed: "Mixed · منوّع", .quran: "Quran · القرآن", .hadith: "Hadith · الحديث",
+        .azkar: "Azkar · الأذكار", .poetry: "Poetry · الشعر", .wisdom: "Wisdom · الحكم",
+    ]
+}
+
+struct ScriptureIntent: WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "Quran, Hadith, Poetry & Wisdom"
+    @Parameter(title: "Source", default: .mixed) var source: QuoteSourceOption
+}
+
+struct ScriptureEntry: TimelineEntry {
+    let date: Date
+    let lang: Lang
+    let source: QuoteSource
+}
+
+struct ScriptureProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> ScriptureEntry { ScriptureEntry(date: .now, lang: SharedStore.lang, source: .quran) }
+    func snapshot(for configuration: ScriptureIntent, in context: Context) async -> ScriptureEntry {
+        ScriptureEntry(date: .now, lang: SharedStore.lang, source: QuoteSource(rawValue: configuration.source.rawValue) ?? .mixed)
+    }
+    func timeline(for configuration: ScriptureIntent, in context: Context) async -> Timeline<ScriptureEntry> {
+        let source = QuoteSource(rawValue: configuration.source.rawValue) ?? .mixed
+        let start = Date(timeIntervalSince1970: (Date.now.timeIntervalSince1970 / 7200).rounded(.down) * 7200)
+        let entries = (0..<12).map { ScriptureEntry(date: $0 == 0 ? .now : start.addingTimeInterval(Double($0) * 7200), lang: SharedStore.lang, source: source) }
+        return Timeline(entries: entries, policy: .atEnd)
+    }
+}
+
+struct ScriptureWidget: Widget {
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: "ScriptureWidget", intent: ScriptureIntent.self, provider: ScriptureProvider()) { e in
+            ScriptureEntryView(entry: e).widgetGlass()
+        }
+        .configurationDisplayName("قرآن وحديث وشعر · Quran & wisdom")
+        .description("A verse, hadith, line of poetry or proverb. Touch and hold the widget to choose the source.")
+        .supportedFamilies(families(homeFamilies, lock: false) + rectangular)
+    }
+}
+
+private struct ScriptureEntryView: View {
+    @Environment(\.widgetFamily) private var family
+    let entry: ScriptureEntry
+    var body: some View { ScriptureWidgetView(size: WidgetSize(family), source: entry.source, now: entry.date, lang: entry.lang) }
 }
 
 // MARK: - Tasbih (interactive)
@@ -196,56 +321,53 @@ struct TasbihEntry: TimelineEntry {
 struct TasbihProvider: TimelineProvider {
     private func current() -> TasbihEntry {
         let d = SharedStore.defaults
-        return TasbihEntry(date: .now, count: d.integer(forKey: SharedStore.Key.tasbihCount),
-                           target: SharedStore.tasbihTarget,
+        return TasbihEntry(date: .now, count: d.integer(forKey: SharedStore.Key.tasbihCount), target: SharedStore.tasbihTarget,
                            phrase: min(max(d.integer(forKey: SharedStore.Key.tasbihPhrase), 0), TasbihPhrases.ar.count - 1),
                            lang: SharedStore.lang)
     }
     func placeholder(in context: Context) -> TasbihEntry { current() }
     func getSnapshot(in context: Context, completion: @escaping (TasbihEntry) -> Void) { completion(current()) }
     func getTimeline(in context: Context, completion: @escaping (Timeline<TasbihEntry>) -> Void) {
-        completion(Timeline(entries: [current()], policy: .never))
+        // Refresh after midnight so the weekly chart moves on to a new day.
+        let midnight = Calendar.current.startOfDay(for: .now.addingTimeInterval(86_400))
+        completion(Timeline(entries: [current()], policy: .after(midnight)))
     }
 }
 
-struct TasbihWidgetView: View {
+private struct TasbihEntryView: View {
+    @Environment(\.widgetFamily) private var family
     let entry: TasbihEntry
-
     var body: some View {
-        let inRound = entry.target > 0 ? entry.count % entry.target : entry.count
-        ZStack(alignment: .topTrailing) {
-            Button(intent: IncrementTasbihIntent()) {
-                VStack(spacing: 2) {
-                    Text(TasbihPhrases.ar[entry.phrase]).font(.amiri(15)).foregroundStyle(.white.opacity(0.9)).lineLimit(1)
-                    Text(entry.lang.num(inRound))
-                        .font(.system(size: 40, weight: .bold, design: .rounded)).foregroundStyle(.white)
-                        .contentTransition(.numericText())
-                    Text(entry.target > 0 ? "/ \(entry.lang.num(entry.target))" : "∞").font(.caption).foregroundStyle(Brand.mushafGold)
-                    ProgressView(value: Double(inRound), total: Double(max(entry.target, 1)))
-                        .tint(Brand.mushafGold).padding(.horizontal, 6).padding(.top, 4)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .buttonStyle(.plain)
-
-            Button(intent: ResetTasbihIntent()) {
-                Image(systemName: "arrow.counterclockwise").font(.caption.bold()).foregroundStyle(.white)
-                    .frame(width: 26, height: 26)
-                    .background(.white.opacity(0.18), in: Circle())
-            }
-            .buttonStyle(.plain)
-        }
+        TasbihWidgetView(size: WidgetSize(family), count: entry.count, target: entry.target, phrase: entry.phrase, lang: entry.lang)
     }
 }
 
 struct TasbihWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(kind: "TasbihWidget", provider: TasbihProvider()) { entry in
-            TasbihWidgetView(entry: entry)
-                .containerBackground(for: .widget) { Brand.widgetGradient }
+        StaticConfiguration(kind: "TasbihWidget", provider: TasbihProvider()) { e in
+            TasbihEntryView(entry: e).widgetGlass()
         }
-        .configurationDisplayName("Tasbih · المسبحة")
+        .configurationDisplayName("المسبحة · Tasbih")
         .description("Count your tasbih right on the Home Screen.")
-        .supportedFamilies([.systemSmall])
+        .supportedFamilies(families([.systemSmall], lock: false) + tasbihLock)
+    }
+
+    private var tasbihLock: [WidgetFamily] {
+        #if os(iOS)
+        [.accessoryCircular, .accessoryRectangular]
+        #else
+        []
+        #endif
+    }
+}
+
+struct CounterWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "CounterWidget", provider: TasbihProvider()) { e in
+            TasbihEntryView(entry: e).widgetGlass()
+        }
+        .configurationDisplayName("العدّاد والإحصاء · Counter & weekly stats")
+        .description("The counter with your tasbih over the week.")
+        .supportedFamilies([.systemMedium])
     }
 }

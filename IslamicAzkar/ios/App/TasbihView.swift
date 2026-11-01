@@ -43,7 +43,7 @@ struct TasbihView: View {
             .padding(20)
             .frame(maxWidth: .infinity)
         }
-        .background(Color.groupedBackground)
+        .background(Backdrop())
         .navigationTitle(s.tasbih)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
@@ -57,17 +57,18 @@ struct TasbihView: View {
         return Button {
             model.tasbihCount += 1
             model.tasbihTotal += 1
+            TasbihHistory.add()
         } label: {
             ZStack {
-                Circle().fill(Color.groupedCard)
+                Circle().fill(.clear).glassCard(cornerRadius: 400)
                 Circle()
-                    .stroke(Color.softFill, lineWidth: 8)
-                    .padding(4)
+                    .stroke(Color.primary.opacity(0.08), lineWidth: 10)
+                    .padding(10)
                 Circle()
                     .trim(from: 0, to: target > 0 ? CGFloat(inRound) / CGFloat(target) : 0)
-                    .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 8, lineCap: .round))
+                    .stroke(LinearGradient(colors: [Theme.accent, Theme.gold], startPoint: .top, endPoint: .bottom), style: StrokeStyle(lineWidth: 10, lineCap: .round))
                     .rotationEffect(.degrees(-90))
-                    .padding(4)
+                    .padding(10)
                 VStack(spacing: 4) {
                     Text(TasbihPhrases.ar[model.tasbihPhrase]).font(.amiri(24))
                     Text(lang.num(inRound))
@@ -97,11 +98,11 @@ struct TasbihView: View {
                         model.tasbihCount = 0
                     } label: {
                         Text(TasbihPhrases.ar[i]).font(.amiri(17))
-                            .foregroundStyle(selected ? .white : .primary)
+                            .foregroundStyle(selected ? Theme.onAccent : Color.primary)
                             .padding(.horizontal, 14).padding(.vertical, 5)
                     }
                     .buttonStyle(.plain)
-                    .background(selected ? Color.accentColor : Color.softFill, in: Capsule())
+                    .background(selected ? Theme.accent : Color.primary.opacity(0.07), in: Capsule())
                 }
             }
             .padding(.horizontal, 2).padding(.vertical, 4)

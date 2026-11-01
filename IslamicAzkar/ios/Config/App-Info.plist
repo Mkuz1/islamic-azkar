@@ -8,6 +8,8 @@
 		<string>Amiri-Bold.ttf</string>
 		<string>ArefRuqaa-Bold.ttf</string>
 		<string>AmiriQuran-Regular.ttf</string>
+		<string>ReemKufi.ttf</string>
+		<string>Nastaliq.ttf</string>
 	</array>
 	<key>CFBundleURLTypes</key>
 	<array>
@@ -26,6 +28,8 @@
 		<string>en</string>
 		<string>fr</string>
 	</array>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Your approximate location is used only on this iPhone to calculate prayer times. يُستخدم موقعك التقريبي على هذا الجهاز فقط لحساب مواقيت الصلاة.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 </dict>

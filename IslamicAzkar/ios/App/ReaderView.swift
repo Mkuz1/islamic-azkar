@@ -11,6 +11,7 @@ struct ReaderView: View {
     let focus: Int?
 
     @State private var remaining: [Int: Int] = [:]
+    @State private var celebration: Int?   // streak shown on the completion card
 
     var body: some View {
         let data = AzkarData.shared
@@ -33,13 +34,19 @@ struct ReaderView: View {
                     .padding(.horizontal, 4)
 
                     ForEach(Array(items.enumerated()), id: \.element.id) { i, z in
-                        ZikrCard(zikr: z, index: i + 1, total: items.count, remaining: left(z), chapterTitle: title) {
-                            let r = left(z) - 1
+                        ZikrCard(zikr: z, index: i + 1, total: items.count, remaining: left(z), chapterTitle: title) { all in
+                            let r = all ? 0 : left(z) - 1
                             withAnimation(.snappy) { remaining[z.id] = r }
                             if r == 0, i + 1 < items.count {
                                 Task {
                                     try? await Task.sleep(for: .milliseconds(300))
                                     withAnimation(.smooth) { proxy.scrollTo(items[i + 1].id, anchor: .top) }
+                                }
+                            }
+                            if r == 0, items.allSatisfy({ $0.id == z.id || left($0) == 0 }) {
+                                Task {
+                                    try? await Task.sleep(for: .milliseconds(450))
+                                    celebration = Streaks.record(reading.key)
                                 }
                             }
                         }
@@ -59,7 +66,7 @@ struct ReaderView: View {
                         }
                         .frame(maxWidth: .infinity)
                         .padding(24)
-                        .card()
+                        .glassCard()
                         .transition(.scale.combined(with: .opacity))
                     }
                 }
@@ -68,10 +75,19 @@ struct ReaderView: View {
                 .frame(maxWidth: 760)
                 .frame(maxWidth: .infinity)
             }
-            .background(Color.groupedBackground)
+            .background(Backdrop())
             .navigationTitle(title)
             .onAppear {
                 if let focus { proxy.scrollTo(focus, anchor: .top) }
+                if model.ciScreen == "celebration" {
+                    for z in items { remaining[z.id] = 0 }
+                    celebration = 3
+                }
+            }
+            .sheet(isPresented: Binding(get: { celebration != nil }, set: { if !$0 { celebration = nil } })) {
+                CelebrationView(reading: reading, streak: celebration ?? 1, count: items.count, repetitions: total) { celebration = nil }
+                    .presentationDetents([.large])
+                    .presentationCornerRadius(34)
             }
         }
         .sensoryFeedback(.success, trigger: done == total && total > 0) { _, new in new && model.haptics }
@@ -89,7 +105,8 @@ struct ZikrCard: View {
     let remaining: Int
     let chapterTitle: String
     var label: String? = nil
-    let onCount: () -> Void
+    /// Counts one repetition, or all of them at once (`true`) for azkar said 100 times.
+    let onCount: (Bool) -> Void
 
     var body: some View {
         let s = model.s
@@ -144,13 +161,26 @@ struct ZikrCard: View {
             }
             .opacity(done ? 0.5 : 1)
 
+            if zikr.repeatCount >= 100 && !done {
+                Button { onCount(true) } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark").font(.subheadline.weight(.bold))
+                        Text(s.completed).font(.headline)
+                        Text("· " + s.repeatTimes(zikr.repeatCount)).font(.subheadline).opacity(0.8)
+                    }
+                    .padding(.horizontal, 14).padding(.vertical, 4)
+                }
+                .prominentGlassButton()
+                .tint(Theme.accent)
+                .sensoryFeedback(.success, trigger: done) { _, _ in model.haptics }
+            } else {
             Button(action: count) {
                 HStack(spacing: 10) {
                     ZStack {
                         Circle().stroke(.quaternary, lineWidth: 3)
                         Circle()
                             .trim(from: 0, to: CGFloat(zikr.repeatCount - remaining) / CGFloat(zikr.repeatCount))
-                            .stroke(Color.accentColor, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                            .stroke(Theme.accent, style: StrokeStyle(lineWidth: 3, lineCap: .round))
                             .rotationEffect(.degrees(-90))
                         if done {
                             Image(systemName: "checkmark").font(.footnote.bold()).foregroundStyle(.tint)
@@ -168,14 +198,15 @@ struct ZikrCard: View {
             .glassButton()
             .disabled(done)
             .sensoryFeedback(.increase, trigger: remaining) { _, _ in model.haptics }
+            }
         }
         .padding(18)
-        .card()
+        .glassCard()
         .contentShape(RoundedRectangle(cornerRadius: 22))
         .onTapGesture(perform: count)
     }
 
-    private func count() { if remaining > 0 { onCount() } }
+    private func count() { if remaining > 0 && zikr.repeatCount < 100 { onCount(false) } }
 
     private var shareText: String {
         var t = zikr.ar
@@ -226,15 +257,15 @@ struct FavoritesView: View {
                 ForEach(favs) { z in
                     let title = chapterTitle(z)
                     ZikrCard(zikr: z, index: nil, total: nil, remaining: remaining[z.id] ?? z.repeatCount,
-                             chapterTitle: title, label: title) {
-                        remaining[z.id] = (remaining[z.id] ?? z.repeatCount) - 1
+                             chapterTitle: title, label: title) { all in
+                        remaining[z.id] = all ? 0 : (remaining[z.id] ?? z.repeatCount) - 1
                     }
                 }
             }
             .padding(.horizontal, 16).padding(.bottom, 30)
             .frame(maxWidth: 760).frame(maxWidth: .infinity)
         }
-        .background(Color.groupedBackground)
+        .background(Backdrop())
         .navigationTitle(model.s.tabFavorites)
     }
 

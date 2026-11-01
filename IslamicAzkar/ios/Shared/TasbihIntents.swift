@@ -8,7 +8,9 @@ struct IncrementTasbihIntent: AppIntent {
 
     func perform() async throws -> some IntentResult {
         SharedStore.incrementTasbih()
+        TasbihHistory.add()
         WidgetCenter.shared.reloadTimelines(ofKind: "TasbihWidget")
+        WidgetCenter.shared.reloadTimelines(ofKind: "CounterWidget")
         return .result()
     }
 }
@@ -20,6 +22,7 @@ struct ResetTasbihIntent: AppIntent {
     func perform() async throws -> some IntentResult {
         SharedStore.resetTasbih()
         WidgetCenter.shared.reloadTimelines(ofKind: "TasbihWidget")
+        WidgetCenter.shared.reloadTimelines(ofKind: "CounterWidget")
         return .result()
     }
 }

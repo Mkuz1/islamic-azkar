@@ -1,0 +1,416 @@
+{
+ "poetry": [
+  {
+   "ar": "الخَيْلُ وَاللَّيْلُ وَالبَيْداءُ تَعرِفُني\nوَالسَّيفُ وَالرُّمحُ وَالقِرطاسُ وَالقَلَمُ",
+   "en": "The horses, the night and the desert know me, and so do the sword, the spear, the paper and the pen.",
+   "fr": "Les chevaux, la nuit et le désert me connaissent, ainsi que l’épée, la lance, le papier et la plume.",
+   "srcAr": "المتنبي",
+   "srcEn": "Al-Mutanabbi",
+   "srcFr": "Al-Mutanabbi"
+  },
+  {
+   "ar": "ما كُلُّ ما يَتَمَنّى المَرءُ يُدرِكُهُ\nتَجري الرِّياحُ بِما لا تَشتَهي السُّفُنُ",
+   "en": "Not everything a man wishes for does he attain; the winds blow as the ships do not desire.",
+   "fr": "L’homme n’obtient pas tout ce qu’il souhaite ; les vents soufflent contre le désir des navires.",
+   "srcAr": "المتنبي",
+   "srcEn": "Al-Mutanabbi",
+   "srcFr": "Al-Mutanabbi"
+  },
+  {
+   "ar": "عَلى قَدرِ أَهلِ العَزمِ تَأتي العَزائِمُ\nوَتَأتي عَلى قَدرِ الكِرامِ المَكارِمُ",
+   "en": "Resolve comes in the measure of the resolute, and noble deeds in the measure of the noble.",
+   "fr": "La détermination vient à la mesure des résolus, et les nobles actions à la mesure des nobles.",
+   "srcAr": "المتنبي",
+   "srcEn": "Al-Mutanabbi",
+   "srcFr": "Al-Mutanabbi"
+  },
+  {
+   "ar": "إِذا غامَرتَ في شَرَفٍ مَرومِ\nفَلا تَقنَع بِما دونَ النُّجومِ",
+   "en": "When you venture after a coveted honour, do not settle for anything below the stars.",
+   "fr": "Quand tu poursuis un honneur convoité, ne te contente de rien en deçà des étoiles.",
+   "srcAr": "المتنبي",
+   "srcEn": "Al-Mutanabbi",
+   "srcFr": "Al-Mutanabbi"
+  },
+  {
+   "ar": "أَعَزُّ مَكانٍ في الدُّنى سَرجُ سابِحٍ\nوَخَيرُ جَليسٍ في الزَّمانِ كِتابُ",
+   "en": "The dearest seat in the world is the saddle of a swift horse, and the best companion at any time is a book.",
+   "fr": "La plus noble place au monde est la selle d’un coursier, et le meilleur compagnon de tout temps est un livre.",
+   "srcAr": "المتنبي",
+   "srcEn": "Al-Mutanabbi",
+   "srcFr": "Al-Mutanabbi"
+  },
+  {
+   "ar": "وَإِذا أَتَتكَ مَذَمَّتي مِن ناقِصٍ\nفَهِيَ الشَّهادَةُ لي بِأَنّي كامِلُ",
+   "en": "When blame of me reaches you from a lesser man, it is testimony that I am complete.",
+   "fr": "Quand le blâme à mon égard te vient d’un homme imparfait, c’est le témoignage de ma perfection.",
+   "srcAr": "المتنبي",
+   "srcEn": "Al-Mutanabbi",
+   "srcFr": "Al-Mutanabbi"
+  },
+  {
+   "ar": "دَعِ الأَيّامَ تَفعَلُ ما تَشاءُ\nوَطِب نَفساً إِذا حَكَمَ القَضاءُ",
+   "en": "Let the days do as they will, and be at peace when destiny decrees.",
+   "fr": "Laisse les jours faire ce qu’ils veulent, et apaise ton âme quand le destin décide.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "نَعيبُ زَمانَنا وَالعَيبُ فينا\nوَما لِزَمانِنا عَيبٌ سِوانا",
+   "en": "We blame our times while the fault is in us; our times have no fault but ourselves.",
+   "fr": "Nous blâmons notre époque alors que la faute est en nous ; notre époque n’a d’autre défaut que nous.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "شَكَوتُ إِلى وَكيعٍ سوءَ حِفظي\nفَأَرشَدَني إِلى تَركِ المَعاصي",
+   "en": "I complained to Wakiʿ of my poor memory; he guided me to leave off sins.",
+   "fr": "Je me suis plaint à Wakîʿ de ma mauvaise mémoire ; il m’a conseillé de délaisser les péchés.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "وَأَخبَرَني بِأَنَّ العِلمَ نورٌ\nوَنورُ اللَّهِ لا يُهدى لِعاصي",
+   "en": "He told me that knowledge is a light, and the light of Allah is not given to the disobedient.",
+   "fr": "Il m’a appris que la science est une lumière, et que la lumière d’Allah n’est pas offerte au pécheur.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "وَلَرُبَّ نازِلَةٍ يَضيقُ لَها الفَتى\nذَرعاً وَعِندَ اللَّهِ مِنها المَخرَجُ",
+   "en": "Many a hardship weighs heavily on a man, yet with Allah lies the way out of it.",
+   "fr": "Que d’épreuves accablent l’homme, alors qu’auprès d’Allah se trouve l’issue.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "ضاقَت فَلَمّا اِستَحكَمَت حَلَقاتُها\nفُرِجَت وَكُنتُ أَظُنُّها لا تُفرَجُ",
+   "en": "It tightened, and when its rings were firmly closed, it was lifted, though I thought it never would be.",
+   "fr": "Elle s’est resserrée, et quand ses anneaux furent bien clos, elle s’est dénouée, alors que je la croyais sans issue.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "تَغَرَّب عَنِ الأَوطانِ في طَلَبِ العُلا\nوَسافِر فَفي الأَسفارِ خَمسُ فَوائِدِ",
+   "en": "Leave your homeland in pursuit of greatness, and travel, for in travel there are five benefits.",
+   "fr": "Quitte ta patrie en quête d’élévation, et voyage, car le voyage apporte cinq bienfaits.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "لِسانَكَ لا تَذكُر بِهِ عَورَةَ اِمرِئٍ\nفَكُلُّكَ عَوراتٌ وَلِلنّاسِ أَعيُنُ",
+   "en": "Do not let your tongue mention another’s faults, for you are all faults, and people have eyes.",
+   "fr": "Que ta langue ne mentionne pas les défauts d’autrui, car tu n’es que défauts et les gens ont des yeux.",
+   "srcAr": "الإمام الشافعي",
+   "srcEn": "Imam al-Shafiʿi",
+   "srcFr": "Imam al-Shafiʿi"
+  },
+  {
+   "ar": "وَإِنَّما الأُمَمُ الأَخلاقُ ما بَقِيَت\nفَإِن هُمُ ذَهَبَت أَخلاقُهُم ذَهَبوا",
+   "en": "Nations endure only as long as their morals endure; if their morals go, they go too.",
+   "fr": "Les nations ne durent que tant que durent leurs vertus ; si leurs vertus disparaissent, elles disparaissent.",
+   "srcAr": "أحمد شوقي",
+   "srcEn": "Ahmad Shawqi",
+   "srcFr": "Ahmad Shawqi"
+  },
+  {
+   "ar": "قُم لِلمُعَلِّمِ وَفِّهِ التَّبجيلا\nكادَ المُعَلِّمُ أَن يَكونَ رَسولا",
+   "en": "Stand for the teacher and give him full honour; the teacher is almost a messenger.",
+   "fr": "Lève-toi pour l’enseignant et rends-lui tout honneur ; l’enseignant est presque un messager.",
+   "srcAr": "أحمد شوقي",
+   "srcEn": "Ahmad Shawqi",
+   "srcFr": "Ahmad Shawqi"
+  },
+  {
+   "ar": "إِذا الشَّعبُ يَوماً أَرادَ الحَياةَ\nفَلا بُدَّ أَن يَستَجيبَ القَدَر",
+   "en": "If one day a people wills to live, then destiny must answer.",
+   "fr": "Si un jour un peuple veut vivre, le destin doit lui répondre.",
+   "srcAr": "أبو القاسم الشابي",
+   "srcEn": "Abu al-Qasim al-Shabbi",
+   "srcFr": "Abu al-Qasim al-Shabbi"
+  },
+  {
+   "ar": "وَمَهما تَكُن عِندَ اِمرِئٍ مِن خَليقَةٍ\nوَإِن خالَها تَخفى عَلى النّاسِ تُعلَمِ",
+   "en": "Whatever trait a man may have, though he thinks it hidden from people, it will be known.",
+   "fr": "Quel que soit le caractère d’un homme, même s’il le croit caché aux gens, il finira par être connu.",
+   "srcAr": "زهير بن أبي سلمى",
+   "srcEn": "Zuhayr ibn Abi Sulma",
+   "srcFr": "Zuhayr ibn Abi Sulma"
+  },
+  {
+   "ar": "سَتُبدي لَكَ الأَيّامُ ما كُنتَ جاهِلاً\nوَيَأتيكَ بِالأَخبارِ مَن لَم تُزَوِّدِ",
+   "en": "The days will reveal to you what you did not know, and news will come to you from one you never sent.",
+   "fr": "Les jours te révéleront ce que tu ignorais, et des nouvelles te viendront de celui que tu n’as pas envoyé.",
+   "srcAr": "طرفة بن العبد",
+   "srcEn": "Tarafa ibn al-ʿAbd",
+   "srcFr": "Tarafa ibn al-ʿAbd"
+  },
+  {
+   "ar": "وَأَحسَنُ مِنكَ لَم تَرَ قَطُّ عَيني\nوَأَجمَلُ مِنكَ لَم تَلِدِ النِّساءُ",
+   "en": "My eye has never seen anyone finer than you, and no woman has borne anyone more beautiful.",
+   "fr": "Mon œil n’a jamais vu meilleur que toi, et aucune femme n’a enfanté plus beau que toi.",
+   "srcAr": "حسان بن ثابت",
+   "srcEn": "Hassan ibn Thabit",
+   "srcFr": "Hassan ibn Thabit"
+  },
+  {
+   "ar": "خُلِقتَ مُبَرَّأً مِن كُلِّ عَيبٍ\nكَأَنَّكَ قَد خُلِقتَ كَما تَشاءُ",
+   "en": "You were created free of every flaw, as though you were created as you wished.",
+   "fr": "Tu as été créé exempt de tout défaut, comme si tu avais été créé selon ton désir.",
+   "srcAr": "حسان بن ثابت",
+   "srcEn": "Hassan ibn Thabit",
+   "srcFr": "Hassan ibn Thabit"
+  },
+  {
+   "ar": "مُحَمَّدٌ سَيِّدُ الكَونَينِ وَالثَّقَلَينِ\nوَالفَريقَينِ مِن عُربٍ وَمِن عَجَمِ",
+   "en": "Muhammad, master of both worlds, of men and jinn, and of both peoples, Arabs and non-Arabs.",
+   "fr": "Muhammad, maître des deux mondes, des hommes et des djinns, et des deux peuples, Arabes et non-Arabes.",
+   "srcAr": "البوصيري",
+   "srcEn": "Al-Busiri",
+   "srcFr": "Al-Busiri"
+  },
+  {
+   "ar": "أَلا لَيتَ الشَّبابَ يَعودُ يَوماً\nفَأُخبِرَهُ بِما فَعَلَ المَشيبُ",
+   "en": "If only youth would return one day, so I could tell it what old age has done.",
+   "fr": "Ah, si la jeunesse revenait un jour, je lui dirais ce qu’a fait la vieillesse.",
+   "srcAr": "أبو العتاهية",
+   "srcEn": "Abu al-ʿAtahiya",
+   "srcFr": "Abu al-ʿAtahiya"
+  },
+  {
+   "ar": "وَإِنّي وَإِن كُنتُ الأَخيرَ زَمانُهُ\nلَآتٍ بِما لَم تَستَطِعهُ الأَوائِلُ",
+   "en": "Though I come last in time, I bring what the ancients could not.",
+   "fr": "Bien que je sois venu le dernier, j’apporte ce que les anciens n’ont pu accomplir.",
+   "srcAr": "أبو العلاء المعري",
+   "srcEn": "Abu al-ʿAla al-Maʿarri",
+   "srcFr": "Abu al-ʿAla al-Maʿarri"
+  }
+ ],
+ "wisdom": [
+  {
+   "ar": "مَن جَدَّ وَجَد، وَمَن زَرَعَ حَصَد",
+   "en": "Who strives finds, and who sows reaps.",
+   "fr": "Qui persévère trouve, et qui sème récolte.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "العِلمُ في الصِّغَرِ كالنَّقشِ على الحَجَر",
+   "en": "Learning in youth is like engraving on stone.",
+   "fr": "Apprendre jeune, c’est graver dans la pierre.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "الصَّبرُ مِفتاحُ الفَرَج",
+   "en": "Patience is the key to relief.",
+   "fr": "La patience est la clé du soulagement.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "خَيرُ الكَلامِ ما قَلَّ ودَلّ",
+   "en": "The best speech is brief and meaningful.",
+   "fr": "La meilleure parole est brève et éloquente.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "لِكُلِّ مَقامٍ مَقال",
+   "en": "Every situation has its fitting words.",
+   "fr": "À chaque situation sa parole.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "الوَقتُ كالسَّيفِ إن لم تَقطَعهُ قَطَعَك",
+   "en": "Time is like a sword: if you do not cut it, it cuts you.",
+   "fr": "Le temps est comme une épée : si tu ne le tranches pas, il te tranche.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "إذا كانَ الكَلامُ مِن فِضّة، فالسُّكوتُ مِن ذَهَب",
+   "en": "If speech is silver, silence is golden.",
+   "fr": "Si la parole est d’argent, le silence est d’or.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "في التَّأنّي السَّلامة، وفي العَجَلةِ النَّدامة",
+   "en": "In patience there is safety, and in haste regret.",
+   "fr": "Dans la patience, la sécurité ; dans la hâte, le regret.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "الجارَ قَبلَ الدّار، والرَّفيقَ قَبلَ الطَّريق",
+   "en": "Choose the neighbour before the house, and the companion before the road.",
+   "fr": "Choisis le voisin avant la maison, et le compagnon avant la route.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "القَناعةُ كَنزٌ لا يَفنى",
+   "en": "Contentment is a treasure that never runs out.",
+   "fr": "Le contentement est un trésor inépuisable.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "صَديقُكَ مَن صَدَقَك، لا مَن صَدَّقَك",
+   "en": "Your friend is the one who tells you the truth, not the one who agrees with you.",
+   "fr": "Ton ami est celui qui te dit la vérité, non celui qui te donne raison.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "رُبَّ أخٍ لكَ لم تَلِدهُ أُمُّك",
+   "en": "Many a brother of yours was not born to your mother.",
+   "fr": "Que de frères ne sont pas nés de ta mère.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "قِيمةُ كُلِّ امرِئٍ ما يُحسِنُه",
+   "en": "The worth of every person is what they do well.",
+   "fr": "La valeur de chacun est dans ce qu’il fait bien.",
+   "srcAr": "علي بن أبي طالب",
+   "srcEn": "ʿAli ibn Abi Talib",
+   "srcFr": "ʿAli ibn Abi Talib"
+  },
+  {
+   "ar": "خَيرُ الأُمورِ أَوسَطُها",
+   "en": "The best of matters is the middle way.",
+   "fr": "Le meilleur des choses est le juste milieu.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "ما ضاعَ حَقٌّ وَراءَهُ مُطالِب",
+   "en": "No right is lost while someone claims it.",
+   "fr": "Aucun droit ne se perd tant que quelqu’un le réclame.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "اُطلُبِ العِلمَ مِنَ المَهدِ إلى اللَّحد",
+   "en": "Seek knowledge from the cradle to the grave.",
+   "fr": "Cherche le savoir du berceau jusqu’à la tombe.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "مَن حَفَرَ حُفرةً لأخيهِ وَقَعَ فيها",
+   "en": "Who digs a pit for his brother falls into it.",
+   "fr": "Qui creuse une fosse pour son frère y tombe.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "مَن سارَ على الدَّربِ وَصَل",
+   "en": "Who walks the path arrives.",
+   "fr": "Qui suit le chemin arrive.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "لا تُؤَجِّل عَمَلَ اليَومِ إلى الغَد",
+   "en": "Do not put off today’s work until tomorrow.",
+   "fr": "Ne remets pas à demain le travail d’aujourd’hui.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "يَدٌ واحِدةٌ لا تُصَفِّق",
+   "en": "One hand cannot clap.",
+   "fr": "Une seule main ne peut applaudir.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "التَّواضُعُ مِن شِيَمِ الكِرام",
+   "en": "Humility is a trait of the noble.",
+   "fr": "L’humilité est une qualité des nobles.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  },
+  {
+   "ar": "مَن عاشَرَ قَوماً أربَعينَ يَوماً صارَ مِنهُم",
+   "en": "Whoever lives among a people for forty days becomes one of them.",
+   "fr": "Qui vit quarante jours parmi un peuple devient l’un des siens.",
+   "srcAr": "مثل عربي",
+   "srcEn": "Arabic proverb",
+   "srcFr": "Proverbe arabe"
+  }
+ ],
+ "encouragements": [
+  {
+   "ar": "أَحَبُّ الأَعْمَالِ إِلَى اللَّهِ أَدْوَمُهَا وَإِنْ قَلَّ",
+   "srcAr": "متفق عليه",
+   "en": "The most beloved deeds to Allah are the most consistent, even if small.",
+   "fr": "Les œuvres les plus aimées d'Allah sont les plus régulières, même si elles sont peu nombreuses.",
+   "srcEn": "Al-Bukhārī & Muslim",
+   "srcFr": "Al-Bukhārī & Muslim"
+  },
+  {
+   "ar": "فَاذْكُرُونِي أَذْكُرْكُمْ",
+   "srcAr": "البقرة ١٥٢",
+   "en": "So remember Me; I will remember you.",
+   "fr": "Souvenez-vous de Moi, Je Me souviendrai de vous.",
+   "srcEn": "Al-Baqarah 2:152",
+   "srcFr": "Al-Baqarah 2:152"
+  },
+  {
+   "ar": "أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+   "srcAr": "الرعد ٢٨",
+   "en": "Truly, in the remembrance of Allah do hearts find rest.",
+   "fr": "C'est par le rappel d'Allah que les cœurs s'apaisent.",
+   "srcEn": "Ar-Raʿd 13:28",
+   "srcFr": "Ar-Raʿd 13:28"
+  },
+  {
+   "ar": "لَا يَزَالُ لِسَانُكَ رَطْبًا مِنْ ذِكْرِ اللَّهِ",
+   "srcAr": "رواه الترمذي",
+   "en": "Keep your tongue moist with the remembrance of Allah.",
+   "fr": "Que ta langue ne cesse d'être humectée par le rappel d'Allah.",
+   "srcEn": "At-Tirmidhī",
+   "srcFr": "At-Tirmidhī"
+  },
+  {
+   "ar": "مَثَلُ الَّذِي يَذْكُرُ رَبَّهُ وَالَّذِي لَا يَذْكُرُ رَبَّهُ مَثَلُ الْحَيِّ وَالْمَيِّتِ",
+   "srcAr": "رواه البخاري",
+   "en": "The one who remembers his Lord and the one who does not are like the living and the dead.",
+   "fr": "Celui qui évoque son Seigneur et celui qui ne L'évoque pas sont comme le vivant et le mort.",
+   "srcEn": "Al-Bukhārī",
+   "srcFr": "Al-Bukhārī"
+  }
+ ]
+}
