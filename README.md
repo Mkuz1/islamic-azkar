@@ -24,7 +24,7 @@ Release builds are signed with an upload key kept outside this repository
 
 ## Website
 
-Live at https://islamic-azkar.pages.dev
+Live at https://islamicazkar.net (also https://islamic-azkar.pages.dev)
 
 Static files, no build step. Preview locally with `python3 -m http.server --directory website`,
 deploy with `wrangler pages deploy website --project-name islamic-azkar`.
