@@ -41,4 +41,4 @@ jobs:
       - name: Smoke test
         run: |
           sleep 20
-          curl -fsS https://islamicazkar.net/data/azkar.json | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('guides'), 'live site has no Umrah guide yet'; print('live:', len(d['chapters']), 'chapters')"
+          curl -fsS "https://islamicazkar.net/data/azkar.json?check=$GITHUB_RUN_ID" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('guides'), 'live site has no Umrah guide yet'; print('live:', len(d['chapters']), 'chapters')"

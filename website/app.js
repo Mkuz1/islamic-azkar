@@ -541,7 +541,7 @@
   // ───────────── Boot ─────────────
   applyLang(); applyPrefs();
   app.innerHTML = `<div class="loading">…</div>`;
-  fetch("data/azkar.json").then(r => r.json()).then(d => {
+  fetch("data/azkar.json?v=2026-11-01") /* bump when the data changes: browsers cache data/ for a day */.then(r => r.json()).then(d => {
     data = d;
     index = { chapters: new Map(d.chapters.map(c => [c.id, c])), items: new Map() };
     const add = (z, key, title) => index.items.set(z.id, { z, key, title });
