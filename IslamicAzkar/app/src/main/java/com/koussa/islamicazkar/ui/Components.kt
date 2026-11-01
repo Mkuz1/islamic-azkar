@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.IosShare
@@ -106,6 +107,7 @@ fun categoryIcon(key: String): ImageVector = when (key) {
     "travel" -> Icons.Rounded.FlightTakeoff
     "nature" -> Icons.Rounded.Thunderstorm
     "hajj" -> Icons.Rounded.Explore
+    "sunnah" -> Icons.AutoMirrored.Rounded.MenuBook
     else -> Icons.Rounded.AutoAwesome
 }
 
@@ -121,6 +123,7 @@ fun categoryHue(key: String): Color = when (key) {
     "travel" -> Color(0xFF30B0C7)
     "nature" -> Color(0xFF00C7BE)
     "hajj" -> Color(0xFFA2845E)
+    "sunnah" -> Color(0xFF0A84FF)
     else -> Color(0xFFFF2D55)
 }
 
@@ -221,6 +224,17 @@ fun ZikrCard(
                     fontSize = (16 * settings.textScale).sp, lineHeight = (22 * settings.textScale).sp,
                     modifier = Modifier.padding(top = 10.dp),
                 )
+            }
+        }
+
+        z.ref?.let { ref ->
+            Row(
+                Modifier.fillMaxWidth().alpha(dim).padding(top = 12.dp, end = 8.dp),
+                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.AutoMirrored.Rounded.MenuBook, null, tint = g.text3, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(ref[lang], color = g.text3, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
             }
         }
 

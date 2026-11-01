@@ -17,8 +17,9 @@ android {
         applicationId = "com.koussa.islamicazkar"
         minSdk = 26
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.0"
+        // The GitHub release tag must be "v" + versionName (e.g. v1.0.4): the github build compares them.
+        versionCode = 4
+        versionName = "1.0.4"
         vectorDrawables { useSupportLibrary = true }
     }
 
@@ -48,6 +49,14 @@ android {
         }
     }
 
+    // "play": the Google Play build, updated by the Play Store only.
+    // "github": the APK published on GitHub releases; it can update itself in the app.
+    flavorDimensions += "store"
+    productFlavors {
+        create("play") { dimension = "store" }
+        create("github") { dimension = "store" }
+    }
+
     buildTypes {
         debug {
             signingConfig = signingConfigs.getByName("debug")
@@ -67,7 +76,7 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions { jvmTarget = "17" }
-    buildFeatures { compose = true }
+    buildFeatures { compose = true; buildConfig = true }
     testOptions { unitTests { isIncludeAndroidResources = true } }
     packaging {
         resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }

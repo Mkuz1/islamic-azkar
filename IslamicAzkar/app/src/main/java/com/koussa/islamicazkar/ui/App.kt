@@ -103,6 +103,7 @@ sealed interface Route {
     data object WidgetsRoute : Route { override val key = "widgets" }
     data object SettingsRoute : Route { override val key = "settings" }
     data class Category(val catKey: String) : Route { override val key = "cat:$catKey" }
+    data class GuideRoute(val guideKey: String) : Route { override val key = "guide:$guideKey" }
     data class Reader(val reading: Reading, val focusZikr: Int? = null) : Route { override val key = "read:${reading.key()}" }
 }
 
@@ -218,6 +219,8 @@ fun AzkarApp(state: AppState) {
                         .padding(horizontal = 18.dp, vertical = 10.dp),
                 )
 
+                UpdateHost(Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 92.dp))
+
                 ToastHost(state, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 92.dp))
 
                 state.shareTarget?.let { (z, title) ->
@@ -259,6 +262,7 @@ private fun Pane(route: Route) {
                         Route.WidgetsRoute -> WidgetsScreen()
                         Route.SettingsRoute -> SettingsScreen()
                         is Route.Category -> CategoryScreen(r.catKey)
+                        is Route.GuideRoute -> GuideScreen(r.guideKey)
                         is Route.Reader -> ReaderScreen(r.reading, r.focusZikr)
                     }
                 }

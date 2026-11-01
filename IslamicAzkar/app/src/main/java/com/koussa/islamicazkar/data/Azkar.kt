@@ -22,6 +22,8 @@ data class Zikr(
     val en: String,
     val fr: String,
     val repeat: Int,
+    /** Hadith reference (book and number), present on the duas added from the hadith collections. */
+    val ref: Localized? = null,
 ) {
     fun meaning(lang: Lang): String = when (lang) {
         Lang.FR -> fr
@@ -29,6 +31,24 @@ data class Zikr(
         Lang.AR -> ""
     }
 }
+
+/** A text in the three languages. */
+data class Localized(val ar: String, val en: String, val fr: String) {
+    operator fun get(lang: Lang): String = when (lang) {
+        Lang.AR -> ar
+        Lang.EN -> en
+        Lang.FR -> fr
+    }
+
+    companion object {
+        fun of(o: JSONObject?): Localized? = o?.let { Localized(it.optString("ar"), it.optString("en"), it.optString("fr")) }
+    }
+}
+
+/** One step of a guide (e.g. ʿUmrah), with the duas it links to and its hadith sources. */
+data class GuideStep(val icon: String, val title: Localized, val text: Localized, val zikr: List<Int>, val ref: Localized)
+
+data class Guide(val key: String, val title: Localized, val intro: Localized, val note: Localized, val chapter: Int, val steps: List<GuideStep>)
 
 data class Chapter(
     val id: Int,
@@ -78,7 +98,10 @@ object AzkarRepository {
         val chapters: List<Chapter>,
         val morning: List<Zikr>,
         val evening: List<Zikr>,
+        val guides: List<Guide> = emptyList(),
     ) {
+        val umrahGuide: Guide? get() = guides.firstOrNull { it.key == "umrah" }
+
         val chapterById: Map<Int, Chapter> = chapters.associateBy { it.id }
         val zikrById: Map<Int, Zikr> =
             (chapters.flatMap { it.items } + morning + evening).associateBy { it.id }
@@ -106,7 +129,7 @@ object AzkarRepository {
 
     private fun parseItems(arr: JSONArray): List<Zikr> = List(arr.length()) { i ->
         val o = arr.getJSONObject(i)
-        Zikr(o.getInt("id"), o.getString("ar"), o.optString("tr"), o.optString("en"), o.optString("fr"), o.optInt("n", 1))
+        Zikr(o.getInt("id"), o.getString("ar"), o.optString("tr"), o.optString("en"), o.optString("fr"), o.optInt("n", 1), Localized.of(o.optJSONObject("ref")))
     }
 
     private fun parse(root: JSONObject): Data {
@@ -123,7 +146,26 @@ object AzkarRepository {
                 Chapter(o.getInt("id"), o.getString("ar"), o.getString("en"), o.getString("fr"), parseItems(o.getJSONArray("items")))
             }
         }
-        return Data(cats, chapters, parseItems(root.getJSONArray("morning")), parseItems(root.getJSONArray("evening")))
+        val guides = root.optJSONArray("guides")?.let { a ->
+            List(a.length()) { i ->
+                val o = a.getJSONObject(i)
+                val steps = o.getJSONArray("steps").let { sa ->
+                    List(sa.length()) { j ->
+                        val st = sa.getJSONObject(j)
+                        val z = st.getJSONArray("zikr")
+                        GuideStep(
+                            st.optString("icon"), Localized.of(st.getJSONObject("title"))!!, Localized.of(st.getJSONObject("text"))!!,
+                            List(z.length()) { z.getInt(it) }, Localized.of(st.optJSONObject("ref")) ?: Localized("", "", ""),
+                        )
+                    }
+                }
+                Guide(
+                    o.getString("key"), Localized.of(o.getJSONObject("title"))!!, Localized.of(o.getJSONObject("intro"))!!,
+                    Localized.of(o.getJSONObject("note"))!!, o.optInt("chapter"), steps,
+                )
+            }
+        }.orEmpty()
+        return Data(cats, chapters, parseItems(root.getJSONArray("morning")), parseItems(root.getJSONArray("evening")), guides)
     }
 }
 

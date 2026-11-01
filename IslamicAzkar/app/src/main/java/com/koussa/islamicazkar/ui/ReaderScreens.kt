@@ -68,6 +68,8 @@ fun CategoryScreen(key: String) {
 
     LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = screenPadding(hasBack = true)) {
         item { LargeTitle(s.category(key), s.chapters(chapters.size)) }
+        val guide = data.umrahGuide
+        if (key == "hajj" && guide != null) item { InsetGroup(Modifier.padding(bottom = 14.dp)) { GuideRow(guide) } }
         item {
             InsetGroup {
                 chapters.forEachIndexed { i, c ->
@@ -95,7 +97,8 @@ fun ReaderScreen(reading: Reading, focus: Int?) {
         Reading.Morning -> Triple(s.morningAzkar, s.book, data.morning)
         Reading.Evening -> Triple(s.eveningAzkar, s.book, data.evening)
         is Reading.OfChapter -> data.chapterById.getValue(reading.id).let {
-            Triple(it.title(lang), if (lang == Lang.AR) s.book else it.ar, it.items)
+            val source = if (it.items.any { z -> z.ref != null }) s.fromSunnah else s.book
+            Triple(it.title(lang), if (lang == Lang.AR) source else it.ar, it.items)
         }
     }
     val remaining = remember(reading) { mutableStateMapOf<Int, Int>() }

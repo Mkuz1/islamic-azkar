@@ -1,0 +1,46 @@
+# Builds both Android flavors on GitHub (no Android SDK is needed locally to check a change):
+#  - play:   the Google Play build (no self-update code, no REQUEST_INSTALL_PACKAGES)
+#  - github: the APK for GitHub releases, which can update itself
+# These are debug-signed; release APKs/bundles are signed on the Mac with the upload key.
+name: Android
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["IslamicAzkar/app/**", "IslamicAzkar/*.kts", "IslamicAzkar/gradle/**", ".github/workflows/android.yml"]
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: IslamicAzkar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - name: SDK packages
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34-ext12" "build-tools;35.0.1" > /dev/null
+      - name: Build
+        run: ./gradlew --no-daemon assemblePlayDebug assembleGithubDebug testPlayDebugUnitTest --tests '*PrayerCalcTest*'
+      - name: Check permissions per flavor
+        run: |
+          AAPT2="$ANDROID_HOME/build-tools/35.0.1/aapt2"
+          PLAY=$(ls app/build/outputs/apk/play/debug/*.apk); GH=$(ls app/build/outputs/apk/github/debug/*.apk)
+          "$AAPT2" dump permissions "$PLAY"; "$AAPT2" dump permissions "$GH"
+          if "$AAPT2" dump permissions "$PLAY" | grep -q REQUEST_INSTALL_PACKAGES; then echo "::error::Play build must not request REQUEST_INSTALL_PACKAGES"; exit 1; fi
+          "$AAPT2" dump permissions "$GH" | grep -q REQUEST_INSTALL_PACKAGES
+          "$AAPT2" dump badging "$GH" | head -1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-debug-apks
+          path: IslamicAzkar/app/build/outputs/apk/*/debug/*.apk

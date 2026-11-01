@@ -131,6 +131,10 @@ fun HomeScreen() {
                         }
                     }
                 }
+                data.umrahGuide?.let { guide ->
+                    item { SectionHeader(s.guide) }
+                    item { InsetGroup { GuideRow(guide) } }
+                }
                 item {
                     Text(
                         DEDICATION_AR,

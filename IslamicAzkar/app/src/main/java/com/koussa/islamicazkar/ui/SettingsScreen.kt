@@ -215,8 +215,12 @@ fun SettingsScreen() {
         item { SectionHeader(s.about) }
         item {
             InsetGroup {
-                ListRow(s.appName, icon = Icons.Rounded.Info, iconColor = Color(0xFF8E8E93), value = "1.1")
+                ListRow(s.appName, icon = Icons.Rounded.Info, iconColor = Color(0xFF8E8E93), value = com.koussa.islamicazkar.BuildConfig.VERSION_NAME)
                 RowDivider()
+                if (com.koussa.islamicazkar.update.appUpdater().supported) {
+                    UpdateSettingsRow()
+                    RowDivider()
+                }
                 Column(Modifier.padding(16.dp)) {
                     Text(s.aboutText, color = g.text, fontSize = 15.sp, lineHeight = 21.sp)
                     if (lang != Lang.EN) {
