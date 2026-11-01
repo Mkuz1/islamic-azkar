@@ -28,3 +28,4 @@ api/node_modules/
 IslamicAzkar/ios/build/
 IslamicAzkar/ios/shots/
 IslamicAzkar/ios/Payload/
+*.ipa.zip
