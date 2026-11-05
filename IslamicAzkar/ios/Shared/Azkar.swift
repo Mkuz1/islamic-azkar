@@ -233,7 +233,14 @@ func normalizeArabic(_ s: String) -> String {
 
 enum SharedStore {
     static let groupID = "group.com.koussa.IslamicAzkar"
+    #if os(macOS)
+    /// The Mac app has no widget extension and is not signed into the App Group's team: on macOS 15
+    /// reading another team's group container is a protected access that can stall launch, so it
+    /// keeps its settings in its own defaults.
+    static let defaults: UserDefaults = .standard
+    #else
     static let defaults: UserDefaults = UserDefaults(suiteName: groupID) ?? .standard
+    #endif
 
     enum Key {
         static let lang = "lang"

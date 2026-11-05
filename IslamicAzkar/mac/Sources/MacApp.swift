@@ -7,6 +7,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if UserDefaults.standard.string(forKey: "ciShot") != nil { print("ci: launched"); fflush(stdout) }
         // CI screenshots of the menu bar panel: `-ciMenu 1` shows it in a plain window.
         if UserDefaults.standard.bool(forKey: "ciMenu") { MenuPanelPreviewWindow.show() }
         // `-ciShot <file.png>` saves the front window as a PNG after a few seconds, then quits
