@@ -19,7 +19,10 @@ extension SharedStore {
     static var palette: Palette { Palette.all[safe: defaults.integer(forKey: Key.palette)] ?? .mushaf }
     static var script: Script { Script(rawValue: defaults.integer(forKey: Key.script)) ?? .ruqaa }
     static var hijriOffset: Int { defaults.integer(forKey: Key.hijriOffset) }
-    static var method: CalcMethod { CalcMethod.allCases[safe: defaults.integer(forKey: Key.method)] ?? .mwl }
+    /// Dubai (Dulook DXB) unless the user picked another method.
+    static var method: CalcMethod {
+        defaults.object(forKey: Key.method) == nil ? .dubai : (CalcMethod.allCases[safe: defaults.integer(forKey: Key.method)] ?? .dubai)
+    }
     static var asrHanafi: Bool { defaults.bool(forKey: Key.asrHanafi) }
     static var place: Place? { Place.read(defaults) }
 }
@@ -205,6 +208,9 @@ enum CalcMethod: Int, CaseIterable, Identifiable {
     var fajr: Double { [18, 18.5, 19.5, 15, 18, 19.5, 18.2, 12, 18][rawValue] }
     var isha: Double { [17, 0, 17.5, 15, 18, 0, 18.2, 12, 17][rawValue] }
     var ishaMinutes: Int { self == .ummAlQura || self == .gulf ? 90 : 0 }
+    /// Precaution minutes added to Fajr, sunrise, Dhuhr, Asr, Maghrib and Isha. Dubai follows Dubai's
+    /// Islamic Affairs department (IACAD, the Dulook DXB app): 18.2°, Dhuhr and Maghrib +3 min (aladhan method 16).
+    var offsets: [Double] { self == .dubai ? [0, 0, 3, 0, 3, 0] : [0, 0, 0, 0, 0, 0] }
 }
 
 /// Prayer times from the sun's position, with the angle-based rule for high latitudes.
@@ -266,7 +272,7 @@ enum PrayerCalc {
             if isha.isNaN || isha - sunset > ishaLimit { isha = sunset + ishaLimit }
         }
         let shift = tz - lng / 15
-        return [fajr, sunrise, dhuhr, asrT, sunset, isha].map { $0 + shift }
+        return zip([fajr, sunrise, dhuhr, asrT, sunset, isha], method.offsets).map { $0 + shift + $1 / 60 }
     }
 }
 

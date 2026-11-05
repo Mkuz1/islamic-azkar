@@ -36,9 +36,11 @@ struct RootView: View {
             Tab(s.tabTasbih, systemImage: "circle.hexagongrid.fill", value: AppTab.tasbih) {
                 NavigationStack { TasbihView() }
             }
+            #if os(iOS)
             Tab(model.m.tabWidgets, systemImage: "square.grid.2x2.fill", value: AppTab.widgets) {
                 NavigationStack { WidgetsView() }
             }
+            #endif
             Tab(s.tabSettings, systemImage: "gearshape.fill", value: AppTab.settings) {
                 NavigationStack { SettingsView() }
             }

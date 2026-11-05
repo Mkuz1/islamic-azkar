@@ -1,0 +1,56 @@
+# Mac app: the iPhone app's SwiftUI code (../ios/App, ../ios/Shared) built for macOS, plus the
+# menu bar panel in Sources/. Generate the Xcode project with `xcodegen` (done in CI, see
+# .github/workflows/mac.yml); the generated IslamicAzkarMac.xcodeproj is not committed.
+name: IslamicAzkarMac
+options:
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.5"
+    CURRENT_PROJECT_VERSION: "5"
+targets:
+  IslamicAzkar:
+    type: application
+    platform: macOS
+    sources:
+      - path: ../ios/App
+        excludes: ["Assets.xcassets"]
+      - path: ../ios/Shared
+        excludes: ["Fonts/**"]
+      - path: Sources
+      - path: Assets.xcassets
+      - path: ../ios/Shared/Fonts
+        type: folder
+        buildPhase: resources
+    info:
+      path: Info.plist
+      properties:
+        CFBundleDisplayName: Islamic Azkar
+        CFBundleName: Islamic Azkar
+        LSApplicationCategoryType: public.app-category.lifestyle
+        LSMinimumSystemVersion: "15.0"
+        ATSApplicationFontsPath: Fonts
+        NSHumanReadableCopyright: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم"
+        NSLocationUsageDescription: "Your approximate location is used only on this Mac to calculate prayer times. يُستخدم موقعك التقريبي على هذا الجهاز فقط لحساب مواقيت الصلاة."
+        NSLocationWhenInUseUsageDescription: "Your approximate location is used only on this Mac to calculate prayer times. يُستخدم موقعك التقريبي على هذا الجهاز فقط لحساب مواقيت الصلاة."
+        CFBundleLocalizations: [ar, en, fr]
+        CFBundleURLTypes:
+          - CFBundleURLName: com.koussa.IslamicAzkar
+            CFBundleURLSchemes: [islamicazkar]
+    settings:
+      base:
+        PRODUCT_NAME: Islamic Azkar
+        PRODUCT_BUNDLE_IDENTIFIER: com.koussa.IslamicAzkar
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        DEVELOPMENT_TEAM: ""
+        ENABLE_HARDENED_RUNTIME: NO
+        ENABLE_APP_SANDBOX: NO
+        COMBINE_HIDPI_IMAGES: YES
+        ARCHS: "arm64 x86_64"
+        ONLY_ACTIVE_ARCH: NO

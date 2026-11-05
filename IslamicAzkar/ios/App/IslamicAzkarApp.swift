@@ -94,7 +94,7 @@ final class AppModel {
         script = int(SharedStore.Key.script, 0)
         hijriOffset = int(SharedStore.Key.hijriOffset, 0)
         place = Place.read(d)
-        method = int(SharedStore.Key.method, 0)
+        method = int(SharedStore.Key.method, CalcMethod.dubai.rawValue)
         asrHanafi = bool(SharedStore.Key.asrHanafi, false)
         applyLaunchArguments()
     }
@@ -193,12 +193,14 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 struct IslamicAzkarApp: App {
     #if os(iOS)
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    #else
+    @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var macDelegate
     #endif
     @State private var model = AppModel()
     @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "main") {
             Group {
                 if model.showDedication {
                     DedicationView(onContinue: { withAnimation(.easeInOut(duration: 0.6)) { model.showDedication = false } },
@@ -224,5 +226,21 @@ struct IslamicAzkarApp: App {
                 if phase == .active { model.reloadTasbihFromStore() }
             }
         }
+        #if os(macOS)
+        .defaultSize(width: 1100, height: 760)
+
+        // The menu bar icon stays while the app runs, even with every window closed or minimized:
+        // it reminds of the azkar due now and shows today's prayer times (MenuBar.swift in mac/).
+        MenuBarExtra {
+            MenuBarPanel()
+                .environment(model)
+                .environment(\.layoutDirection, model.lang.isRTL ? .rightToLeft : .leftToRight)
+                .environment(\.locale, model.lang.locale)
+                .tint(Theme.accent)
+        } label: {
+            MenuBarLabel().environment(model)
+        }
+        .menuBarExtraStyle(.window)
+        #endif
     }
 }

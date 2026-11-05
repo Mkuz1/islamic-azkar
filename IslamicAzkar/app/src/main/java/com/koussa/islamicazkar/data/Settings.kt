@@ -52,7 +52,7 @@ class Settings private constructor(private val sp: SharedPreferences) {
     var hijriOffset by mutableStateOf(sp.getInt(K_HIJRI_OFFSET, 0)); private set
     var lockGlance by mutableStateOf(sp.getBoolean(K_LOCK_GLANCE, false)); private set
     var place by mutableStateOf(Place.read(sp)); private set
-    var method by mutableStateOf(sp.getInt(K_METHOD, 0)); private set
+    var method by mutableStateOf(sp.getInt(K_METHOD, CalcMethod.DUBAI.ordinal)); private set
     var asrHanafi by mutableStateOf(sp.getBoolean(K_ASR, false)); private set
 
     fun updatePalette(v: Int) { palette = v; sp.edit().putInt(K_PALETTE, v).commit() }
