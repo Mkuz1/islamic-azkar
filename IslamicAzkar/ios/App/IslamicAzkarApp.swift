@@ -72,6 +72,7 @@ final class AppModel {
     var m: More { More.of(lang) }
 
     init() {
+        launchTrace("AppModel.init start")
         let d = SharedStore.defaults
         func bool(_ k: String, _ def: Bool) -> Bool { d.object(forKey: k) == nil ? def : d.bool(forKey: k) }
         func int(_ k: String, _ def: Int) -> Int { d.object(forKey: k) == nil ? def : d.integer(forKey: k) }
@@ -96,7 +97,9 @@ final class AppModel {
         place = Place.read(d)
         method = int(SharedStore.Key.method, CalcMethod.dubai.rawValue)
         asrHanafi = bool(SharedStore.Key.asrHanafi, false)
+        launchTrace("AppModel settings read")
         applyLaunchArguments()
+        launchTrace("AppModel.init done")
     }
 
     /// CI screenshots: `-ciScreen home|reader|celebration|tasbih|widgets|settings|favorites|dedication -ciLang ar -ciDark 1`.
@@ -190,6 +193,12 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 #endif
 
 @main
+/// `-ciTrace 1`: prints launch stages to stderr (diagnosing a launch that shows nothing).
+func launchTrace(_ stage: String) {
+    guard UserDefaults.standard.bool(forKey: "ciTrace") else { return }
+    FileHandle.standardError.write(Data("trace: \(stage)\n".utf8))
+}
+
 struct IslamicAzkarApp: App {
     #if os(iOS)
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
@@ -198,6 +207,8 @@ struct IslamicAzkarApp: App {
     #endif
     @State private var model = AppModel()
     @Environment(\.scenePhase) private var scenePhase
+
+    init() { launchTrace("App.init") }
 
     var body: some Scene {
         WindowGroup(id: "main") {
@@ -217,6 +228,7 @@ struct IslamicAzkarApp: App {
             .tint(Theme.accent)
             .onOpenURL { model.handle(url: $0) }
             .onAppear {
+                launchTrace("main window appeared")
                 #if os(iOS)
                 delegate.model = model
                 #endif

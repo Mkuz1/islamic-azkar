@@ -50,7 +50,7 @@ jobs:
           mkdir -p shots
           shot() { # name screen lang dark [extra args]
             n=$1; sc=$2; l=$3; dk=$4; shift 4
-            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciShot "$PWD/shots/$n.png" "$@" > "shots/$n.log" 2>&1 &
+            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciShot "$PWD/shots/$n.png" -ciTrace 1 "$@" > "shots/$n.log" 2>&1 &
             PID=$!
             for i in $(seq 1 30); do kill -0 $PID 2>/dev/null || break; sleep 1; done
             kill $PID 2>/dev/null || true
@@ -62,6 +62,12 @@ jobs:
               echo "no screenshot for $n"
             fi
           }
+          echo "--- bare launch (no arguments) for 15 s"
+          ( "$APP/Contents/MacOS/Islamic Azkar" -ciTrace 1 > shots/bare.log 2>&1 & P=$!; sleep 15; kill $P 2>/dev/null; true )
+          cat shots/bare.log
+          echo "--- spctl / codesign"
+          spctl --assess --type execute -vv "$APP" 2>&1 || true
+          codesign -dvv "$APP" 2>&1 | head -12 || true
           shot 03-mac-menu-en home en 0 -ciMenu 1
           shot 01-mac-home-ar home ar 0
       - uses: actions/upload-artifact@v4
