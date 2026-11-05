@@ -1,11 +1,8 @@
-- Duas from the Quran: 33 supplications of the Prophets and the believers, with surah and verse
-- 8 more duas from the Sunnah: ruqyah for the sick, a dua for the deceased, supplicating for others, seeking refuge
-- The ʿUmrah guide now shows each step with its duas as full cards, with counters and a progress bar
+- New: Islamic Azkar for Mac. The menu bar shows the app icon and the next prayer; click it for the azkar due now (and whether you read them today) and today's prayer times for your location. The app keeps running in the menu bar when its window is closed, and can open at login.
+- Prayer times now follow Dubai's Islamic Affairs department (IACAD, the Dulook DXB app) by default: Fajr and Isha at 18.2°, Dhuhr and Maghrib +3 minutes. Other methods remain in Settings.
 
-- أدعية من القرآن الكريم: ٣٣ دعاءً من أدعية الأنبياء والمؤمنين مع ذكر السورة والآية
-- ٨ أدعية جديدة من السنة: الرقية والدعاء للمريض والميت والدعاء للغير والاستعاذة
-- دليل العمرة يعرض كل خطوة مع أذكارها في بطاقات كاملة بعدّاد وشريط تقدّم
+- جديد: أذكار إسلامية على ماك. يظهر في شريط القوائم رمز التطبيق والصلاة القادمة؛ اضغط عليه لترى الأذكار المستحبة الآن (وهل قرأتها اليوم) ومواقيت الصلاة لمدينتك. يبقى التطبيق في شريط القوائم بعد إغلاق نافذته، ويمكن تشغيله عند بدء الجهاز.
+- مواقيت الصلاة أصبحت افتراضيًا وفق دائرة الشؤون الإسلامية والعمل الخيري بدبي (تطبيق دلوك): الفجر والعشاء بزاوية ١٨٫٢°، والظهر والمغرب +٣ دقائق. ويمكن اختيار طرق أخرى من الإعدادات.
 
-- Invocations du Coran : 33 invocations des prophètes et des croyants, avec sourate et verset
-- 8 nouvelles invocations de la Sunna : roqya pour le malade, invocation pour le défunt, invoquer pour autrui, demander protection
-- Le guide de la ʿOumra présente chaque étape avec ses invocations en cartes complètes, avec compteur et barre de progression
+- Nouveau : Islamic Azkar pour Mac. La barre des menus affiche l'icône de l'application et la prochaine prière ; cliquez pour voir les adhkar du moment (et si vous les avez lus aujourd'hui) et les horaires de prière du jour pour votre ville. L'application reste dans la barre des menus quand sa fenêtre est fermée et peut s'ouvrir à la connexion.
+- Les horaires de prière suivent désormais par défaut le département des affaires islamiques de Dubaï (IACAD, l'application Dulook DXB) : Fajr et Icha à 18,2°, Dhohr et Maghrib +3 minutes. Les autres méthodes restent dans les Réglages.

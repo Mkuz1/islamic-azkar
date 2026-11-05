@@ -62,6 +62,21 @@ This Mac has no Xcode, so it builds on GitHub Actions (`.github/workflows/ios.ym
 
 `IslamicAzkar/ios/typecheck.sh` gives a quick local check against the macOS SDK before pushing.
 
+## Mac
+
+`IslamicAzkar/mac/` builds the iPhone app's SwiftUI code (`ios/App`, `ios/Shared`) as a native Mac app, plus
+`mac/Sources/`: a menu bar item (app icon and next prayer) whose panel shows the azkar due now, whether they were
+read today, the countdown and today's prayer times for the chosen place, "open at login", and the app keeps running
+in the menu bar when its window is closed. The Xcode project is generated from `mac/project.yml` with XcodeGen.
+`.github/workflows/mac.yml` builds it on every push; releases attach `IslamicAzkar.dmg` (universal, ad-hoc signed:
+the first time, right-click the app and choose Open, or allow it in System Settings → Privacy & Security).
+
+## Prayer times
+
+Default method: Dubai, as used by Dubai's Islamic Affairs department (IACAD) in the Dulook DXB app — Fajr and Isha
+at 18.2°, Dhuhr and Maghrib +3 minutes (aladhan.com method 16). `PrayerCalcTest.dubaiDulook` checks it against six
+reference days through the year.
+
 ## Website
 
 Live at https://islamicazkar.net (also https://islamic-azkar.pages.dev)

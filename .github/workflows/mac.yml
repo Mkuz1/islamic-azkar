@@ -1,6 +1,6 @@
 # Builds the Mac app (menu bar prayer times and azkar reminder) on a GitHub-hosted Mac:
 #  - IslamicAzkar.dmg (ad-hoc signed, universal: Apple silicon and Intel)
-#  - screenshots of the main window and the menu bar panel
+# (GitHub's Mac runners give apps no usable window session, so there are no screenshots.)
 name: Mac
 
 on:
@@ -43,41 +43,9 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist"
           mkdir -p ../../out && ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
           ls -lh ../../out
-      - name: Screenshots (printed into this log as base64 JPEG between ===SHOT markers)
-        continue-on-error: true
-        run: |
-          APP="build/Build/Products/Release/Islamic Azkar.app"
-          mkdir -p shots
-          shot() { # name screen lang dark [extra args]
-            n=$1; sc=$2; l=$3; dk=$4; shift 4
-            open -n -W --stdout "$PWD/shots/$n.log" --stderr "$PWD/shots/$n.log" "$APP" --args -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciShot "$PWD/shots/$n.png" "$@" &
-            PID=$!
-            for i in $(seq 1 40); do [ -f "shots/$n.png" ] && sleep 2 && break; kill -0 $PID 2>/dev/null || break; sleep 1; done
-            pkill -f "Islamic Azkar.app/Contents/MacOS" 2>/dev/null || true; kill $PID 2>/dev/null || true; sleep 1
-            echo "--- app output for $n"; grep -v "^$" "shots/$n.log" | tail -15
-            if [ -f "shots/$n.png" ]; then
-              sips -s format jpeg -s formatOptions 55 -Z 1000 "shots/$n.png" --out "shots/$n.jpg" > /dev/null
-              echo "===SHOT $n"; base64 -i "shots/$n.jpg" | tr -d '\n' | fold -w 3000; echo; echo "===END $n"
-            else
-              echo "no screenshot for $n"
-            fi
-          }
-          shot 03-mac-menu-en home en 0 -ciMenu 1
-          shot 04-mac-menu-ar-dark home ar 1 -ciMenu 1
-          shot 01-mac-home-en home en 0
-          shot 06-mac-guide-fr guide fr 1
-          ls -la shots
       - uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
           name: IslamicAzkar-dmg
           retention-days: 3
           path: out/IslamicAzkar.dmg
-      - uses: actions/upload-artifact@v4
-        continue-on-error: true
-        if: always()
-        with:
-          name: mac-screenshots
-          retention-days: 3
-          path: IslamicAzkar/mac/shots
-          if-no-files-found: ignore
