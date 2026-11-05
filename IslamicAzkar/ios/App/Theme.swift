@@ -123,9 +123,11 @@ struct LanguagePill: View {
                     withAnimation(.snappy) { model.lang = lang }
                 } label: {
                     Text(label).font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(on ? Color.primary : Color.secondary)
+                        // Explicit light / dark colours: on the Mac's glass capsule the system secondary
+                        // colour came out almost black in Dark mode.
+                        .foregroundStyle(on ? Theme.dynamic(light: 0x111111, dark: 0xFFFFFF) : Theme.dynamic(light: 0x5F6B66, dark: 0xC9D3CE))
                         .frame(width: 42, height: 32)
-                        .background(on ? AnyShapeStyle(.background.opacity(0.9)) : AnyShapeStyle(.clear), in: Capsule())
+                        .background(on ? AnyShapeStyle(Theme.dynamic(light: 0xFFFFFF, dark: 0x3A3A3C, alphaLight: 0.9, alphaDark: 0.9)) : AnyShapeStyle(.clear), in: Capsule())
                 }
                 .buttonStyle(.plain)
             }
