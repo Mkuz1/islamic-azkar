@@ -9,10 +9,13 @@ enum SidebarItem: Hashable {
 }
 
 /// Mac navigation: a sidebar (app header, sections, categories, ʿUmrah guide) and one navigation
-/// stack in the detail column with a toolbar back button, ⌘[ and Esc to go back.
+/// stack in the detail column. The Back button sits at the top of the page itself (⌘[ and Esc too);
+/// the show / hide sidebar button sits in the sidebar. Clicking any sidebar item, even the one already
+/// selected, shows that section's main page.
 struct MacRootView: View {
     @Environment(AppModel.self) private var model
     @State private var extra: SidebarItem?
+    @State private var columns: NavigationSplitViewVisibility = .all
 
     private var selection: Binding<SidebarItem?> {
         Binding(
@@ -33,29 +36,53 @@ struct MacRootView: View {
 
     var body: some View {
         @Bindable var m = model
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columns) {
             sidebar
+                .toolbar(removing: .sidebarToggle)
                 .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 320)
         } detail: {
             NavigationStack(path: $m.homePath) {
                 root
                     .navigationDestination(for: Route.self) { destination($0) }
             }
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    Button(action: back) {
-                        Label(backTitle, systemImage: model.lang.isRTL ? "chevron.right" : "chevron.left")
-                    }
-                    .keyboardShortcut("[", modifiers: .command)
-                    .disabled(atHome)
-                    .help(backTitle)
-                }
-            }
+            .safeAreaInset(edge: .top, spacing: 0) { pageBar }
             .onExitCommand(perform: back)
         }
         .frame(minWidth: 860, minHeight: 600)
         .onChange(of: model.tab) { _, _ in if extra != nil, model.tab != .home { extra = nil } }
         .task { await MacNavTest.runIfRequested(model: model, select: { selection.wrappedValue = $0 }, back: back) }
+    }
+
+    /// Top of the page: Back (and, when the sidebar is hidden, the button to show it again).
+    private var pageBar: some View {
+        HStack(spacing: 8) {
+            if columns == .detailOnly {
+                Button { withAnimation { columns = .all } } label: {
+                    Image(systemName: "sidebar.leading").frame(height: 18)
+                }
+                .help(sidebarTitle)
+            }
+            Button(action: back) {
+                Label(backTitle, systemImage: model.lang.isRTL ? "chevron.right" : "chevron.left")
+                    .frame(height: 18)
+            }
+            .keyboardShortcut("[", modifiers: .command)
+            .disabled(atHome)
+            .help(backTitle + " (⌘[)")
+            Spacer()
+        }
+        .buttonStyle(.bordered)
+        .padding(.horizontal, 16).padding(.vertical, 8)
+        .background(.bar)
+        .overlay(alignment: .bottom) { Divider() }
+    }
+
+    private var sidebarTitle: String {
+        switch model.lang {
+        case .ar: return "إظهار الشريط الجانبي أو إخفاؤه"
+        case .en: return "Show or hide the sidebar"
+        case .fr: return "Afficher ou masquer la barre latérale"
+        }
     }
 
     private var backTitle: String {
@@ -115,6 +142,12 @@ struct MacRootView: View {
                 Text(model.s.appName).font(.headline).foregroundStyle(.primary)
                 Text(Hijri.format(model.lang, Hijri.of())).font(.caption).foregroundStyle(.secondary).lineLimit(1)
             }
+            Spacer(minLength: 4)
+            Button { withAnimation { columns = .detailOnly } } label: {
+                Image(systemName: "sidebar.leading").font(.system(size: 14, weight: .medium))
+            }
+            .buttonStyle(.borderless)
+            .help(sidebarTitle)
         }
         .textCase(nil)
         .padding(.vertical, 8)
@@ -130,6 +163,10 @@ struct MacRootView: View {
                 .background(color, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
         }
         .tag(item)
+        // The list only reports a *change* of selection: clicking the section you are already in
+        // (e.g. Home while reading inside it) must still go back to that section's main page.
+        .contentShape(Rectangle())
+        .onTapGesture { selection.wrappedValue = item }
     }
 
     // MARK: Detail
@@ -178,6 +215,8 @@ enum MacNavTest {
         model.showDedication = false
         await step("01-home", { select(.tab(.home)) }, expect: { model.tab == .home && model.homePath.isEmpty })
         await step("02-open-morning", { model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
+        await step("02b-click-home-while-reading", { select(.tab(.home)) }, expect: { model.homePath.isEmpty })
+        await step("02c-open-morning-again", { model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
         await step("03-back", back, expect: { model.homePath.isEmpty })
         await step("04-category", { select(.category("prayer")) }, expect: { model.homePath.isEmpty })
         await step("05-open-chapter", { model.homePath.append(.reader(.chapter(25), focus: nil)) }, expect: { model.homePath.count == 1 })
