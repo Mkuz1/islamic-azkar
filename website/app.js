@@ -20,7 +20,7 @@
       textSize: "حجم الخط", showTr: "إظهار النطق", showMean: "إظهار المعنى", theme: "المظهر", system: "تلقائي", light: "فاتح", dark: "داكن", close: "إغلاق",
       tapCount: "اضغط للعدّ", reset: "تصفير", total: n => `المجموع: ${num(n)}`, target: "العدد",
       getApp: "تطبيق أندرويد", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات ومسبحة.",
-      apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", join: "انضم إلى المختبِرين",
+      apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", mac: "نسخة ماك", macNote: "ملف DMG · macOS 15 أو أحدث، مع مواقيت الصلاة في شريط القوائم", join: "انضم إلى المختبِرين",
       joinText: "التطبيق في مرحلة الاختبار على Google Play. سجّل بريد Gmail المرتبط بمتجرك لنضيفك إلى المختبِرين ونرسل لك رابط التثبيت.",
       emailPh: "name@gmail.com", send: "سجّلني", sending: "جارٍ الإرسال…", badEmail: "أدخل عنوان بريد صحيحًا",
       thanks: "جزاك الله خيرًا! وصلنا بريدك وسنضيفك إلى المختبِرين قريبًا إن شاء الله.", failed: "تعذّر الإرسال، حاول مرة أخرى.",
@@ -44,7 +44,7 @@
       textSize: "Text size", showTr: "Show transliteration", showMean: "Show meaning", theme: "Appearance", system: "Auto", light: "Light", dark: "Dark", close: "Close",
       tapCount: "Tap to count", reset: "Reset", total: n => `Total: ${n}`, target: "Target",
       getApp: "Android app", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders and a tasbih.",
-      apk: "Download the app", apkNote: "APK file · Android 8 or later", join: "Join the testers",
+      apk: "Download the app", apkNote: "APK file · Android 8 or later", mac: "Mac app", macNote: "DMG file · macOS 15 or later, with prayer times in the menu bar", join: "Join the testers",
       joinText: "The app is in testing on Google Play. Leave the Gmail address you use on the Play Store and we’ll add you as a tester and send you the install link.",
       emailPh: "name@gmail.com", send: "Sign me up", sending: "Sending…", badEmail: "Enter a valid email address",
       thanks: "Jazak Allah khayran! We got your address and will add you to the testers soon, in sha Allah.", failed: "Couldn’t send it. Please try again.",
@@ -68,7 +68,7 @@
       textSize: "Taille du texte", showTr: "Afficher la translittération", showMean: "Afficher la traduction", theme: "Apparence", system: "Auto", light: "Clair", dark: "Sombre", close: "Fermer",
       tapCount: "Touchez pour compter", reset: "Remettre à zéro", total: n => `Total : ${n}`, target: "Objectif",
       getApp: "Application Android", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels et un chapelet.",
-      apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", join: "Devenir testeur",
+      apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", mac: "Version Mac", macNote: "Fichier DMG · macOS 15 ou plus récent, avec les horaires de prière dans la barre des menus", join: "Devenir testeur",
       joinText: "L’application est en test sur Google Play. Laissez l’adresse Gmail de votre Play Store : nous vous ajouterons aux testeurs et vous enverrons le lien d’installation.",
       emailPh: "nom@gmail.com", send: "M’inscrire", sending: "Envoi…", badEmail: "Saisissez une adresse e-mail valide",
       thanks: "Jazak Allah khayran ! Nous avons bien reçu votre adresse et vous ajouterons aux testeurs très bientôt, in shâ Allah.", failed: "Échec de l’envoi. Réessayez.",
@@ -119,6 +119,7 @@
   };
   // Always the newest APK: GitHub redirects /releases/latest/download/<asset> to the latest release's file.
   const APK_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.apk";
+  const DMG_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.dmg";
   const REGISTER_URL = /(^|\.)islamicazkar\.net$/.test(location.hostname) ? "/api/register" : "https://islamicazkar.net/api/register";
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
   const CAT_STYLE = {
@@ -247,6 +248,8 @@
               <button class="pill press" id="join-toggle" aria-expanded="false" aria-controls="join">${svg("mail")}${t.join}</button>
             </div>
             <small class="apk-note">${t.apkNote}</small>
+            <div class="app-acts" style="margin-top:10px"><a class="pill press" href="${DMG_URL}" rel="noopener">${svg("download")}${t.mac}</a></div>
+            <small class="apk-note">${t.macNote}</small>
             <form id="join" class="join" hidden novalidate>
               <p>${t.joinText}</p>
               <div class="join-row">
