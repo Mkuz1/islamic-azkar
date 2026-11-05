@@ -1,0 +1,26 @@
+# Temporary: fetches public Dubai prayer-time sources to calibrate the "Dubai (Dulook DXB)" method.
+name: Probe
+on:
+  push:
+    branches: ["main-*"]
+    paths: [".github/workflows/probe.yml"]
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: aladhan methods
+        run: curl -sS -m 30 https://api.aladhan.com/v1/methods | python3 -c "import json,sys; d=json.load(sys.stdin)['data']; [print(k, json.dumps(v)) for k,v in d.items()]" || true
+      - name: aladhan Dubai, method 16, several dates
+        run: |
+          for dt in 01-01-2026 21-03-2026 21-06-2026 23-09-2026 05-11-2026 21-12-2026; do
+            echo "== $dt"; curl -sS -m 30 "https://api.aladhan.com/v1/timings/$dt?latitude=25.2048&longitude=55.2708&method=16" | python3 -c "import json,sys; d=json.load(sys.stdin)['data']; print(d['timings']); print(d['meta'])" || true
+          done
+      - name: IACAD site
+        run: |
+          for u in https://www.iacad.gov.ae https://www.iacad.gov.ae/en https://www.iacad.gov.ae/en/prayer-times https://www.iacad.gov.ae/ar/prayer-times https://iacad.gov.ae/en/services/prayer-timings; do
+            echo "== $u"; curl -sSL -m 30 -A "Mozilla/5.0" -o page.html -w '%{http_code} %{url_effective}\n' "$u" || true
+            grep -oiE '(prayer|salat|fajr|isha|maghrib|api|json)[^"<> ]{0,120}' page.html | sort -u | head -60 || true
+          done
+      - name: Dulook in app stores
+        run: |
+          curl -sS -m 30 "https://itunes.apple.com/search?term=dulook&entity=software&country=ae" | python3 -c "import json,sys; [print(r['trackName'],'|',r['sellerName'],'|',r['trackViewUrl'],'|',r['description'][:1500].replace(chr(10),' ')) for r in json.load(sys.stdin)['results']]" || true
