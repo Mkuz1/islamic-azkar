@@ -47,7 +47,9 @@ struct MacRootView: View {
                 root
                     .safeAreaInset(edge: .top, spacing: 0) { pageBar }
                     .navigationDestination(for: Route.self) { route in
-                        destination(route).safeAreaInset(edge: .top, spacing: 0) { pageBar }
+                        destination(route)
+                            .navigationBarBackButtonHidden(true)   // one Back control: the page bar's
+                            .safeAreaInset(edge: .top, spacing: 0) { pageBar }
                     }
             }
             .onExitCommand(perform: back)
@@ -58,7 +60,14 @@ struct MacRootView: View {
     }
 
     /// Top of the page: Back (and, when the sidebar is hidden, the button to show it again).
+    @ViewBuilder
     private var pageBar: some View {
+        if !atHome || columns == .detailOnly {
+            pageBarContent
+        }
+    }
+
+    private var pageBarContent: some View {
         HStack(spacing: 8) {
             if columns == .detailOnly {
                 Button { withAnimation { columns = .all } } label: {
@@ -66,13 +75,14 @@ struct MacRootView: View {
                 }
                 .help(sidebarTitle)
             }
-            Button(action: back) {
-                Label(backTitle, systemImage: model.lang.isRTL ? "chevron.right" : "chevron.left")
-                    .frame(height: 18)
+            if !atHome {   // Home's first page has nowhere to go back to
+                Button(action: back) {
+                    Label(backTitle, systemImage: model.lang.isRTL ? "chevron.right" : "chevron.left")
+                        .frame(height: 18)
+                }
+                .keyboardShortcut("[", modifiers: .command)
+                .help(backTitle + " (⌘[)")
             }
-            .keyboardShortcut("[", modifiers: .command)
-            .disabled(atHome)
-            .help(backTitle + " (⌘[)")
             Spacer()
         }
         .buttonStyle(.bordered)
@@ -201,10 +211,14 @@ struct MacRootView: View {
 /// readings, logs how long the main thread took to respond to each step, saves a screenshot after
 /// each step in the `-ciShotDir` folder, then quits. A step that leaves the wrong screen fails it.
 enum MacNavTest {
+    /// The window content is rebuilt on a language change; the test must only start once.
+    @MainActor private static var started = false
+
     @MainActor
     static func runIfRequested(model: AppModel, select: @escaping (SidebarItem) -> Void, back: @escaping () -> Void) async {
         let d = UserDefaults.standard
-        guard d.bool(forKey: "ciNav"), let dir = d.string(forKey: "ciShotDir") else { return }
+        guard d.bool(forKey: "ciNav"), let dir = d.string(forKey: "ciShotDir"), !started else { return }
+        started = true
         var failures = 0
         func step(_ name: String, _ action: () -> Void, expect: () -> Bool) async {
             let start = Date()
@@ -237,6 +251,18 @@ enum MacNavTest {
         await step("10d-back-to-home", back, expect: { model.tab == .home && model.homePath.isEmpty })
         await step("09b-settings-back", { select(.tab(.settings)); back() }, expect: { model.tab == .home })
         await step("11-home-open-evening", { select(.tab(.home)); model.show(.evening, split: false) }, expect: { model.homePath.count == 1 })
+        // BUG-001: changing the language, then opening a reading, crashed (layout loop). Only model
+        // operations from here on: the window content is rebuilt, so `select` / `back` are stale.
+        await step("12-language-ar", { model.lang = .ar }, expect: { model.lang == .ar && model.homePath.isEmpty })
+        await step("13-open-morning-ar", { model.tab = .home; model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
+        await step("14-language-en", { model.lang = .en }, expect: { model.homePath.isEmpty })
+        await step("15-open-evening-en", { model.show(.evening, split: false) }, expect: { model.homePath.count == 1 })
+        // BUG-004: a dhikr completed in a reading is completed everywhere.
+        let first = AzkarData.shared.morning[0]
+        await step("16-shared-progress", { model.setRemaining(first, 0) }, expect: { model.remaining(first) == 0 })
+        // BUG-003: dark appearance (screenshot to review).
+        await step("17-dark-home", { model.homePath = []; model.theme = .dark }, expect: { model.theme == .dark })
+        await step("18-dark-reader", { model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
         launchTrace("nav done, failures: \(failures)")
         exit(failures == 0 ? 0 : 3)
     }

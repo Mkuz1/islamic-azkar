@@ -39,9 +39,7 @@ struct GuideLinkRow: View {
 struct GuideView: View {
     @Environment(AppModel.self) private var model
     let key: String
-    @State private var remaining: [Int: Int] = [:]
-
-    private func left(_ z: Zikr) -> Int { remaining[z.id] ?? z.repeatCount }
+    private func left(_ z: Zikr) -> Int { model.remaining(z) }
 
     var body: some View {
         let data = AzkarData.shared
@@ -63,7 +61,7 @@ struct GuideView: View {
                         StepCard(number: i + 1, count: steps.count, step: pair.0)
                         ForEach(pair.1) { z in
                             ZikrCard(zikr: z, index: numberOf[z.id], total: all.count, remaining: left(z), chapterTitle: guide.title(lang)) { everything in
-                                withAnimation(.snappy) { remaining[z.id] = everything ? 0 : left(z) - 1 }
+                                withAnimation(.snappy) { model.setRemaining(z, everything ? 0 : left(z) - 1) }
                             }
                         }
                         Spacer().frame(height: 8)

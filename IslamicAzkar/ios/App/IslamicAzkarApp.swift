@@ -21,7 +21,15 @@ enum Route: Hashable {
 final class AppModel {
     private let d = SharedStore.defaults
 
-    var lang: Lang { didSet { d.set(lang.rawValue, forKey: SharedStore.Key.lang); refreshExtensions() } }
+    var lang: Lang {
+        didSet {
+            d.set(lang.rawValue, forKey: SharedStore.Key.lang)
+            #if os(macOS)
+            if oldValue != lang { homePath = [] }
+            #endif
+            refreshExtensions()
+        }
+    }
     var theme: ThemeMode { didSet { d.set(theme.rawValue, forKey: "theme") } }
     var textScale: Double { didSet { d.set(textScale, forKey: "text_scale") } }
     var showTranslit: Bool { didSet { d.set(showTranslit, forKey: "translit") } }
@@ -67,6 +75,21 @@ final class AppModel {
     var showDedication = true
     var shareTarget: ShareTarget?
     var toast: String?
+
+    /// Today's remaining repetitions by dhikr id, shared by every screen that shows a dhikr (a reading,
+    /// Favourites, the ʿUmrah guide), so completing a dhikr in one shows it completed in the others.
+    private(set) var progress: [Int: Int] = [:]
+    private var progressDay = Calendar.current.startOfDay(for: .now)
+
+    func remaining(_ z: Zikr) -> Int {
+        progressDay == Calendar.current.startOfDay(for: .now) ? (progress[z.id] ?? z.repeatCount) : z.repeatCount
+    }
+
+    func setRemaining(_ z: Zikr, _ value: Int) {
+        let today = Calendar.current.startOfDay(for: .now)
+        if progressDay != today { progress = [:]; progressDay = today }
+        progress[z.id] = max(0, min(value, z.repeatCount))
+    }
 
     var s: L10n { L10n.of(lang) }
     var m: More { More.of(lang) }
@@ -237,7 +260,9 @@ struct IslamicAzkarApp: App {
                         .transition(.opacity)
                 } else {
                     #if os(macOS)
-                    MacRootView().transition(.opacity)
+                    // Rebuilt on a language change so the split view takes the new layout direction
+                    // (keeping the old one made the next navigation loop and crash).
+                    MacRootView().id(model.lang).transition(.opacity)
                     #else
                     RootView().transition(.opacity)
                     #endif

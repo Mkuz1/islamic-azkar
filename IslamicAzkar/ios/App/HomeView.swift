@@ -258,7 +258,7 @@ private struct SearchResults: View {
 
         VStack(spacing: 0) {
             if chapters.isEmpty && hits.isEmpty {
-                ContentUnavailableView.search(text: query).padding(.top, 40)
+                ContentUnavailableView.search(text: query.count > 40 ? String(query.prefix(40)) + "…" : query).padding(.top, 40)
             }
             if !chapters.isEmpty {
                 SectionLabel(text: model.s.categories)

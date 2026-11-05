@@ -1,6 +1,8 @@
 import SwiftUI
 #if os(iOS)
 import UIKit
+#else
+import AppKit
 #endif
 
 /// The Android app's palette: Apple's label hierarchy tinted with the Mushaf's green and gold,
@@ -28,7 +30,13 @@ enum Theme {
                            blue: CGFloat(hex & 0xFF) / 255, alpha: a)
         })
         #else
-        Color(hex: light, alpha: alphaLight)
+        // Follows the window's appearance (Light / Dark / Auto), like the iOS version.
+        Color(nsColor: NSColor(name: nil) { appearance in
+            let isDark = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            let hex = isDark ? dark : light
+            return NSColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+                           blue: CGFloat(hex & 0xFF) / 255, alpha: isDark ? alphaDark : alphaLight)
+        })
         #endif
     }
 }

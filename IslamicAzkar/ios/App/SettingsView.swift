@@ -105,7 +105,7 @@ struct SettingsView: View {
                 }
                 if model.generalOn {
                     Picker(s.every, selection: $am.generalEvery) {
-                        ForEach([1, 2, 3, 4, 6], id: \.self) { h in Text("\(lang.num(h)) h").tag(h) }
+                        ForEach([1, 2, 3, 4, 6], id: \.self) { h in Text(hours(h)).tag(h) }
                     }
                     timeRow(s.between, $am.generalFrom)
                     timeRow(s.and, $am.generalTo)
@@ -171,6 +171,15 @@ struct SettingsView: View {
         })
     }
 
+    /// "every … hours" in the app's language.
+    private func hours(_ n: Int) -> String {
+        switch model.lang {
+        case .ar: return n == 1 ? "ساعة" : n == 2 ? "ساعتين" : "\(Lang.ar.num(n)) ساعات"
+        case .en: return n == 1 ? "1 hour" : "\(n) hours"
+        case .fr: return n == 1 ? "1 heure" : "\(n) heures"
+        }
+    }
+
     private func timeRow(_ title: String, _ minutes: Binding<Int>) -> some View {
         DatePicker(title, selection: Binding<Date>(
             get: { Calendar.current.date(bySettingHour: minutes.wrappedValue / 60, minute: minutes.wrappedValue % 60, second: 0, of: .now) ?? .now },
@@ -179,5 +188,7 @@ struct SettingsView: View {
                 minutes.wrappedValue = (c.hour ?? 0) * 60 + (c.minute ?? 0)
             }
         ), displayedComponents: .hourAndMinute)
+        // Same digits as the prayer times (Arabic-Indic in Arabic).
+        .environment(\.locale, model.lang == .ar ? Locale(identifier: "ar@numbers=arab") : model.lang.locale)
     }
 }

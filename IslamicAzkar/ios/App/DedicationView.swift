@@ -75,6 +75,7 @@ struct DedicationView: View {
                         }
                         .pickerStyle(.segmented)
                         .labelsHidden()
+                        .environment(\.colorScheme, .dark)   // white labels on the dark green
                         .frame(maxWidth: 260)
                         .environment(\.layoutDirection, .leftToRight)
                         .padding(.top, 24 * k)
