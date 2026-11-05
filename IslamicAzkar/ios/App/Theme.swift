@@ -73,8 +73,17 @@ extension View {
     }
 
     /// Page chrome: backdrop behind, hidden system background.
+    @ViewBuilder
     func pageBackdrop() -> some View {
+        #if os(macOS)
+        // macOS draws a Form as label/value columns across the whole window: use the grouped
+        // (iOS Settings-like) style in a centred column instead.
+        self.formStyle(.grouped).scrollContentBackground(.hidden)
+            .frame(maxWidth: 720).frame(maxWidth: .infinity)
+            .background(Backdrop())
+        #else
         self.scrollContentBackground(.hidden).background(Backdrop())
+        #endif
     }
 }
 
