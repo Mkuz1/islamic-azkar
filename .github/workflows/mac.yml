@@ -52,7 +52,13 @@ jobs:
             n=$1; sc=$2; l=$3; dk=$4; shift 4
             "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciShot "$PWD/shots/$n.png" -ciTrace 1 "$@" > "shots/$n.log" 2>&1 &
             PID=$!
-            for i in $(seq 1 30); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+            for i in $(seq 1 14); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+            if kill -0 $PID 2>/dev/null; then
+              echo "--- still running after 14 s: main thread stack"
+              sample $PID 3 -file "shots/$n.sample.txt" > /dev/null 2>&1 || true
+              awk '/Thread_[0-9]+.*(main-thread|DispatchQueue_1)/{p=1} p&&/^ *Thread_/&&!/main-thread|DispatchQueue_1/{if(seen)exit} p{seen=1; print}' "shots/$n.sample.txt" | cut -c1-220 | head -90
+              echo "--- CPU"; ps -o pid,%cpu,state,command -p $PID | cut -c1-120
+            fi
             kill $PID 2>/dev/null || true
             echo "--- app output for $n"; grep -v "^$" "shots/$n.log" | tail -15
             if [ -f "shots/$n.png" ]; then
@@ -62,14 +68,8 @@ jobs:
               echo "no screenshot for $n"
             fi
           }
-          echo "--- bare launch (no arguments) for 15 s"
-          ( "$APP/Contents/MacOS/Islamic Azkar" -ciTrace 1 > shots/bare.log 2>&1 & P=$!; sleep 15; kill $P 2>/dev/null; true )
-          cat shots/bare.log
-          echo "--- spctl / codesign"
-          spctl --assess --type execute -vv "$APP" 2>&1 || true
-          codesign -dvv "$APP" 2>&1 | head -12 || true
           shot 03-mac-menu-en home en 0 -ciMenu 1
-          shot 01-mac-home-ar home ar 0
+
       - uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
