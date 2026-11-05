@@ -192,13 +192,13 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 }
 #endif
 
-@main
 /// `-ciTrace 1`: prints launch stages to stderr (diagnosing a launch that shows nothing).
 func launchTrace(_ stage: String) {
     guard UserDefaults.standard.bool(forKey: "ciTrace") else { return }
     FileHandle.standardError.write(Data("trace: \(stage)\n".utf8))
 }
 
+@main
 struct IslamicAzkarApp: App {
     #if os(iOS)
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
