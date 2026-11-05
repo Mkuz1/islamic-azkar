@@ -7,6 +7,7 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if UserDefaults.standard.string(forKey: "ciShot") != nil { print("ci: launched, windows=\(NSApp.windows.count)"); fflush(stdout) }
         // CI screenshots of the menu bar panel: `-ciMenu 1` shows it in a plain window.
         if UserDefaults.standard.bool(forKey: "ciMenu") { MenuPanelPreviewWindow.show() }
         // CI: `-ciShot <file.png>` saves the front window as a PNG after a few seconds, then quits
@@ -14,6 +15,8 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
         if let path = UserDefaults.standard.string(forKey: "ciShot") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
                 let w = MenuPanelPreviewWindow.window ?? NSApp.windows.first { $0.isVisible && $0.frame.width > 300 }
+                print("ci: capture, windows=\(NSApp.windows.map { "\($0.className) \(Int($0.frame.width))x\(Int($0.frame.height)) visible=\($0.isVisible)" }), chosen=\(w != nil)")
+                fflush(stdout)
                 if let v = w?.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) {
                     v.cacheDisplay(in: v.bounds, to: rep)
                     try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
