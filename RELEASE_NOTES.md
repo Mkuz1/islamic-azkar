@@ -1,5 +1,11 @@
-- Mac: the Back button (and ⌘[ / Esc) now always works: one page back, or to Home from the first page of Favourites, Tasbih, Settings, a category or the ʿUmrah guide.
+- Mac: the Back button sits at the top of every page; the button that shows or hides the sidebar sits in the sidebar.
+- Mac: clicking any item in the sidebar opens that section's main page, even the section you are already in (e.g. Home while reading).
+- Mac: morning and evening reminders now appear as banners while the app runs in the menu bar; a bell 🔔 appears in the menu bar until the azkar are read; Settings has a "Send a test reminder" button.
 
-- ماك: زر الرجوع (و ⌘[ و Esc) يعمل دائمًا الآن: صفحة واحدة للخلف، أو إلى الرئيسية من أول صفحة في المفضلة أو المسبحة أو الإعدادات أو أي قسم أو دليل العمرة.
+- ماك: زر الرجوع أعلى كل صفحة، وزر إظهار الشريط الجانبي أو إخفائه داخل الشريط الجانبي.
+- ماك: النقر على أي عنصر في الشريط الجانبي يفتح الصفحة الرئيسية لذلك القسم، حتى لو كنت فيه (مثل الرئيسية أثناء القراءة).
+- ماك: تذكيرات الصباح والمساء تظهر الآن والتطبيق يعمل في شريط القوائم، ويظهر جرس 🔔 حتى تُقرأ الأذكار، وفي الإعدادات زر «إرسال تذكير تجريبي».
 
-- Mac : le bouton Retour (et ⌘[ / Échap) fonctionne toujours : une page en arrière, ou vers l'Accueil depuis la première page des Favoris, du Tasbih, des Réglages, d'une catégorie ou du guide de la ʿOumra.
+- Mac : le bouton Retour est en haut de chaque page ; le bouton qui affiche ou masque la barre latérale est dans la barre latérale.
+- Mac : cliquer sur un élément de la barre latérale ouvre la page principale de cette section, même celle où vous êtes déjà (ex. Accueil pendant la lecture).
+- Mac : les rappels du matin et du soir s'affichent pendant que l'application tourne dans la barre des menus ; une cloche 🔔 reste affichée jusqu'à la lecture ; bouton « Envoyer un rappel de test » dans les Réglages.
