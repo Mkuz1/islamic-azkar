@@ -28,6 +28,8 @@ targets:
     info:
       path: Info.plist
       properties:
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
         CFBundleDisplayName: Islamic Azkar
         CFBundleName: Islamic Azkar
         LSApplicationCategoryType: public.app-category.lifestyle

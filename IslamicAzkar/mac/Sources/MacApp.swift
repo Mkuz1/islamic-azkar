@@ -9,6 +9,18 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CI screenshots of the menu bar panel: `-ciMenu 1` shows it in a plain window.
         if UserDefaults.standard.bool(forKey: "ciMenu") { MenuPanelPreviewWindow.show() }
+        // CI: `-ciShot <file.png>` saves the front window as a PNG after a few seconds, then quits
+        // (GitHub's Mac runners cannot screenshot the screen itself).
+        if let path = UserDefaults.standard.string(forKey: "ciShot") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                let w = MenuPanelPreviewWindow.window ?? NSApp.windows.first { $0.isVisible && $0.frame.width > 300 }
+                if let v = w?.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) {
+                    v.cacheDisplay(in: v.bounds, to: rep)
+                    try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
+                }
+                NSApp.terminate(nil)
+            }
+        }
     }
 }
 
@@ -39,6 +51,8 @@ func showMainWindow(_ openWindow: OpenWindowAction) {
 
 /// CI only: the menu bar panel in an ordinary window so it can be screenshotted.
 enum MenuPanelPreviewWindow {
+    @MainActor static var window: NSWindow?
+
     @MainActor static func show() {
         let model = AppModel()
         let view = MenuBarPanel()
@@ -50,6 +64,7 @@ enum MenuPanelPreviewWindow {
         w.title = "Islamic Azkar"
         w.setFrameTopLeftPoint(NSPoint(x: 40, y: (NSScreen.main?.frame.height ?? 900) - 40))
         w.makeKeyAndOrderFront(nil)
+        window = w
         NSApp.activate(ignoringOtherApps: true)
     }
 }
