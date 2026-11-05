@@ -52,7 +52,13 @@ extension View {
     @ViewBuilder
     func glassCard(cornerRadius: CGFloat = 26) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if os(macOS)
+        // On the Mac a live glass effect behind every card (dozens in a reading) makes scrolling and
+        // navigation lag: a tinted card with a hairline rim looks the same at a fraction of the cost.
+        self.background(Theme.pane, in: shape)
+            .overlay(shape.strokeBorder(Theme.rim, lineWidth: 0.7))
+        #else
+        if #available(iOS 26.0, *) {
             self.background(Theme.pane, in: shape)
                 .glassEffect(.regular, in: shape)
         } else {
@@ -60,6 +66,7 @@ extension View {
                 .overlay(shape.strokeBorder(Theme.rim, lineWidth: 0.7))
                 .shadow(color: .black.opacity(0.06), radius: 12, y: 4)
         }
+        #endif
     }
 
     /// A small glass capsule (chips, the language switch).

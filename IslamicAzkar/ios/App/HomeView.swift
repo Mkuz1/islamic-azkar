@@ -212,6 +212,7 @@ struct GlassRow<Content: View>: View {
         VStack(spacing: 0) {
             HStack(spacing: 14) { content }
                 .padding(.horizontal, 16).frame(minHeight: 56)
+                .contentShape(Rectangle())
             if divider { Divider().padding(.leading, 62) }
         }
         .contentShape(Rectangle())
@@ -234,6 +235,7 @@ extension View {
 struct PressStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .contentShape(Rectangle())   // the whole card is clickable, not only its text (macOS)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(response: 0.25, dampingFraction: 0.6), value: configuration.isPressed)
     }
@@ -311,6 +313,7 @@ struct ChapterRow: View {
                     Image(systemName: "chevron.forward").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
                 }
                 .padding(.horizontal, 16).padding(.vertical, 12).frame(minHeight: 56)
+                .contentShape(Rectangle())
                 .background(selected ? Theme.accentSoft : .clear)
                 if divider { Divider().padding(.leading, 16) }
             }

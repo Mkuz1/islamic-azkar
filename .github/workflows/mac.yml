@@ -87,6 +87,16 @@ jobs:
           check guide-fr guide fr
           check tap-dedication-en dedication en -ciTap dedication
           check tap-home-ar home ar -ciTap home
+          # Navigation smoke test: sidebar sections, open / back, category, favourites, tasbih, settings, guide.
+          mkdir -p shots/nav
+          "$APP/Contents/MacOS/Islamic Azkar" -ciScreen home -ciLang en -ciNav 1 -ciShotDir "$PWD/shots/nav" -ciTrace 1 > shots/nav.log 2>&1 &
+          PID=$!
+          for i in $(seq 1 60); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+          if kill -0 $PID 2>/dev/null; then echo "::error::navigation test did not finish"; kill $PID; FAILED=1; NAV=timeout
+          else wait $PID; NAV=$?; fi
+          echo "--- navigation test (exit $NAV)"; grep "nav " shots/nav.log || cat shots/nav.log
+          [ "$NAV" = 0 ] || FAILED=1
+          for f in shots/nav/*.png; do [ -f "$f" ] && cp "$f" "shots/nav-$(basename "$f")"; done
           # Screenshots go to the "mac-shots" branch (artifact storage is full), to review the Mac layout.
           mkdir -p /tmp/macshots
           for f in shots/*.png; do sips -s format jpeg -s formatOptions 60 -Z 1100 "$f" --out "/tmp/macshots/$(basename "${f%.png}").jpg" > /dev/null; done

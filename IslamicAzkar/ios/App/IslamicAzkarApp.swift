@@ -230,7 +230,11 @@ struct IslamicAzkarApp: App {
                                    onOpen: { r in withAnimation(.easeInOut(duration: 0.6)) { model.open(r) } })
                         .transition(.opacity)
                 } else {
+                    #if os(macOS)
+                    MacRootView().transition(.opacity)
+                    #else
                     RootView().transition(.opacity)
+                    #endif
                 }
             }
             .environment(model)
