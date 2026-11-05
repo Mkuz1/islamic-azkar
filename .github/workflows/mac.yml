@@ -50,7 +50,10 @@ jobs:
           mkdir -p shots
           shot() { # name screen lang dark [extra args]
             n=$1; sc=$2; l=$3; dk=$4; shift 4
-            timeout 40 "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciShot "$PWD/shots/$n.png" "$@" > /dev/null 2>&1 || true
+            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciShot "$PWD/shots/$n.png" "$@" > /dev/null 2>&1 &
+            PID=$!
+            for i in $(seq 1 30); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+            kill $PID 2>/dev/null || true
             if [ -f "shots/$n.png" ]; then
               sips -s format jpeg -s formatOptions 55 -Z 1000 "shots/$n.png" --out "shots/$n.jpg" > /dev/null
               echo "===SHOT $n"; base64 -i "shots/$n.jpg" | tr -d '\n' | fold -w 3000; echo; echo "===END $n"
