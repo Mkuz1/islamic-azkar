@@ -63,12 +63,16 @@ jobs:
           shot 06-mac-guide-en guide en 0
           ls -la shots
       - uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: IslamicAzkar-dmg
+          retention-days: 3
           path: out/IslamicAzkar.dmg
       - uses: actions/upload-artifact@v4
+        continue-on-error: true
         if: always()
         with:
           name: mac-screenshots
+          retention-days: 3
           path: IslamicAzkar/mac/shots
           if-no-files-found: ignore

@@ -41,6 +41,8 @@ jobs:
           "$AAPT2" dump permissions "$GH" | grep -q REQUEST_INSTALL_PACKAGES
           "$AAPT2" dump badging "$GH" | head -1
       - uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: android-debug-apks
+          retention-days: 3
           path: IslamicAzkar/app/build/outputs/apk/*/debug/*.apk

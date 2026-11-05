@@ -7,6 +7,9 @@
 #  - Mac app, ad-hoc signed                                → same public release (IslamicAzkar.dmg)
 #  - Android "play" App Bundle for Google Play          → private release in this repository (IslamicAzkar-play.aab)
 #
+# Each build job uploads its file straight to a draft release (no workflow artifacts, so the
+# Actions storage quota never blocks a release); the last job publishes the drafts.
+#
 # Repository secrets (Settings → Secrets and variables → Actions):
 #   UPLOAD_KEYSTORE_BASE64   the upload keystore file, base64-encoded
 #   UPLOAD_KEYSTORE_PASSWORD UPLOAD_KEY_ALIAS  UPLOAD_KEY_PASSWORD
@@ -33,11 +36,51 @@ env:
   UPLOAD_CERT_SHA256: 25f7c4e6493965e99e62586e699bff3727da15d431ca7119671b33c90bd24eee
 
 jobs:
+  # Version from build.gradle.kts, checked against the tag or the RELEASE file; creates both draft releases.
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version
+        id: version
+        run: |
+          V=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' IslamicAzkar/app/build.gradle.kts)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = tag ]; then WANT="${GITHUB_REF_NAME}"; else WANT=$(tr -d '[:space:]' < RELEASE); fi
+          if [ "$WANT" != "v$V" ]; then echo "::error::Release $WANT does not match versionName $V (expected v$V)"; exit 1; fi
+          grep -q "MARKETING_VERSION: \"$V\"" IslamicAzkar/mac/project.yml || { echo "::error::mac/project.yml MARKETING_VERSION is not $V"; exit 1; }
+          grep -q "MARKETING_VERSION = $V;" IslamicAzkar/ios/IslamicAzkar.xcodeproj/project.pbxproj || { echo "::error::iOS MARKETING_VERSION is not $V"; exit 1; }
+      - name: Release notes
+        env:
+          V: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "**Islamic Azkar $V**"; echo
+            cat RELEASE_NOTES.md; echo
+            echo '**Android:** install `IslamicAzkar.apk` (Android 8 or later).'
+            echo '**iPhone:** `IslamicAzkar.ipa` is unsigned; install it with Sideloadly or AltStore.'
+            echo '**Mac:** open `IslamicAzkar.dmg` and drag the app to Applications (macOS 15 or later). The first time, right-click the app and choose Open.'
+          } > notes.md
+      - name: Draft releases
+        env:
+          V: ${{ steps.version.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -n "$PUBLIC_TOKEN" ] || { echo "::error::Add the RELEASES_TOKEN secret."; exit 1; }
+          if ! GH_TOKEN="$PUBLIC_TOKEN" gh release view "v$V" -R Mkuz1/islamic-azkar-releases >/dev/null 2>&1; then
+            GH_TOKEN="$PUBLIC_TOKEN" gh release create "v$V" -R Mkuz1/islamic-azkar-releases --draft --title "Islamic Azkar $V" --notes-file notes.md
+          fi
+          if ! gh release view "v$V" >/dev/null 2>&1; then
+            gh release create "v$V" --draft --title "Islamic Azkar $V" --notes-file notes.md --target "$GITHUB_SHA"
+          fi
+
   android:
     runs-on: ubuntu-latest
     timeout-minutes: 40
-    outputs:
-      version: ${{ steps.version.outputs.version }}
+    needs: prepare
     defaults:
       run:
         working-directory: IslamicAzkar
@@ -48,16 +91,6 @@ jobs:
           distribution: temurin
           java-version: 17
           cache: gradle
-      - name: Version
-        id: version
-        run: |
-          V=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' app/build.gradle.kts)
-          echo "version=$V" >> "$GITHUB_OUTPUT"
-          echo "versionName $V"
-          if [ "${GITHUB_REF_TYPE}" = tag ]; then WANT="${GITHUB_REF_NAME}"; else WANT=$(tr -d '[:space:]' < ../RELEASE); fi
-          if [ "$WANT" != "v$V" ]; then
-            echo "::error::Release $WANT does not match versionName $V (expected v$V)"; exit 1
-          fi
       - name: Upload key
         env:
           KS: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
@@ -87,7 +120,7 @@ jobs:
           "$BT/apksigner" verify --print-certs "$APK" | tee certs.txt
           grep -qi "SHA-256 digest: $UPLOAD_CERT_SHA256" certs.txt || { echo "::error::APK is not signed with the upload key"; exit 1; }
           "$BT/aapt2" dump badging "$APK" | head -1
-          "$BT/aapt2" dump badging "$APK" | head -1 | grep -q "versionName='${{ steps.version.outputs.version }}'"
+          "$BT/aapt2" dump badging "$APK" | head -1 | grep -q "versionName='${{ needs.prepare.outputs.version }}'"
           "$BT/aapt2" dump permissions "$APK" | grep -q REQUEST_INSTALL_PACKAGES
           keytool -printcert -jarfile app/build/outputs/bundle/playRelease/app-play-release.aab | tr -d ':' | grep -qi "$UPLOAD_CERT_SHA256" \
             || { echo "::error::App Bundle is not signed with the upload key"; exit 1; }
@@ -97,12 +130,18 @@ jobs:
       - name: Remove the key
         if: always()
         run: rm -rf ../upload-key
-      - uses: actions/upload-artifact@v4
-        with:
-          name: android
-          path: out/
+      - name: Upload to the draft releases
+        working-directory: .
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.apk -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.apk out/IslamicAzkar-play.aab -R "$GITHUB_REPOSITORY" --clobber
 
   ios:
+    needs: prepare
     runs-on: macos-26
     timeout-minutes: 45
     defaults:
@@ -125,12 +164,18 @@ jobs:
           cp -R build/device/Build/Products/Release-iphoneos/IslamicAzkar.app Payload/
           /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Payload/IslamicAzkar.app/Info.plist
           mkdir -p ../../out && zip -qry ../../out/IslamicAzkar.ipa Payload
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ios
-          path: out/
+      - name: Upload to the draft releases
+        working-directory: .
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.ipa -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.ipa -R "$GITHUB_REPOSITORY" --clobber
 
   mac:
+    needs: prepare
     runs-on: macos-26
     timeout-minutes: 45
     defaults:
@@ -153,57 +198,34 @@ jobs:
           codesign --force --deep --sign - "$APP"
           /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist"
           mkdir -p ../../out && ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
-      - uses: actions/upload-artifact@v4
-        with:
-          name: mac
-          path: out/
+      - name: Upload to the draft releases
+        working-directory: .
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.dmg -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.dmg -R "$GITHUB_REPOSITORY" --clobber
 
   publish:
-    needs: [android, ios, mac]
+    needs: [prepare, android, ios, mac]
     runs-on: ubuntu-latest
     env:
-      V: ${{ needs.android.outputs.version }}
+      V: ${{ needs.prepare.outputs.version }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          path: dist
-          merge-multiple: true
-      - name: Release notes
-        run: |
-          cat > notes.md <<NOTES
-          **Islamic Azkar $V**
-
-          $(cat RELEASE_NOTES.md)
-
-          **Android:** install \`IslamicAzkar.apk\` (Android 8 or later).
-          **iPhone:** \`IslamicAzkar.ipa\` is unsigned; install it with Sideloadly or AltStore.
-          **Mac:** open \`IslamicAzkar.dmg\` and drag the app to Applications (macOS 15 or later). The first time, right-click the app and choose Open.
-          NOTES
-          sed -i 's/^          //' notes.md
-          ls -la dist
-      - name: Public release (APK + IPA)
+      - name: Publish the releases
         env:
-          GH_TOKEN: ${{ secrets.RELEASES_TOKEN }}
-        run: |
-          [ -n "$GH_TOKEN" ] || { echo "::error::Add the RELEASES_TOKEN secret."; exit 1; }
-          R=Mkuz1/islamic-azkar-releases
-          if gh release view "v$V" -R $R >/dev/null 2>&1; then
-            gh release upload "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa dist/IslamicAzkar.dmg -R $R --clobber
-          else
-            gh release create "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa dist/IslamicAzkar.dmg -R $R --title "Islamic Azkar $V" --notes-file notes.md --latest
-          fi
-      - name: Private release (Play bundle)
-        env:
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view "v$V" >/dev/null 2>&1; then
-            gh release upload "v$V" dist/IslamicAzkar-play.aab dist/IslamicAzkar.apk dist/IslamicAzkar.ipa --clobber
-          else
-            gh release create "v$V" dist/IslamicAzkar-play.aab dist/IslamicAzkar.apk dist/IslamicAzkar.ipa --title "Islamic Azkar $V" --notes-file notes.md --target "$GITHUB_SHA"
-          fi
-      - name: Check the public download
+          GH_TOKEN="$PUBLIC_TOKEN" gh release edit "v$V" -R Mkuz1/islamic-azkar-releases --draft=false --latest
+          gh release edit "v$V" -R "$GITHUB_REPOSITORY" --draft=false
+      - name: Check the public downloads
         run: |
           sleep 10
-          curl -fsSL -o /tmp/latest.apk https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.apk
-          cmp /tmp/latest.apk dist/IslamicAzkar.apk && echo "latest/download serves $V"
+          for f in IslamicAzkar.apk IslamicAzkar.ipa IslamicAzkar.dmg; do
+            curl -fsSL -o "/tmp/$f" "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/$f"
+            ls -l "/tmp/$f"
+          done
+          unzip -p /tmp/IslamicAzkar.ipa Payload/IslamicAzkar.app/Info.plist | grep -a -A1 CFBundleShortVersionString

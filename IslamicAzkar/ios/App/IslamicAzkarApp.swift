@@ -228,7 +228,9 @@ struct IslamicAzkarApp: App {
         }
         #if os(macOS)
         .defaultSize(width: 1100, height: 760)
+        #endif
 
+        #if os(macOS)
         // The menu bar icon stays while the app runs, even with every window closed or minimized:
         // it reminds of the azkar due now and shows today's prayer times (MenuBar.swift in mac/).
         MenuBarExtra {

@@ -68,13 +68,17 @@ jobs:
           ls -lh IslamicAzkar.ipa
 
       - uses: actions/upload-artifact@v4
+        continue-on-error: true
         if: always()
         with:
           name: screenshots
+          retention-days: 3
           path: IslamicAzkar/ios/shots
           if-no-files-found: ignore
 
       - uses: actions/upload-artifact@v4
+        continue-on-error: true
         with:
           name: IslamicAzkar-ipa
+          retention-days: 3
           path: IslamicAzkar/ios/IslamicAzkar.ipa
