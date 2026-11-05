@@ -58,12 +58,32 @@ jobs:
               grep -A60 "main-thread\|DispatchQueue_1" "shots/$n.sample.txt" | cut -c1-200 | head -60
               kill $PID; cat "shots/$n.log"; return 1
             fi
-            [ -s "shots/$n.png" ] || { echo "::error::$n: no window was drawn"; cat "shots/$n.log"; return 1; }
+            if [ ! -s "shots/$n.png" ]; then
+              echo "::error::$n: no window was drawn"; cat "shots/$n.log"
+              R=$(ls -t ~/Library/Logs/DiagnosticReports/*Islamic* 2>/dev/null | head -1)
+              if [ -n "$R" ]; then echo "--- crash report $R"; python3 -c "
+          import json,sys
+          t=open(sys.argv[1]).read(); h,_,b=t.partition(chr(10)); d=json.loads(b)
+          print('exception:', d.get('exception')); print('termination:', d.get('termination',{}).get('indicator'))
+          for k in ('asi','lastExceptionBacktrace'): print(k, json.dumps(d.get(k))[:1500])
+          img=d.get('usedImages',[]); th=d['threads'][d.get('faultingThread',0)]
+          for f in th['frames'][:40]:
+              name=img[f['imageIndex']].get('name','?') if f.get('imageIndex') is not None and f['imageIndex']<len(img) else '?'
+              print(' ', name, f.get('symbol','?'), f.get('sourceFile',''), f.get('sourceLine',''))
+          " "$R" || head -c 4000 "$R"; fi
+              FAILED=1; return 0
+            fi
             echo "$n: launched and drew $(sips -g pixelWidth -g pixelHeight "shots/$n.png" | tail -2 | awk '{print $2}' | paste -sd x -)"
           }
+          FAILED=0
           check menu-en home en -ciMenu 1
-          check home-ar home ar
+          check home-en home en
+          check reader-en reader en
           check guide-fr guide fr
+          # one small screenshot of the main window in this log, to review the Mac layout
+          sips -s format jpeg -s formatOptions 35 -Z 640 shots/home-en.png --out shots/home-en.jpg > /dev/null && \
+            { echo "===SHOT home-en"; base64 -i shots/home-en.jpg | tr -d '\n' | fold -w 3000; echo; echo "===END"; }
+          [ "$FAILED" = 0 ]
       - uses: actions/upload-artifact@v4
         continue-on-error: true
         with:
