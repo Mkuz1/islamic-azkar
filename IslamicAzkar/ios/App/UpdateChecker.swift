@@ -17,7 +17,11 @@ final class UpdateChecker {
     private var lastCheck: Date?
 
     private static let latest = URL(string: "https://api.github.com/repos/Mkuz1/islamic-azkar-releases/releases/latest")!
+    #if os(macOS)
+    private static let asset = "IslamicAzkar.dmg"
+    #else
     private static let asset = "IslamicAzkar.ipa"
+    #endif
     private static let dismissedKey = "update_dismissed"
 
     static var installedVersion: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0" }
@@ -73,6 +77,22 @@ struct UpdateTexts {
     let howTo: String
 
     static func of(_ lang: Lang) -> UpdateTexts {
+        #if os(macOS)
+        let t = ios(lang)
+        let how: String
+        switch lang {
+        case .ar: how = "نزّل ملف DMG من صفحة الإصدار، وافتحه، واسحب التطبيق إلى مجلد التطبيقات ليحلّ محلّ النسخة الحالية."
+        case .en: how = "Download the DMG from the release page, open it and drag the app to Applications to replace this version."
+        case .fr: how = "Téléchargez le DMG depuis la page de la version, ouvrez-le et faites glisser l'application dans Applications pour remplacer cette version."
+        }
+        return UpdateTexts(available: t.available, open: t.open, later: t.later, check: t.check, checking: t.checking,
+                           upToDate: t.upToDate, failed: t.failed, version: t.version, current: t.current, howTo: how)
+        #else
+        return ios(lang)
+        #endif
+    }
+
+    private static func ios(_ lang: Lang) -> UpdateTexts {
         switch lang {
         case .ar: return UpdateTexts(available: "يتوفّر إصدار جديد", open: "صفحة التنزيل", later: "لاحقًا", check: "البحث عن تحديثات",
                                      checking: "جارٍ البحث…", upToDate: "لديك أحدث إصدار", failed: "تعذّر البحث، حاول لاحقًا.",

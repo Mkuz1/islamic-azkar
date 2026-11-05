@@ -4,6 +4,7 @@
 # and pushing (to main or a main-* branch), by pushing that tag, or from the Actions tab.
 #  - Android "github" APK, signed with the upload key  → public release in Mkuz1/islamic-azkar-releases (IslamicAzkar.apk)
 #  - unsigned iPhone IPA (install with Sideloadly/AltStore) → same public release (IslamicAzkar.ipa)
+#  - Mac app, ad-hoc signed                                → same public release (IslamicAzkar.dmg)
 #  - Android "play" App Bundle for Google Play          → private release in this repository (IslamicAzkar-play.aab)
 #
 # Repository secrets (Settings → Secrets and variables → Actions):
@@ -129,8 +130,36 @@ jobs:
           name: ios
           path: out/
 
+  mac:
+    runs-on: macos-26
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: IslamicAzkar/mac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode
+        run: |
+          XCODE=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
+          sudo xcode-select -s "$XCODE"
+      - name: Build the DMG
+        run: |
+          set -o pipefail
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          xcodebuild -project IslamicAzkarMac.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -destination 'generic/platform=macOS' -derivedDataPath build build | xcbeautify --renderer github-actions
+          APP="build/Build/Products/Release/Islamic Azkar.app"
+          codesign --force --deep --sign - "$APP"
+          /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist"
+          mkdir -p ../../out && ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mac
+          path: out/
+
   publish:
-    needs: [android, ios]
+    needs: [android, ios, mac]
     runs-on: ubuntu-latest
     env:
       V: ${{ needs.android.outputs.version }}
@@ -149,6 +178,7 @@ jobs:
 
           **Android:** install \`IslamicAzkar.apk\` (Android 8 or later).
           **iPhone:** \`IslamicAzkar.ipa\` is unsigned; install it with Sideloadly or AltStore.
+          **Mac:** open \`IslamicAzkar.dmg\` and drag the app to Applications (macOS 15 or later). The first time, right-click the app and choose Open.
           NOTES
           sed -i 's/^          //' notes.md
           ls -la dist
@@ -159,9 +189,9 @@ jobs:
           [ -n "$GH_TOKEN" ] || { echo "::error::Add the RELEASES_TOKEN secret."; exit 1; }
           R=Mkuz1/islamic-azkar-releases
           if gh release view "v$V" -R $R >/dev/null 2>&1; then
-            gh release upload "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa -R $R --clobber
+            gh release upload "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa dist/IslamicAzkar.dmg -R $R --clobber
           else
-            gh release create "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa -R $R --title "Islamic Azkar $V" --notes-file notes.md --latest
+            gh release create "v$V" dist/IslamicAzkar.apk dist/IslamicAzkar.ipa dist/IslamicAzkar.dmg -R $R --title "Islamic Azkar $V" --notes-file notes.md --latest
           fi
       - name: Private release (Play bundle)
         env:
