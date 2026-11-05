@@ -1,8 +1,14 @@
-- Mac: fixes the app not opening (no window and no menu bar icon) in 1.0.6.
-- Mac: the menu bar shows the app icon and the next prayer; click it for the azkar due now and today's prayer times. Prayer times follow Dubai's Islamic Affairs department (Dulook DXB) by default.
+- Mac: new sidebar with the app icon and name, Home, Favourites, Tasbih, Settings, every category and the ʿUmrah guide.
+- Mac: a Back button in the toolbar (also ⌘[ and Esc) on every page.
+- Mac: smoother scrolling and navigation; cards and rows respond to a click anywhere on them.
+- Mac: Settings in a centred column instead of stretched across the window; new app icon matching Android.
 
-- ماك: إصلاح عدم فتح التطبيق (بلا نافذة ولا رمز في شريط القوائم) في الإصدار ١٫٠٫٦.
-- ماك: يظهر في شريط القوائم رمز التطبيق والصلاة القادمة؛ اضغط عليه لترى الأذكار المستحبة الآن ومواقيت اليوم. المواقيت افتراضيًا وفق دائرة الشؤون الإسلامية بدبي (دلوك).
+- ماك: شريط جانبي جديد فيه رمز التطبيق واسمه، والرئيسية والمفضلة والمسبحة والإعدادات وكل الأقسام ودليل العمرة.
+- ماك: زر رجوع في شريط الأدوات (وأيضًا ⌘[ و Esc) في كل صفحة.
+- ماك: تنقّل وتمرير أسلس، والبطاقات تستجيب للنقر في أي مكان منها.
+- ماك: الإعدادات في عمود متوسّط بدل امتدادها على كامل النافذة، ورمز جديد مطابق لنسخة أندرويد.
 
-- Mac : corrige l'application qui ne s'ouvrait pas (ni fenêtre ni icône dans la barre des menus) en 1.0.6.
-- Mac : la barre des menus affiche l'icône et la prochaine prière ; cliquez pour les adhkar du moment et les horaires du jour. Horaires par défaut selon les affaires islamiques de Dubaï (Dulook DXB).
+- Mac : nouvelle barre latérale avec l'icône et le nom de l'application, Accueil, Favoris, Tasbih, Réglages, toutes les catégories et le guide de la ʿOumra.
+- Mac : un bouton Retour dans la barre d'outils (aussi ⌘[ et Échap) sur chaque page.
+- Mac : navigation et défilement plus fluides ; cartes et lignes réagissent à un clic n'importe où.
+- Mac : Réglages dans une colonne centrée au lieu d'être étirés ; nouvelle icône identique à Android.
