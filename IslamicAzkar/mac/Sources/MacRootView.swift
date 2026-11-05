@@ -47,7 +47,7 @@ struct MacRootView: View {
                         Label(backTitle, systemImage: model.lang.isRTL ? "chevron.right" : "chevron.left")
                     }
                     .keyboardShortcut("[", modifiers: .command)
-                    .disabled(model.homePath.isEmpty)
+                    .disabled(atHome)
                     .help(backTitle)
                 }
             }
@@ -55,7 +55,7 @@ struct MacRootView: View {
         }
         .frame(minWidth: 860, minHeight: 600)
         .onChange(of: model.tab) { _, _ in if extra != nil, model.tab != .home { extra = nil } }
-        .task { await MacNavTest.runIfRequested(model: model, select: { selection.wrappedValue = $0 }) }
+        .task { await MacNavTest.runIfRequested(model: model, select: { selection.wrappedValue = $0 }, back: back) }
     }
 
     private var backTitle: String {
@@ -66,9 +66,16 @@ struct MacRootView: View {
         }
     }
 
+    /// Home's first page: the only place with nowhere to go back to.
+    private var atHome: Bool { model.homePath.isEmpty && extra == nil && model.tab == .home }
+
+    /// Back one page; from the first page of any other section, back to Home.
     private func back() {
-        guard !model.homePath.isEmpty else { return }
-        model.homePath.removeLast()
+        if !model.homePath.isEmpty {
+            model.homePath.removeLast()
+        } else if !atHome {
+            selection.wrappedValue = .tab(.home)
+        }
     }
 
     // MARK: Sidebar
@@ -154,7 +161,7 @@ struct MacRootView: View {
 /// each step in the `-ciShotDir` folder, then quits. A step that leaves the wrong screen fails it.
 enum MacNavTest {
     @MainActor
-    static func runIfRequested(model: AppModel, select: @escaping (SidebarItem) -> Void) async {
+    static func runIfRequested(model: AppModel, select: @escaping (SidebarItem) -> Void, back: @escaping () -> Void) async {
         let d = UserDefaults.standard
         guard d.bool(forKey: "ciNav"), let dir = d.string(forKey: "ciShotDir") else { return }
         var failures = 0
@@ -171,14 +178,21 @@ enum MacNavTest {
         model.showDedication = false
         await step("01-home", { select(.tab(.home)) }, expect: { model.tab == .home && model.homePath.isEmpty })
         await step("02-open-morning", { model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
-        await step("03-back", { model.homePath.removeLast() }, expect: { model.homePath.isEmpty })
+        await step("03-back", back, expect: { model.homePath.isEmpty })
         await step("04-category", { select(.category("prayer")) }, expect: { model.homePath.isEmpty })
         await step("05-open-chapter", { model.homePath.append(.reader(.chapter(25), focus: nil)) }, expect: { model.homePath.count == 1 })
-        await step("06-back", { model.homePath.removeLast() }, expect: { model.homePath.isEmpty })
+        await step("06-back", back, expect: { model.homePath.isEmpty })
+        await step("06b-back-to-home", back, expect: { model.tab == .home && model.homePath.isEmpty })
         await step("07-favorites", { select(.tab(.favorites)) }, expect: { model.tab == .favorites })
+        await step("07b-back-to-home", back, expect: { model.tab == .home })
         await step("08-tasbih", { select(.tab(.tasbih)) }, expect: { model.tab == .tasbih })
+        await step("08b-back-to-home", back, expect: { model.tab == .home })
         await step("09-settings", { select(.tab(.settings)) }, expect: { model.tab == .settings })
         await step("10-guide", { select(.guide) }, expect: { model.tab == .home })
+        await step("10b-guide-open-dua", { model.show(.chapter(115), split: false) }, expect: { model.homePath.count == 1 })
+        await step("10c-back", back, expect: { model.homePath.isEmpty })
+        await step("10d-back-to-home", back, expect: { model.tab == .home && model.homePath.isEmpty })
+        await step("09b-settings-back", { select(.tab(.settings)); back() }, expect: { model.tab == .home })
         await step("11-home-open-evening", { select(.tab(.home)); model.show(.evening, split: false) }, expect: { model.homePath.count == 1 })
         launchTrace("nav done, failures: \(failures)")
         exit(failures == 0 ? 0 : 3)
