@@ -1,14 +1,5 @@
-- Mac: new sidebar with the app icon and name, Home, Favourites, Tasbih, Settings, every category and the ʿUmrah guide.
-- Mac: a Back button in the toolbar (also ⌘[ and Esc) on every page.
-- Mac: smoother scrolling and navigation; cards and rows respond to a click anywhere on them.
-- Mac: Settings in a centred column instead of stretched across the window; new app icon matching Android.
+- Mac: the Back button (and ⌘[ / Esc) now always works: one page back, or to Home from the first page of Favourites, Tasbih, Settings, a category or the ʿUmrah guide.
 
-- ماك: شريط جانبي جديد فيه رمز التطبيق واسمه، والرئيسية والمفضلة والمسبحة والإعدادات وكل الأقسام ودليل العمرة.
-- ماك: زر رجوع في شريط الأدوات (وأيضًا ⌘[ و Esc) في كل صفحة.
-- ماك: تنقّل وتمرير أسلس، والبطاقات تستجيب للنقر في أي مكان منها.
-- ماك: الإعدادات في عمود متوسّط بدل امتدادها على كامل النافذة، ورمز جديد مطابق لنسخة أندرويد.
+- ماك: زر الرجوع (و ⌘[ و Esc) يعمل دائمًا الآن: صفحة واحدة للخلف، أو إلى الرئيسية من أول صفحة في المفضلة أو المسبحة أو الإعدادات أو أي قسم أو دليل العمرة.
 
-- Mac : nouvelle barre latérale avec l'icône et le nom de l'application, Accueil, Favoris, Tasbih, Réglages, toutes les catégories et le guide de la ʿOumra.
-- Mac : un bouton Retour dans la barre d'outils (aussi ⌘[ et Échap) sur chaque page.
-- Mac : navigation et défilement plus fluides ; cartes et lignes réagissent à un clic n'importe où.
-- Mac : Réglages dans une colonne centrée au lieu d'être étirés ; nouvelle icône identique à Android.
+- Mac : le bouton Retour (et ⌘[ / Échap) fonctionne toujours : une page en arrière, ou vers l'Accueil depuis la première page des Favoris, du Tasbih, des Réglages, d'une catégorie ou du guide de la ʿOumra.
