@@ -4,20 +4,36 @@ import SwiftUI
 // The menu bar item of the Mac app: the app icon (and the next prayer), and a panel with the
 // azkar due now and today's prayer times for the place chosen in Settings.
 
+/// Ticks every 30 seconds for the menu bar label. (A TimelineView inside a MenuBarExtra label makes
+/// SwiftUI re-layout the status item endlessly, freezing the app at launch.)
+@Observable
+final class MenuClock {
+    static let shared = MenuClock()
+    var now = Date()
+    private var timer: Timer?
+
+    private init() {
+        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in self?.now = Date() }
+    }
+}
+
 /// Icon in the menu bar, followed by the next prayer and its time when that option is on.
 struct MenuBarLabel: View {
     @Environment(AppModel.self) private var model
     @AppStorage("menubar_next_prayer") private var showNext = true
+    private let clock = MenuClock.shared
 
     var body: some View {
-        TimelineView(.everyMinute) { ctx in
-            HStack(spacing: 4) {
+        if showNext, let place = model.place {
+            let next = Prayers.next(place, now: clock.now)
+            Label {
+                Text("\(model.m.prayers[next.index]) \(Prayers.clock(next.time, place, model.lang))")
+            } icon: {
                 Image("MenuBarIcon")
-                if showNext, let place = model.place {
-                    let next = Prayers.next(place, now: ctx.date)
-                    Text("\(model.m.prayers[next.index]) \(Prayers.clock(next.time, place, model.lang))")
-                }
             }
+            .labelStyle(.titleAndIcon)
+        } else {
+            Image("MenuBarIcon")
         }
     }
 }

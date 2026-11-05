@@ -69,6 +69,7 @@ jobs:
             fi
           }
           shot 03-mac-menu-en home en 0 -ciMenu 1
+          shot 01-mac-home-ar home ar 0
 
       - uses: actions/upload-artifact@v4
         continue-on-error: true
