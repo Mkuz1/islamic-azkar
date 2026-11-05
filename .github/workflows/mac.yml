@@ -9,6 +9,9 @@ on:
     branches: [main, "main-*"]
     paths: ["IslamicAzkar/ios/App/**", "IslamicAzkar/ios/Shared/**", "IslamicAzkar/mac/**", ".github/workflows/mac.yml"]
 
+permissions:
+  contents: write
+
 concurrency:
   group: mac-${{ github.ref }}
   cancel-in-progress: true
@@ -44,6 +47,8 @@ jobs:
           mkdir -p ../../out && ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
           ls -lh ../../out
       - name: Launch check (the app must start, draw its window and the menu bar panel, then quit)
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           APP="build/Build/Products/Release/Islamic Azkar.app"
           mkdir -p shots
@@ -80,9 +85,15 @@ jobs:
           check home-en home en
           check reader-en reader en
           check guide-fr guide fr
-          # one small screenshot of the main window in this log, to review the Mac layout
-          sips -s format jpeg -s formatOptions 35 -Z 640 shots/home-en.png --out shots/home-en.jpg > /dev/null && \
-            { echo "===SHOT home-en"; base64 -i shots/home-en.jpg | tr -d '\n' | fold -w 3000; echo; echo "===END"; }
+          check tap-dedication-en dedication en -ciTap dedication
+          check tap-home-ar home ar -ciTap home
+          # Screenshots go to the "mac-shots" branch (artifact storage is full), to review the Mac layout.
+          mkdir -p /tmp/macshots
+          for f in shots/*.png; do sips -s format jpeg -s formatOptions 60 -Z 1100 "$f" --out "/tmp/macshots/$(basename "${f%.png}").jpg" > /dev/null; done
+          cd /tmp/macshots && git init -q && git checkout -q -b mac-shots && git add . \
+            && git -c user.name=ci -c user.email=ci@localhost commit -qm "Mac screenshots ${GITHUB_SHA::7}" \
+            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" mac-shots && echo "screenshots pushed to mac-shots" || true
+          cd - > /dev/null
           [ "$FAILED" = 0 ]
       - uses: actions/upload-artifact@v4
         continue-on-error: true

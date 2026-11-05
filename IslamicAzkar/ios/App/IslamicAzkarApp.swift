@@ -125,6 +125,18 @@ final class AppModel {
         case "quran": homePath = [.reader(.chapter(137), focus: nil)]
         default: tab = .home
         }
+        // `-ciTap dedication|home`: 2 s after launch, open the morning azkar the way a tap does
+        // (from the dedication screen's button, or from the Home tile).
+        if let tap = args.string(forKey: "ciTap") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
+                launchTrace("ciTap \(tap)")
+                if tap == "dedication" {
+                    withAnimation(.easeInOut(duration: 0.6)) { self.open(.morning) }
+                } else {
+                    self.homePath.append(.reader(.morning, focus: nil))
+                }
+            }
+        }
     }
 
     private func save(_ key: String, _ value: Any) {
