@@ -13,7 +13,10 @@ final class MenuClock {
     private var timer: Timer?
 
     private init() {
-        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in self?.now = Date() }
+        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+            self?.now = Date()
+            MacReminders.check()   // backup for the scheduled morning / evening reminders
+        }
     }
 }
 
@@ -24,14 +27,18 @@ struct MenuBarLabel: View {
     private let clock = MenuClock.shared
 
     var body: some View {
+        // A bell while the azkar of a reminder that has come due are still unread.
+        let bell = MacReminders.pending(at: clock.now) != nil ? "🔔 " : ""
         if showNext, let place = model.place {
             let next = Prayers.next(place, now: clock.now)
             Label {
-                Text("\(model.m.prayers[next.index]) \(Prayers.clock(next.time, place, model.lang))")
+                Text("\(bell)\(model.m.prayers[next.index]) \(Prayers.clock(next.time, place, model.lang))")
             } icon: {
                 Image("MenuBarIcon")
             }
             .labelStyle(.titleAndIcon)
+        } else if !bell.isEmpty {
+            Label { Text("🔔") } icon: { Image("MenuBarIcon") }.labelStyle(.titleAndIcon)
         } else {
             Image("MenuBarIcon")
         }

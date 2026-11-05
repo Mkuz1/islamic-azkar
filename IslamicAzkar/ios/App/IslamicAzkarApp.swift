@@ -220,7 +220,13 @@ struct IslamicAzkarApp: App {
     @State private var model = AppModel()
     @Environment(\.scenePhase) private var scenePhase
 
-    init() { launchTrace("App.init") }
+    init() {
+        launchTrace("App.init")
+        #if os(macOS)
+        // Show reminders as banners even though the app keeps running in the menu bar.
+        UNUserNotificationCenter.current().delegate = MacNotifications.shared
+        #endif
+    }
 
     var body: some Scene {
         WindowGroup(id: "main") {
@@ -247,6 +253,7 @@ struct IslamicAzkarApp: App {
                 launchTrace("main window appeared")
                 #if os(macOS)
                 MacCI.start()
+                MacNotifications.shared.open = { [model] url in model.handle(url: url) }
                 #endif
                 #if os(iOS)
                 delegate.model = model

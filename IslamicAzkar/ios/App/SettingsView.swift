@@ -96,6 +96,9 @@ struct SettingsView: View {
                 if model.morningOn { timeRow(s.time, $am.morningAt) }
                 Toggle(isOn: withPermission($am.eveningOn)) { Label(s.eveningReminder, systemImage: "moon.stars.fill") }
                 if model.eveningOn { timeRow(s.time, $am.eveningAt) }
+                #if os(macOS)
+                MacTestReminderRow()
+                #endif
                 Toggle(isOn: withPermission($am.generalOn)) {
                     Label { VStack(alignment: .leading) { Text(s.generalReminders); Text(s.generalRemindersHint).font(.caption).foregroundStyle(.secondary) } }
                     icon: { Image(systemName: "bell.badge.fill") }
