@@ -43,34 +43,27 @@ jobs:
           /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist"
           mkdir -p ../../out && ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
           ls -lh ../../out
-      - name: Launch check and screenshots (printed into this log as base64 JPEG between ===SHOT markers)
-        continue-on-error: true
+      - name: Launch check (the app must start, draw its window and the menu bar panel, then quit)
         run: |
           APP="build/Build/Products/Release/Islamic Azkar.app"
           mkdir -p shots
-          shot() { # name screen lang dark [extra args]
-            n=$1; sc=$2; l=$3; dk=$4; shift 4
-            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciShot "$PWD/shots/$n.png" -ciTrace 1 "$@" > "shots/$n.log" 2>&1 &
+          check() { # name screen lang [extra args]
+            n=$1; sc=$2; l=$3; shift 3
+            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciShot "$PWD/shots/$n.png" -ciTrace 1 "$@" > "shots/$n.log" 2>&1 &
             PID=$!
-            for i in $(seq 1 14); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+            for i in $(seq 1 25); do kill -0 $PID 2>/dev/null || break; sleep 1; done
             if kill -0 $PID 2>/dev/null; then
-              echo "--- still running after 14 s: main thread stack"
-              sample $PID 3 -file "shots/$n.sample.txt" > /dev/null 2>&1 || true
-              awk '/Thread_[0-9]+.*(main-thread|DispatchQueue_1)/{p=1} p&&/^ *Thread_/&&!/main-thread|DispatchQueue_1/{if(seen)exit} p{seen=1; print}' "shots/$n.sample.txt" | cut -c1-220 | head -90
-              echo "--- CPU"; ps -o pid,%cpu,state,command -p $PID | cut -c1-120
+              echo "::error::$n: the app did not finish launching (main thread stack below)"
+              sample $PID 2 -file "shots/$n.sample.txt" > /dev/null 2>&1 || true
+              grep -A60 "main-thread\|DispatchQueue_1" "shots/$n.sample.txt" | cut -c1-200 | head -60
+              kill $PID; cat "shots/$n.log"; return 1
             fi
-            kill $PID 2>/dev/null || true
-            echo "--- app output for $n"; grep -v "^$" "shots/$n.log" | tail -15
-            if [ -f "shots/$n.png" ]; then
-              sips -s format jpeg -s formatOptions 55 -Z 1000 "shots/$n.png" --out "shots/$n.jpg" > /dev/null
-              echo "===SHOT $n"; base64 -i "shots/$n.jpg" | tr -d '\n' | fold -w 3000; echo; echo "===END $n"
-            else
-              echo "no screenshot for $n"
-            fi
+            [ -s "shots/$n.png" ] || { echo "::error::$n: no window was drawn"; cat "shots/$n.log"; return 1; }
+            echo "$n: launched and drew $(sips -g pixelWidth -g pixelHeight "shots/$n.png" | tail -2 | awk '{print $2}' | paste -sd x -)"
           }
-          shot 03-mac-menu-en home en 0 -ciMenu 1
-          shot 01-mac-home-ar home ar 0
-
+          check menu-en home en -ciMenu 1
+          check home-ar home ar
+          check guide-fr guide fr
       - uses: actions/upload-artifact@v4
         continue-on-error: true
         with:

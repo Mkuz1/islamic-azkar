@@ -1,8 +1,8 @@
-- New: Islamic Azkar for Mac. The menu bar shows the app icon and the next prayer; click it for the azkar due now (and whether you read them today) and today's prayer times for your location. The app keeps running in the menu bar when its window is closed, and can open at login.
-- Prayer times now follow Dubai's Islamic Affairs department (IACAD, the Dulook DXB app) by default: Fajr and Isha at 18.2°, Dhuhr and Maghrib +3 minutes. Other methods remain in Settings.
+- Mac: fixes the app not opening (no window and no menu bar icon) in 1.0.6.
+- Mac: the menu bar shows the app icon and the next prayer; click it for the azkar due now and today's prayer times. Prayer times follow Dubai's Islamic Affairs department (Dulook DXB) by default.
 
-- جديد: أذكار إسلامية على ماك. يظهر في شريط القوائم رمز التطبيق والصلاة القادمة؛ اضغط عليه لترى الأذكار المستحبة الآن (وهل قرأتها اليوم) ومواقيت الصلاة لمدينتك. يبقى التطبيق في شريط القوائم بعد إغلاق نافذته، ويمكن تشغيله عند بدء الجهاز.
-- مواقيت الصلاة أصبحت افتراضيًا وفق دائرة الشؤون الإسلامية والعمل الخيري بدبي (تطبيق دلوك): الفجر والعشاء بزاوية ١٨٫٢°، والظهر والمغرب +٣ دقائق. ويمكن اختيار طرق أخرى من الإعدادات.
+- ماك: إصلاح عدم فتح التطبيق (بلا نافذة ولا رمز في شريط القوائم) في الإصدار ١٫٠٫٦.
+- ماك: يظهر في شريط القوائم رمز التطبيق والصلاة القادمة؛ اضغط عليه لترى الأذكار المستحبة الآن ومواقيت اليوم. المواقيت افتراضيًا وفق دائرة الشؤون الإسلامية بدبي (دلوك).
 
-- Nouveau : Islamic Azkar pour Mac. La barre des menus affiche l'icône de l'application et la prochaine prière ; cliquez pour voir les adhkar du moment (et si vous les avez lus aujourd'hui) et les horaires de prière du jour pour votre ville. L'application reste dans la barre des menus quand sa fenêtre est fermée et peut s'ouvrir à la connexion.
-- Les horaires de prière suivent désormais par défaut le département des affaires islamiques de Dubaï (IACAD, l'application Dulook DXB) : Fajr et Icha à 18,2°, Dhohr et Maghrib +3 minutes. Les autres méthodes restent dans les Réglages.
+- Mac : corrige l'application qui ne s'ouvrait pas (ni fenêtre ni icône dans la barre des menus) en 1.0.6.
+- Mac : la barre des menus affiche l'icône et la prochaine prière ; cliquez pour les adhkar du moment et les horaires du jour. Horaires par défaut selon les affaires islamiques de Dubaï (Dulook DXB).
