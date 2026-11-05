@@ -7,20 +7,30 @@ final class MacAppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        launchTrace("didFinishLaunching, windows: \(NSApp.windows.count)")
-        // CI screenshots of the menu bar panel: `-ciMenu 1` shows it in a plain window.
+        launchTrace("didFinishLaunching")
+        MacCI.start()
+    }
+}
+
+/// CI and diagnostics: `-ciMenu 1` shows the menu bar panel in a plain window; `-ciShot <file.png>`
+/// saves the front window as a PNG after a few seconds, then quits. Started once, from whichever
+/// comes first: the app delegate or the main window appearing.
+enum MacCI {
+    @MainActor private static var started = false
+
+    @MainActor static func start() {
+        guard !started else { return }
+        started = true
         if UserDefaults.standard.bool(forKey: "ciMenu") { MenuPanelPreviewWindow.show() }
-        // `-ciShot <file.png>` saves the front window as a PNG after a few seconds, then quits
-        // (for screenshots on a Mac with a logged-in session).
-        if let path = UserDefaults.standard.string(forKey: "ciShot") {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
-                let w = MenuPanelPreviewWindow.window ?? NSApp.windows.first { $0.isVisible && $0.frame.width > 300 }
-                if let v = w?.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) {
-                    v.cacheDisplay(in: v.bounds, to: rep)
-                    try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
-                }
-                NSApp.terminate(nil)
+        guard let path = UserDefaults.standard.string(forKey: "ciShot") else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+            let w = MenuPanelPreviewWindow.window ?? NSApp.windows.first { $0.isVisible && $0.frame.width > 300 }
+            launchTrace("capture: \(NSApp.windows.count) windows, chosen \(w?.frame.size.debugDescription ?? "none")")
+            if let v = w?.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) {
+                v.cacheDisplay(in: v.bounds, to: rep)
+                try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
             }
+            NSApp.terminate(nil)
         }
     }
 }

@@ -229,6 +229,9 @@ struct IslamicAzkarApp: App {
             .onOpenURL { model.handle(url: $0) }
             .onAppear {
                 launchTrace("main window appeared")
+                #if os(macOS)
+                MacCI.start()
+                #endif
                 #if os(iOS)
                 delegate.model = model
                 #endif
