@@ -42,10 +42,14 @@ struct MacRootView: View {
                 .navigationSplitViewColumnWidth(min: 220, ideal: 250, max: 320)
         } detail: {
             NavigationStack(path: $m.homePath) {
+                // The bar is attached to every page: pages pushed on the stack do not inherit
+                // an inset set on the stack itself.
                 root
-                    .navigationDestination(for: Route.self) { destination($0) }
+                    .safeAreaInset(edge: .top, spacing: 0) { pageBar }
+                    .navigationDestination(for: Route.self) { route in
+                        destination(route).safeAreaInset(edge: .top, spacing: 0) { pageBar }
+                    }
             }
-            .safeAreaInset(edge: .top, spacing: 0) { pageBar }
             .onExitCommand(perform: back)
         }
         .frame(minWidth: 860, minHeight: 600)
