@@ -19,8 +19,10 @@
       reps: n => arCount(n, "تكرار واحد", "تكراران", "تكرارات", "تكرارًا"),
       textSize: "حجم الخط", showTr: "إظهار النطق", showMean: "إظهار المعنى", theme: "المظهر", system: "تلقائي", light: "فاتح", dark: "داكن", close: "إغلاق",
       tapCount: "اضغط للعدّ", reset: "تصفير", total: n => `المجموع: ${num(n)}`, target: "العدد",
-      getApp: "تطبيق أندرويد", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات ومسبحة.",
-      apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", mac: "نسخة ماك", macNote: "ملف DMG · macOS 15 أو أحدث، مع مواقيت الصلاة في شريط القوائم", join: "انضم إلى المختبِرين",
+      getApp: "التطبيقات", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات، مسبحة، وسجلّ يومي بالأذكار التي أتممتها.",
+      record: "سجلّي", recTitle: "سجلّ الأذكار", recSub: "الأذكار التي أتممتها كل يوم، محفوظة في هذا المتصفح", activeDays: "أيام الذكر هذا الشهر", monthDone: "أذكار أتممتها هذا الشهر", inRow: "أيام متتالية",
+      nothingDay: "لم تُتمّ أذكارًا في هذا اليوم.", dayDone: "الأذكار المكتملة", today: "اليوم", prevMonth: "الشهر السابق", nextMonth: "الشهر التالي", week: ["أحد", "اثن", "ثلا", "أرب", "خمي", "جمع", "سبت"],
+      apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", mac: "نسخة ماك", macNote: "ملف DMG · macOS 15 أو أحدث: مواقيت الصلاة في شريط القوائم، وتذكير يظهر أعلى الشاشة", join: "انضم إلى المختبِرين",
       joinText: "التطبيق في مرحلة الاختبار على Google Play. سجّل بريد Gmail المرتبط بمتجرك لنضيفك إلى المختبِرين ونرسل لك رابط التثبيت.",
       emailPh: "name@gmail.com", send: "سجّلني", sending: "جارٍ الإرسال…", badEmail: "أدخل عنوان بريد صحيحًا",
       thanks: "جزاك الله خيرًا! وصلنا بريدك وسنضيفك إلى المختبِرين قريبًا إن شاء الله.", failed: "تعذّر الإرسال، حاول مرة أخرى.",
@@ -43,8 +45,10 @@
       reps: n => n === 1 ? "1 repetition" : `${n} repetitions`,
       textSize: "Text size", showTr: "Show transliteration", showMean: "Show meaning", theme: "Appearance", system: "Auto", light: "Light", dark: "Dark", close: "Close",
       tapCount: "Tap to count", reset: "Reset", total: n => `Total: ${n}`, target: "Target",
-      getApp: "Android app", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders and a tasbih.",
-      apk: "Download the app", apkNote: "APK file · Android 8 or later", mac: "Mac app", macNote: "DMG file · macOS 15 or later, with prayer times in the menu bar", join: "Join the testers",
+      getApp: "The apps", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders, a tasbih, and a daily record of the azkar you complete.",
+      record: "Record", recTitle: "Azkar record", recSub: "The azkar you completed each day, kept in this browser", activeDays: "Days with azkar this month", monthDone: "Azkar completed this month", inRow: "Days in a row",
+      nothingDay: "No azkar completed on this day.", dayDone: "Azkar completed", today: "Today", prevMonth: "Previous month", nextMonth: "Next month", week: ["S", "M", "T", "W", "T", "F", "S"],
+      apk: "Download the app", apkNote: "APK file · Android 8 or later", mac: "Mac app", macNote: "DMG file · macOS 15 or later: prayer times in the menu bar and reminders at the top of the screen", join: "Join the testers",
       joinText: "The app is in testing on Google Play. Leave the Gmail address you use on the Play Store and we’ll add you as a tester and send you the install link.",
       emailPh: "name@gmail.com", send: "Sign me up", sending: "Sending…", badEmail: "Enter a valid email address",
       thanks: "Jazak Allah khayran! We got your address and will add you to the testers soon, in sha Allah.", failed: "Couldn’t send it. Please try again.",
@@ -67,8 +71,10 @@
       reps: n => n === 1 ? "1 répétition" : `${n} répétitions`,
       textSize: "Taille du texte", showTr: "Afficher la translittération", showMean: "Afficher la traduction", theme: "Apparence", system: "Auto", light: "Clair", dark: "Sombre", close: "Fermer",
       tapCount: "Touchez pour compter", reset: "Remettre à zéro", total: n => `Total : ${n}`, target: "Objectif",
-      getApp: "Application Android", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels et un chapelet.",
-      apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", mac: "Version Mac", macNote: "Fichier DMG · macOS 15 ou plus récent, avec les horaires de prière dans la barre des menus", join: "Devenir testeur",
+      getApp: "Les applications", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels, un chapelet et un historique quotidien des adhkar terminés.",
+      record: "Historique", recTitle: "Historique des adhkar", recSub: "Les adhkar terminés chaque jour, gardés dans ce navigateur", activeDays: "Jours avec des adhkar ce mois-ci", monthDone: "Adhkar terminés ce mois-ci", inRow: "Jours d'affilée",
+      nothingDay: "Aucun dhikr terminé ce jour-là.", dayDone: "Adhkar terminés", today: "Aujourd'hui", prevMonth: "Mois précédent", nextMonth: "Mois suivant", week: ["D", "L", "M", "M", "J", "V", "S"],
+      apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", mac: "Version Mac", macNote: "Fichier DMG · macOS 15 ou plus récent : horaires de prière dans la barre des menus et rappels en haut de l'écran", join: "Devenir testeur",
       joinText: "L’application est en test sur Google Play. Laissez l’adresse Gmail de votre Play Store : nous vous ajouterons aux testeurs et vous enverrons le lien d’installation.",
       emailPh: "nom@gmail.com", send: "M’inscrire", sending: "Envoi…", badEmail: "Saisissez une adresse e-mail valide",
       thanks: "Jazak Allah khayran ! Nous avons bien reçu votre adresse et vous ajouterons aux testeurs très bientôt, in shâ Allah.", failed: "Échec de l’envoi. Réessayez.",
@@ -115,6 +121,7 @@
     download: '<path d="M12 3v12M7 10l5 5 5-5M5 19h14"/>',
     book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>',
     kaaba: '<path d="M4 7.5 12 4l8 3.5v10L12 21l-8-3.5zM4 7.5l8 3.5 8-3.5M12 11v10M4 11l8 3.5 8-3.5"/>',
+    calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17h.01M12 17h.01"/>',
     mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
   };
   // Always the newest APK: GitHub redirects /releases/latest/download/<asset> to the latest release's file.
@@ -180,7 +187,7 @@
   const app = document.getElementById("app");
   function shell(active, body) {
     const t = s();
-    const nav = [["#/", "home", t.home, "home"], ["#/fav", "heart", t.favorites, "fav"], ["#/tasbih", "beads", t.tasbih, "tasbih"]]
+    const nav = [["#/", "home", t.home, "home"], ["#/fav", "heart", t.favorites, "fav"], ["#/tasbih", "beads", t.tasbih, "tasbih"], ["#/record", "calendar", t.record, "record"]]
       .map(([h, ic, label, k]) => `<a href="${h}" class="press ${active === k ? "on" : ""}">${svg(ic, ic === "heart" && active === k)}<span>${label}</span></a>`).join("");
     return `
       <header class="topbar"><div class="wrap"><div class="bar glass">
@@ -191,7 +198,7 @@
         <button class="icon-btn press" id="open-settings" aria-label="${t.settings}">${svg("text")}</button>
       </div></div></header>
       <nav class="nav nav-bottom">${nav}</nav>
-      <main><div class="wrap ${active === "read" || active === "tasbih" ? "narrow" : ""}">${body}</div></main>
+      <main><div class="wrap ${active === "read" || active === "tasbih" || active === "record" ? "narrow" : ""}">${body}</div></main>
       <footer class="site">
         <div class="ded">${T.ar.dedication}</div>
         <div class="ded-l">${T.en.dedication} · ${T.fr.dedication}</div>
@@ -351,6 +358,73 @@
     return shell("fav", `<h1 class="large">${t.favorites}</h1><p class="sub">${t.azkar(items.length)}</p><div class="group glass">${rows}</div>`);
   }
 
+  // ───────────── Record ─────────────
+  // Day ("2026-11-06") → readings completed in full that day ("morning", "evening", "c28"…), as in the apps.
+  const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  function markRecord(key) {
+    if (key === "umrah") return;
+    const h = store.get("history", {}), k = dayKey(new Date()), list = h[k] || [];
+    if (!list.includes(key)) list.push(key);
+    h[k] = list; store.set("history", h);
+  }
+  function streakDays(h) {
+    const d = new Date();
+    if (!(h[dayKey(d)] || []).length) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while ((h[dayKey(d)] || []).length) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  let recMonth = 0, recDay = null;   // months back from this one; selected day key
+  function readingLook(key) {
+    const t = s();
+    if (key === "morning") return { title: t.morning, ic: "sun", col: "#ff9500", cat: "" };
+    if (key === "evening") return { title: t.evening, ic: "moon", col: "#5856d6", cat: "" };
+    const id = +key.replace(/^c/, ""), c = index.chapters.get(id);
+    if (!c) return null;
+    const cat = data.categories.find(x => x.chapters.includes(id));
+    const [ic, col] = (cat && CAT_STYLE[cat.key]) || ["spark", "#8e8e93"];
+    return { title: chapterTitle(c), ic, col, cat: cat ? t.cat[cat.key] : "" };
+  }
+  function record() {
+    const t = s(), h = store.get("history", {}), now = new Date(), todayK = dayKey(now);
+    if (!recDay) recDay = todayK;
+    const first = new Date(now.getFullYear(), now.getMonth() + recMonth, 1);
+    const prefix = dayKey(first).slice(0, 8);
+    const inMonth = Object.entries(h).filter(([k]) => k.startsWith(prefix)).map(([, v]) => v);
+    const loc = lang === "ar" ? "ar-u-nu-arab" : lang;
+    const monthName = new Intl.DateTimeFormat(loc, { month: "long", year: "numeric" }).format(first);
+    let hijriMonth = "";
+    try { hijriMonth = new Intl.DateTimeFormat(lang === "ar" ? "ar-SA-u-ca-islamic-umalqura-nu-arab" : `${lang}-u-ca-islamic-umalqura`, { month: "long", year: "numeric" }).format(first); } catch { /* old browsers */ }
+    const lead = first.getDay(), count = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+    let cells = "";
+    for (let i = 0; i < lead; i++) cells += `<span></span>`;
+    for (let d = 1; d <= count; d++) {
+      const date = new Date(first.getFullYear(), first.getMonth(), d), k = dayKey(date), list = h[k] || [];
+      const n = list.length, shade = n === 0 ? 0 : n < 3 ? 1 : n < 6 ? 2 : 3, future = date > now;
+      cells += `<button class="day s${shade}${k === todayK ? " today" : ""}${k === recDay ? " sel" : ""}" data-day="${k}" ${future ? "disabled" : ""}>
+        <b>${num(d)}</b><i>${list.includes("morning") ? svg("sun").replace("<svg", '<svg class="mi"') : ""}${list.includes("evening") ? svg("moon").replace("<svg", '<svg class="ei"') : ""}</i></button>`;
+    }
+    const sel = h[recDay] || [], selDate = new Date(...recDay.split("-").map((v, i) => i === 1 ? v - 1 : +v));
+    const dayTitle = recDay === todayK ? t.today : new Intl.DateTimeFormat(loc, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(selDate);
+    const rows = sel.map(k => {
+      const r = readingLook(k);
+      return r ? `<a class="row press" href="#/read/${k}"><span class="sym" style="background:${r.col}">${svg(r.ic)}</span><span class="t"><b>${esc(r.title)}</b>${r.cat ? `<small>${esc(r.cat)}</small>` : ""}</span><span class="ok">${svg("check")}</span></a>` : "";
+    }).join("");
+    const stat = (v, label, ic) => `<div class="stat glass">${svg(ic)}<b>${num(v)}</b><small>${label}</small></div>`;
+    return shell("record", `<h1 class="large">${t.recTitle}</h1><p class="sub">${t.recSub}</p>
+      <div class="stats">${stat(inMonth.filter(v => v.length).length, t.activeDays, "calendar")}${stat(inMonth.reduce((a, v) => a + v.length, 0), t.monthDone, "check")}${stat(streakDays(h), t.inRow, "spark")}</div>
+      <div class="cal-card glass">
+        <div class="cal-head">
+          <button class="icon-btn press" data-month="-1" aria-label="${t.prevMonth}">${svg("back")}</button>
+          <div><b>${esc(monthName)}</b><small>${esc(hijriMonth)}</small></div>
+          <button class="icon-btn press" data-month="1" aria-label="${t.nextMonth}" ${recMonth >= 0 ? "disabled" : ""}>${svg("chev")}</button>
+        </div>
+        <div class="cal-grid">${t.week.map(w => `<span class="wd">${w}</span>`).join("")}${cells}</div>
+      </div>
+      <div class="section">${esc(dayTitle)}${sel.length ? ` · ${t.dayDone} (${num(sel.length)})` : ""}</div>
+      ${rows ? `<div class="group glass">${rows}</div>` : `<div class="empty glass card" style="padding:24px">${t.nothingDay}</div>`}`);
+  }
+
   function tasbih() {
     const t = s(), st = Object.assign({ phrase: 0, target: 33, count: 0, total: 0 }, store.get("tasbih", {}));
     const r = 46, L = 2 * Math.PI * r, f = st.target ? Math.min(st.count / st.target, 1) : 0;
@@ -405,6 +479,7 @@
     const yd = `${y.getFullYear()}-${y.getMonth() + 1}-${y.getDate()}`;
     const streak = prev.last === d ? prev.n : prev.last === yd ? prev.n + 1 : 1;
     st[key] = { last: d, n: streak }; store.set("streaks", st);
+    markRecord(key);
     const reps = r.items.reduce((a, z) => a + Math.max(1, z.n || 1), 0);
     const e = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
     const next = key === "morning" ? t.seeEvening : key === "evening" ? t.seeMorning : "";
@@ -486,6 +561,7 @@
       };
     } else if (parts[0] === "fav") html = favorites();
     else if (parts[0] === "tasbih") html = tasbih();
+    else if (parts[0] === "record") html = record();
     else if (parts[0] === "umrah") { html = guide(); after = () => updateProgress("umrah"); }
     else html = notFound();
     app.innerHTML = html;
@@ -498,6 +574,8 @@
     const langBtn = ev.target.closest("[data-lang]");
     if (langBtn) { lang = langBtn.dataset.lang; applyLang(); route(); return; }
     if (btn && btn.id === "open-settings") return openSettings();
+    if (btn && btn.dataset.month) { recMonth = Math.min(0, recMonth + +btn.dataset.month); route(); return; }
+    if (btn && btn.dataset.day) { recDay = btn.dataset.day; route(); return; }
     const stepLink = ev.target.closest("[data-step]");
     if (stepLink) { ev.preventDefault(); document.getElementById(`step-${stepLink.dataset.step}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
     if (btn && btn.id === "join-toggle") {

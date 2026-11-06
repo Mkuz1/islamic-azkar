@@ -298,3 +298,39 @@ footer.site .ded-l { margin: 2px 0 12px; }
 .empty { text-align: center; color: var(--text2); padding: 40px 20px; }
 .toast { position: fixed; z-index: 60; left: 50%; bottom: 100px; transform: translateX(-50%); padding: 10px 18px; border-radius: 99px; background: var(--pane-strong); font-size: 14px; animation: fade .2s; }
 .loading { display: grid; place-items: center; min-height: 50vh; color: var(--text2); }
+
+/* Record */
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+.stat { border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.stat svg { width: 20px; height: 20px; color: var(--accent); }
+.stat b { font-size: 24px; font-weight: 650; margin-top: 4px; }
+.stat small { color: var(--text2); font-size: 12.5px; line-height: 1.3; }
+.cal-card { border-radius: 24px; padding: 14px; }
+.cal-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.cal-head > div { flex: 1; text-align: center; }
+.cal-head b { display: block; font-size: 17px; }
+.cal-head small { color: var(--text2); font-size: 12.5px; }
+.cal-head .icon-btn { color: var(--accent); }
+.cal-head .icon-btn:disabled { color: var(--text3); }
+[dir="rtl"] .cal-head .icon-btn svg { transform: scaleX(-1); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.cal-grid .wd { text-align: center; color: var(--text2); font-size: 11.5px; font-weight: 600; padding-bottom: 4px; }
+.day { aspect-ratio: 1 / .95; border: 1.5px solid transparent; border-radius: 12px; background: transparent; color: var(--text); font: inherit; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; }
+.day b { font-weight: 500; font-size: 15px; }
+.day i { display: flex; gap: 2px; height: 10px; }
+.day i svg { width: 10px; height: 10px; }
+.day i .mi { color: #ff9500; }
+.day i .ei { color: #5856d6; }
+.day.s2 i .mi, .day.s3 i .mi { color: #ffd60a; }
+.day.s2 i .ei, .day.s3 i .ei { color: #fff; }
+.day.s1 { background: color-mix(in srgb, var(--accent) 25%, transparent); }
+.day.s2 { background: color-mix(in srgb, var(--accent) 50%, transparent); color: #fff; }
+.day.s3 { background: color-mix(in srgb, var(--accent) 80%, transparent); color: #fff; }
+.day.today b { font-weight: 750; }
+.day.today { border-color: var(--accent); }
+.day.sel { border: 2px solid var(--gold); }
+.day:disabled { color: var(--text3); cursor: default; }
+.row .ok svg { width: 20px; height: 20px; color: var(--accent); }
+@media (max-width: 560px) { .stat b { font-size: 21px; } .stat { padding: 12px; } }
+@media (min-width: 700px) { .day { aspect-ratio: auto; height: 60px; } }
