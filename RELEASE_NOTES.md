@@ -1,5 +1,8 @@
-- Azkar record: each day now lists the azkar you completed in full (e.g. Morning Azkar, Before Sleep), from every category in the app, with the category's icon. They are recorded wherever you finish them: reading, Favourites or the ʿUmrah guide.
+- Mac: reminders now appear on screen as a card at the top centre, over any app, with a short dhikr and a "Read now" button — even if macOS keeps notifications in Notification Center.
+- iPhone and Android: the azkar record is now its own "Record" tab in the bottom bar, with a calendar of the azkar you completed each day. Widgets moved to Settings.
 
-- سجلّ الأذكار: يعرض كل يوم الأذكار التي أتممتها كاملة (مثل أذكار الصباح، وأذكار النوم) من جميع أقسام التطبيق مع أيقونة القسم، وتُسجَّل أينما أتممتها: في القراءة أو المفضلة أو دليل العمرة.
+- ماك: تظهر التذكيرات الآن على الشاشة في بطاقة أعلى المنتصف فوق أي تطبيق، مع ذكر قصير وزر «اقرأ الآن»، حتى لو كان النظام يحفظ الإشعارات في مركز الإشعارات.
+- آيفون وأندرويد: سجلّ الأذكار أصبح تبويبًا مستقلًا «سجلّي» في الشريط السفلي، مع تقويم بالأذكار التي أتممتها كل يوم. انتقلت الأدوات إلى الإعدادات.
 
-- Historique des adhkar : chaque jour liste les adhkar terminés en entier (ex. adhkar du matin, avant de dormir), de toutes les catégories de l'application, avec l'icône de la catégorie. Ils sont enregistrés où que vous les terminiez : lecture, Favoris ou guide de la ʿOumra.
+- Mac : les rappels apparaissent maintenant à l'écran dans une carte en haut au centre, par-dessus toute application, avec un court dhikr et un bouton « Lire maintenant », même si macOS garde les notifications dans le Centre de notifications.
+- iPhone et Android : l'historique des adhkar est maintenant un onglet « Historique » dans la barre du bas, avec un calendrier des adhkar terminés chaque jour. Les widgets sont dans les Réglages.

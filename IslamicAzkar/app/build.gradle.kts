@@ -18,8 +18,8 @@ android {
         minSdk = 26
         targetSdk = 36
         // The GitHub release tag must be "v" + versionName (e.g. v1.0.5): the github build compares them.
-        versionCode = 13
-        versionName = "1.0.13"
+        versionCode = 14
+        versionName = "1.0.14"
         vectorDrawables { useSupportLibrary = true }
     }
 
