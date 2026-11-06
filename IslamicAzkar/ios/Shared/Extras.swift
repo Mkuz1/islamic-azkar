@@ -414,6 +414,7 @@ enum Streaks {
         let count = d.integer(forKey: "streak_\(key)")
         let next = today - last == 0 ? max(count, 1) : today - last == 1 ? count + 1 : 1
         d.set(today, forKey: "streak_day_\(key)")
+        AzkarHistory.markReading(key)
         d.set(next, forKey: "streak_\(key)")
         return next
     }

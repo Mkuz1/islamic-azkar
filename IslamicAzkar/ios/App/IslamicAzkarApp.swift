@@ -14,6 +14,7 @@ enum Route: Hashable {
     case category(String)
     case reader(Reading, focus: Int?)
     case guide(String)
+    case history
 }
 
 /// App-wide state: preferences (persisted in the shared App Group so widgets agree) and navigation.
@@ -88,7 +89,9 @@ final class AppModel {
     func setRemaining(_ z: Zikr, _ value: Int) {
         let today = Calendar.current.startOfDay(for: .now)
         if progressDay != today { progress = [:]; progressDay = today }
-        progress[z.id] = max(0, min(value, z.repeatCount))
+        let new = max(0, min(value, z.repeatCount))
+        if new == 0 && remaining(z) != 0 { AzkarHistory.markZikr(z.id) }   // the Record page
+        progress[z.id] = new
     }
 
     var s: L10n { L10n.of(lang) }

@@ -6,6 +6,7 @@ enum SidebarItem: Hashable {
     case tab(AppTab)
     case category(String)
     case guide
+    case history
 }
 
 /// Mac navigation: a sidebar (app header, sections, categories, ʿUmrah guide) and one navigation
@@ -131,6 +132,7 @@ struct MacRootView: View {
                 row(s.tabFavorites, "heart.fill", .pink, .tab(.favorites))
                 row(s.tabTasbih, "circle.hexagongrid.fill", .teal, .tab(.tasbih))
                 row(s.tabSettings, "gearshape.fill", .gray, .tab(.settings))
+                row(HistoryTexts.of(lang).title, "calendar", .teal, .history)
             } header: {
                 header
             }
@@ -193,6 +195,7 @@ struct MacRootView: View {
         case .tab(.settings): SettingsView()
         case .category(let key): CategoryView(key: key)
         case .guide: GuideView(key: "umrah")
+        case .history: HistoryView()
         default: HomeView()
         }
     }
@@ -203,6 +206,7 @@ struct MacRootView: View {
         case .category(let key): CategoryView(key: key)
         case .reader(let r, let focus): ReaderView(reading: r, focus: focus)
         case .guide(let key): GuideView(key: key)
+        case .history: HistoryView()
         }
     }
 }
@@ -249,6 +253,8 @@ enum MacNavTest {
         await step("10b-guide-open-dua", { model.show(.chapter(115), split: false) }, expect: { model.homePath.count == 1 })
         await step("10c-back", back, expect: { model.homePath.isEmpty })
         await step("10d-back-to-home", back, expect: { model.tab == .home && model.homePath.isEmpty })
+        await step("10e-history", { select(.history) }, expect: { model.tab == .home && model.homePath.isEmpty })
+        await step("10f-history-back", back, expect: { model.tab == .home && model.homePath.isEmpty })
         await step("09b-settings-back", { select(.tab(.settings)); back() }, expect: { model.tab == .home })
         await step("11-home-open-evening", { select(.tab(.home)); model.show(.evening, split: false) }, expect: { model.homePath.count == 1 })
         // BUG-001: changing the language, then opening a reading, crashed (layout loop). Only model
@@ -260,6 +266,8 @@ enum MacNavTest {
         // BUG-004: a dhikr completed in a reading is completed everywhere.
         let first = AzkarData.shared.morning[0]
         await step("16-shared-progress", { model.setRemaining(first, 0) }, expect: { model.remaining(first) == 0 })
+        await step("16b-history-with-record", { model.homePath = [.history] }, expect: { model.homePath.count == 1 })
+        await step("16c-reader-counter", { model.homePath = []; model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
         // BUG-003: dark appearance (screenshot to review).
         await step("17-dark-home", { model.homePath = []; model.theme = .dark }, expect: { model.theme == .dark })
         await step("18-dark-reader", { model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })

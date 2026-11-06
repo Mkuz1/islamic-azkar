@@ -45,21 +45,31 @@ extension View {
     /// The tinted, filled call-to-action: native Liquid Glass on iOS 26.
     @ViewBuilder
     func prominentGlassButton() -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if os(macOS)
+        // On the Mac the glass styles tint the whole button green, hiding green labels: use the
+        // standard prominent button (white text on green).
+        self.buttonStyle(.borderedProminent).buttonBorderShape(.capsule)
+        #else
+        if #available(iOS 26.0, *) {
             self.buttonStyle(.glassProminent)
         } else {
             self.buttonStyle(.borderedProminent).buttonBorderShape(.capsule)
         }
+        #endif
     }
 
     /// Secondary button: native Liquid Glass on iOS 26.
     @ViewBuilder
     func glassButton() -> some View {
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if os(macOS)
+        self.buttonStyle(SoftCapsuleButtonStyle())
+        #else
+        if #available(iOS 26.0, *) {
             self.buttonStyle(.glass)
         } else {
             self.buttonStyle(.bordered).buttonBorderShape(.capsule)
         }
+        #endif
     }
 }
 
@@ -147,3 +157,19 @@ extension View {
         #endif
     }
 }
+
+#if os(macOS)
+/// The Mac's secondary button (the dhikr counter, tasbih controls): a light green capsule with
+/// dark-green text, readable in Light and Dark. (macOS's glass style filled it with green.)
+struct SoftCapsuleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.horizontal, 12).padding(.vertical, 6)
+            .background(Theme.accentSoft, in: Capsule())
+            .overlay(Capsule().strokeBorder(Theme.accent.opacity(0.35), lineWidth: 1))
+            .foregroundStyle(Theme.accent)
+            .contentShape(Capsule())
+            .opacity(configuration.isPressed ? 0.7 : 1)
+    }
+}
+#endif
