@@ -1,8 +1,5 @@
-- New "Azkar record" page (iPhone, iPad and Mac): a calendar of the azkar you finished each day, with morning and evening marks, monthly totals and your streak. Tap a day to see what you finished.
-- Mac: the green buttons now show their text in white; the dhikr counter is easier to read.
+- Azkar record: each day now lists the azkar you completed in full (e.g. Morning Azkar, Before Sleep), from every category in the app, with the category's icon. They are recorded wherever you finish them: reading, Favourites or the ʿUmrah guide.
 
-- صفحة جديدة «سجلّ الأذكار» (آيفون وآيباد وماك): تقويم بالأذكار التي أتممتها كل يوم، مع علامة أذكار الصباح والمساء، ومجموع الشهر، والأيام المتتالية. اضغط على أي يوم لترى ما أتممته.
-- ماك: نص الأزرار الخضراء أصبح باللون الأبيض، وعدّاد الذكر أوضح.
+- سجلّ الأذكار: يعرض كل يوم الأذكار التي أتممتها كاملة (مثل أذكار الصباح، وأذكار النوم) من جميع أقسام التطبيق مع أيقونة القسم، وتُسجَّل أينما أتممتها: في القراءة أو المفضلة أو دليل العمرة.
 
-- Nouvelle page « Historique des adhkar » (iPhone, iPad et Mac) : un calendrier des adhkar terminés chaque jour, avec les marques du matin et du soir, les totaux du mois et les jours d'affilée. Touchez un jour pour voir ce que vous avez terminé.
-- Mac : le texte des boutons verts est maintenant en blanc ; le compteur de dhikr est plus lisible.
+- Historique des adhkar : chaque jour liste les adhkar terminés en entier (ex. adhkar du matin, avant de dormir), de toutes les catégories de l'application, avec l'icône de la catégorie. Ils sont enregistrés où que vous les terminiez : lecture, Favoris ou guide de la ʿOumra.
