@@ -36,11 +36,11 @@ struct RootView: View {
             Tab(s.tabTasbih, systemImage: "circle.hexagongrid.fill", value: AppTab.tasbih) {
                 NavigationStack { TasbihView() }
             }
-            #if os(iOS)
-            Tab(model.m.tabWidgets, systemImage: "square.grid.2x2.fill", value: AppTab.widgets) {
-                NavigationStack { WidgetsView() }
+            Tab(HistoryTexts.of(model.lang).tab, systemImage: "calendar", value: AppTab.record) {
+                NavigationStack(path: $m.recordPath) {
+                    HistoryView().navigationDestination(for: Route.self) { RouteDestination(route: $0) }
+                }
             }
-            #endif
             Tab(s.tabSettings, systemImage: "gearshape.fill", value: AppTab.settings) {
                 NavigationStack { SettingsView() }
             }
@@ -86,12 +86,16 @@ struct HomeTab: View {
         @Bindable var m = model
         NavigationStack(path: $m.homePath) {
             HomeView()
-                .navigationDestination(for: Route.self) { destination($0) }
+                .navigationDestination(for: Route.self) { RouteDestination(route: $0) }
         }
     }
+}
 
-    @ViewBuilder
-    private func destination(_ route: Route) -> some View {
+/// The page for a navigation route, in whichever tab's stack it was pushed.
+struct RouteDestination: View {
+    let route: Route
+
+    var body: some View {
         switch route {
         case .category(let key): CategoryView(key: key)
         case .reader(let r, let focus): ReaderView(reading: r, focus: focus)

@@ -112,6 +112,24 @@ struct SettingsView: View {
                 }
             }
 
+            #if os(iOS)
+            Section {
+                Button { model.showWidgets = true } label: {
+                    HStack(spacing: 12) {
+                        SymbolSquare(symbol: "square.grid.2x2.fill", color: .blue, size: 30)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(m.widgetsTitle).foregroundStyle(.primary)
+                            Text(m.widgetsHint).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.forward").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+            #endif
+
             Section(m.ourApps) {
                 Button { openURL(mushafURL) } label: {
                     HStack(spacing: 14) {
@@ -144,6 +162,9 @@ struct SettingsView: View {
         }
         .pageBackdrop()
         .navigationTitle(s.settings)
+        #if os(iOS)
+        .navigationDestination(isPresented: $am.showWidgets) { WidgetsView() }
+        #endif
     }
 
     private func locate() {

@@ -37,4 +37,6 @@ shot 22-sunnah-fr sunnah fr 0
 shot 23-sunnah-ar-dark sunnah ar 1
 shot 24-quran-ar quran ar 0
 shot 25-quran-en-dark quran en 1
+shot 26-record-en record en 0
+shot 27-record-ar-dark record ar 1
 exit 0

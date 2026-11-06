@@ -51,9 +51,6 @@ struct HomeView: View {
                         GlassGroup { GuideLinkRow(guide: guide) }.padding(.horizontal, 16).padding(.top, 6)
                     }
 
-                    SectionLabel(text: HistoryTexts.of(model.lang).title).padding(.top, 10)
-                    GlassGroup { HistoryLinkRow() }.padding(.horizontal, 16).padding(.top, 6)
-
                     VStack(spacing: 4) {
                         Text(dedicationAr).font(.amiri(17)).foregroundStyle(.secondary)
                         if let t = dedicationTranslation(model.lang) {

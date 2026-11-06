@@ -7,7 +7,7 @@ import UIKit
 
 enum ThemeMode: String, CaseIterable { case system, light, dark }
 
-enum AppTab: Hashable { case home, favorites, tasbih, widgets, settings }
+enum AppTab: Hashable { case home, favorites, tasbih, record, settings }
 
 /// Navigation destinations inside the Home tab.
 enum Route: Hashable {
@@ -70,6 +70,9 @@ final class AppModel {
     // Navigation
     var tab: AppTab = .home
     var homePath: [Route] = []
+    /// The Record tab's own stack, and Settings → Widgets (iPhone / iPad).
+    var recordPath: [Route] = []
+    var showWidgets = false
     /// Split view (iPad, landscape Plus/Max): the reading shown in the detail column.
     var detail: Reading?
     var detailFocus: Int?
@@ -149,7 +152,8 @@ final class AppModel {
         switch screen {
         case "favorites": tab = .favorites
         case "tasbih": tab = .tasbih
-        case "widgets": tab = .widgets
+        case "widgets": tab = .settings; showWidgets = true
+        case "record": tab = .record
         case "settings": tab = .settings
         case "reader", "celebration": homePath = [.reader(.morning, focus: nil)]
         case "guide": homePath = [.guide("umrah")]

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// Texts for the Record page.
 struct HistoryTexts {
-    let title, subtitle, activeDays, finished, streak, nothing, completed, today, open: String
+    let title, subtitle, activeDays, finished, streak, nothing, completed, today, open, tab: String
     let days: (Int) -> String
 
     static func of(_ lang: Lang) -> HistoryTexts {
@@ -11,46 +11,24 @@ struct HistoryTexts {
             title: "سجلّ الأذكار", subtitle: "الأذكار التي أتممتها كل يوم",
             activeDays: "أيام الذكر هذا الشهر", finished: "أذكار أتممتها هذا الشهر", streak: "أيام متتالية",
             nothing: "لم تُتمّ أذكارًا في هذا اليوم.", completed: "الأذكار المكتملة", today: "اليوم",
-            open: "سجلّي", days: { Lang.ar.num($0) })
+            open: "سجلّي", tab: "سجلّي", days: { Lang.ar.num($0) })
         case .en: return HistoryTexts(
             title: "Azkar record", subtitle: "The azkar you completed each day",
             activeDays: "Days with azkar this month", finished: "Azkar completed this month", streak: "Days in a row",
             nothing: "No azkar completed on this day.", completed: "Azkar completed", today: "Today",
-            open: "My record", days: { String($0) })
+            open: "My record", tab: "Record", days: { String($0) })
         case .fr: return HistoryTexts(
             title: "Historique des adhkar", subtitle: "Les adhkar terminés chaque jour",
             activeDays: "Jours avec des adhkar ce mois-ci", finished: "Adhkar terminés ce mois-ci", streak: "Jours d'affilée",
             nothing: "Aucun dhikr terminé ce jour-là.", completed: "Adhkar terminés", today: "Aujourd'hui",
-            open: "Mon historique", days: { String($0) })
+            open: "Mon historique", tab: "Historique", days: { String($0) })
         }
-    }
-}
-
-/// Row that opens the Record page (iPhone Home screen).
-struct HistoryLinkRow: View {
-    @Environment(AppModel.self) private var model
-
-    var body: some View {
-        let t = HistoryTexts.of(model.lang)
-        NavigationLink(value: Route.history) {
-            GlassRow(divider: false) {
-                SymbolSquare(symbol: "calendar", color: .teal, size: 32)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(t.open).foregroundStyle(.primary)
-                    Text(t.subtitle).font(.caption).foregroundStyle(.secondary).lineLimit(1)
-                }
-                Spacer()
-                Image(systemName: "chevron.forward").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
-            }
-        }
-        .buttonStyle(.plain)
     }
 }
 
 /// The Record page: a month calendar of completed azkar, a summary, and the selected day's list.
 struct HistoryView: View {
     @Environment(AppModel.self) private var model
-    @Environment(\.inSplitView) private var split
     @State private var month = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month], from: .now)) ?? .now
     @State private var selected = Calendar.current.startOfDay(for: .now)
     @State private var days: [String: AzkarHistory.Day] = [:]
@@ -211,7 +189,7 @@ struct HistoryView: View {
                 return (categorySymbol(cat.key), categoryHue(cat.key), s.category(cat.key))
             }
         }()
-        return Button { model.show(r, split: split) } label: {
+        return NavigationLink(value: Route.reader(r, focus: nil)) {
             HStack(spacing: 12) {
                 SymbolSquare(symbol: look.symbol, color: look.color, size: 32)
                 VStack(alignment: .leading, spacing: 2) {
