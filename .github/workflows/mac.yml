@@ -87,6 +87,8 @@ jobs:
           check guide-fr guide fr
           check tap-dedication-en dedication en -ciTap dedication
           check tap-home-ar home ar -ciTap home
+          check banner-en home en -ciBanner morning
+          check banner-ar home ar -ciBanner evening
           # Navigation smoke test: sidebar sections, open / back, category, favourites, tasbih, settings, guide.
           mkdir -p shots/nav
           "$APP/Contents/MacOS/Islamic Azkar" -ciScreen home -ciLang en -ciNav 1 -ciShotDir "$PWD/shots/nav" -ciTrace 1 > shots/nav.log 2>&1 &

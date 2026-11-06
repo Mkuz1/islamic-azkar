@@ -15,7 +15,7 @@ final class MenuClock {
     private init() {
         timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             self?.now = Date()
-            MacReminders.check()   // backup for the scheduled morning / evening reminders
+            MainActor.assumeIsolated { MacReminders.check() }   // the on-screen reminder card
         }
     }
 }
@@ -24,9 +24,15 @@ final class MenuClock {
 struct MenuBarLabel: View {
     @Environment(AppModel.self) private var model
     @AppStorage("menubar_next_prayer") private var showNext = true
+    @Environment(\.openWindow) private var openWindow
     private let clock = MenuClock.shared
 
     var body: some View {
+        label.task { ReminderBanner.openMain = { [openWindow] in showMainWindow(openWindow) } }
+    }
+
+    @ViewBuilder
+    private var label: some View {
         // A bell while the azkar of a reminder that has come due are still unread.
         let bell = MacReminders.pending(at: clock.now) != nil ? "🔔 " : ""
         if showNext, let place = model.place {
