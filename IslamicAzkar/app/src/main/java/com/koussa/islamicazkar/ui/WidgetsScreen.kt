@@ -174,7 +174,7 @@ private fun unsupported(lang: Lang) = when (lang) {
     Lang.FR -> "Votre lanceur ne permet pas l’ajout direct. Appuyez longuement sur l’écran d’accueil et choisissez « Widgets »."
 }
 
-private fun tabTitle(lang: Lang) = when (lang) { Lang.AR -> "الأدوات"; Lang.EN -> "Widgets"; Lang.FR -> "Widgets" }
+internal fun tabTitle(lang: Lang) = when (lang) { Lang.AR -> "الأدوات"; Lang.EN -> "Widgets"; Lang.FR -> "Widgets" }
 
 /** Asks the launcher to place [provider] on the home screen; false when the launcher can't. */
 fun pinWidget(ctx: Context, provider: Class<*>): Boolean {
@@ -208,7 +208,7 @@ fun WidgetsScreen() {
         } else action()
     }
     CollapsingTitle(title, listState)
-    LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = screenPadding()) {
+    LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = screenPadding(hasBack = app.depth > 0)) {
         item { LargeTitle(title, s.widgetsHint) }
         GALLERY.forEach { group ->
             item { SectionHeader(group.title(lang)) }

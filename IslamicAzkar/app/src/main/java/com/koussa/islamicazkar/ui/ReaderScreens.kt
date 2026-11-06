@@ -123,6 +123,7 @@ fun ReaderScreen(reading: Reading, focus: Int?) {
     LaunchedEffect(allDone) {
         if (allDone && totalReps > 0 && remaining.isNotEmpty()) {
             delay(450)
+            com.koussa.islamicazkar.data.AzkarHistory.markReading(ctx, reading.key())   // the Record tab
             val streak = when (reading) {
                 Reading.Morning -> app.settings.recordCompletion("morning")
                 Reading.Evening -> app.settings.recordCompletion("evening")

@@ -38,8 +38,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.rounded.Widgets
-import androidx.compose.material.icons.outlined.Widgets
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material.icons.rounded.Favorite
@@ -101,6 +101,7 @@ sealed interface Route {
     data object Favorites : Route { override val key = "fav" }
     data object Tasbih : Route { override val key = "tasbih" }
     data object WidgetsRoute : Route { override val key = "widgets" }
+    data object RecordRoute : Route { override val key = "record" }
     data object SettingsRoute : Route { override val key = "settings" }
     data class Category(val catKey: String) : Route { override val key = "cat:$catKey" }
     data class GuideRoute(val guideKey: String) : Route { override val key = "guide:$guideKey" }
@@ -112,7 +113,7 @@ sealed interface Route {
 class AppState(val settings: Settings) {
     var tab by mutableIntStateOf(0)
     private val stacks = List(5) { mutableStateListOf<Route>() }
-    private val roots = listOf(Route.Home, Route.Favorites, Route.Tasbih, Route.WidgetsRoute, Route.SettingsRoute)
+    private val roots = listOf(Route.Home, Route.Favorites, Route.Tasbih, Route.RecordRoute, Route.SettingsRoute)
 
     /** True when the window is wide enough (tablet, unfolded foldable) for a split view. */
     var wide by mutableStateOf(false)
@@ -209,7 +210,7 @@ fun AzkarApp(state: AppState) {
                         TabItem(s.tabHome, Icons.Outlined.Home, Icons.Rounded.Home),
                         TabItem(s.tabFavorites, Icons.Outlined.FavoriteBorder, Icons.Rounded.Favorite),
                         TabItem(s.tabTasbih, Icons.Outlined.TouchApp, Icons.Rounded.TouchApp),
-                        TabItem(if (Glass.lang == com.koussa.islamicazkar.data.Lang.AR) "الأدوات" else "Widgets", Icons.Outlined.Widgets, Icons.Rounded.Widgets),
+                        TabItem(HistoryTexts.of(Glass.lang).tab, Icons.Outlined.CalendarMonth, Icons.Rounded.CalendarMonth),
                         TabItem(s.tabSettings, Icons.Outlined.Settings, Icons.Rounded.Settings),
                     ),
                     selected = state.tab,
@@ -260,6 +261,7 @@ private fun Pane(route: Route) {
                         Route.Favorites -> FavoritesScreen()
                         Route.Tasbih -> TasbihScreen()
                         Route.WidgetsRoute -> WidgetsScreen()
+                        Route.RecordRoute -> HistoryScreen()
                         Route.SettingsRoute -> SettingsScreen()
                         is Route.Category -> CategoryScreen(r.catKey)
                         is Route.GuideRoute -> GuideScreen(r.guideKey)

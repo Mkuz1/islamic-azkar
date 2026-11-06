@@ -71,8 +71,16 @@ class ScreenshotTest {
     @Config(qualifiers = "w411dp-h4600dp-xhdpi")
     @Test fun settingsFullAr() = shot("09c_settings_full_ar_dark", Lang.AR, ThemeMode.DARK, { AzkarApp(it) }) { it.settings.updatePlace(com.koussa.islamicazkar.data.Cities.all.first { c -> c.name == "Beirut" }); it.selectTab(4) }
     @Config(qualifiers = "w411dp-h3000dp-xhdpi")
-    @Test fun widgetsTabAr() = shot("09d_widgets_tab_ar", Lang.AR, ThemeMode.LIGHT, { AzkarApp(it) }) { it.selectTab(3) }
-    @Test fun widgetsTabEnDark() = shot("09e_widgets_tab_en_dark", Lang.EN, ThemeMode.DARK, { AzkarApp(it) }) { it.selectTab(3) }
+    @Test fun widgetsTabAr() = shot("09d_widgets_tab_ar", Lang.AR, ThemeMode.LIGHT, { AzkarApp(it) }) { it.selectTab(4); it.push(com.koussa.islamicazkar.ui.Route.WidgetsRoute) }
+    @Test fun widgetsTabEnDark() = shot("09e_widgets_tab_en_dark", Lang.EN, ThemeMode.DARK, { AzkarApp(it) }) { it.selectTab(4); it.push(com.koussa.islamicazkar.ui.Route.WidgetsRoute) }
+    @Test fun recordEn() = shot("09f_record_en", Lang.EN, ThemeMode.LIGHT, { AzkarApp(it) }) {
+        listOf("morning", "c28", "c25").forEach { k -> com.koussa.islamicazkar.data.AzkarHistory.markReading(ctx, k) }
+        it.selectTab(3)
+    }
+    @Test fun recordArDark() = shot("09g_record_ar_dark", Lang.AR, ThemeMode.DARK, { AzkarApp(it) }) {
+        listOf("evening", "c28").forEach { k -> com.koussa.islamicazkar.data.AzkarHistory.markReading(ctx, k) }
+        it.selectTab(3)
+    }
     @Test fun homePrayerAr() = shot("02b_home_prayer_ar", Lang.AR, ThemeMode.LIGHT, { AzkarApp(it) }) { it.settings.updatePlace(com.koussa.islamicazkar.data.Cities.all.first { c -> c.name == "Beirut" }) }
     @Test fun shareSheet() = shot("10_share_sheet_en", Lang.EN, ThemeMode.LIGHT, { AzkarApp(it) }) {
         it.open(Reading.Morning)
