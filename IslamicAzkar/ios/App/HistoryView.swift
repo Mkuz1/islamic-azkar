@@ -2,25 +2,25 @@ import SwiftUI
 
 /// Texts for the Record page.
 struct HistoryTexts {
-    let title, subtitle, activeDays, finished, streak, nothing, readings, azkar, today, open: String
+    let title, subtitle, activeDays, finished, streak, nothing, completed, today, open: String
     let days: (Int) -> String
 
     static func of(_ lang: Lang) -> HistoryTexts {
         switch lang {
         case .ar: return HistoryTexts(
-            title: "سجلّ الأذكار", subtitle: "ما أتممته من أذكار كل يوم",
+            title: "سجلّ الأذكار", subtitle: "الأذكار التي أتممتها كل يوم",
             activeDays: "أيام الذكر هذا الشهر", finished: "أذكار أتممتها هذا الشهر", streak: "أيام متتالية",
-            nothing: "لم تُتمّ أذكارًا في هذا اليوم.", readings: "أتممت", azkar: "الأذكار المكتملة", today: "اليوم",
+            nothing: "لم تُتمّ أذكارًا في هذا اليوم.", completed: "الأذكار المكتملة", today: "اليوم",
             open: "سجلّي", days: { Lang.ar.num($0) })
         case .en: return HistoryTexts(
-            title: "Azkar record", subtitle: "The azkar you finished each day",
-            activeDays: "Days with azkar this month", finished: "Azkar finished this month", streak: "Days in a row",
-            nothing: "No azkar finished on this day.", readings: "Completed", azkar: "Azkar finished", today: "Today",
+            title: "Azkar record", subtitle: "The azkar you completed each day",
+            activeDays: "Days with azkar this month", finished: "Azkar completed this month", streak: "Days in a row",
+            nothing: "No azkar completed on this day.", completed: "Azkar completed", today: "Today",
             open: "My record", days: { String($0) })
         case .fr: return HistoryTexts(
             title: "Historique des adhkar", subtitle: "Les adhkar terminés chaque jour",
             activeDays: "Jours avec des adhkar ce mois-ci", finished: "Adhkar terminés ce mois-ci", streak: "Jours d'affilée",
-            nothing: "Aucun dhikr terminé ce jour-là.", readings: "Terminé", azkar: "Adhkar terminés", today: "Aujourd'hui",
+            nothing: "Aucun dhikr terminé ce jour-là.", completed: "Adhkar terminés", today: "Aujourd'hui",
             open: "Mon historique", days: { String($0) })
         }
     }
@@ -47,7 +47,7 @@ struct HistoryLinkRow: View {
     }
 }
 
-/// The Record page: a month calendar of finished azkar, a summary, and the selected day's list.
+/// The Record page: a month calendar of completed azkar, a summary, and the selected day's list.
 struct HistoryView: View {
     @Environment(AppModel.self) private var model
     @Environment(\.inSplitView) private var split
@@ -143,7 +143,7 @@ struct HistoryView: View {
         let isToday = cal.isDateInToday(date)
         let isSelected = cal.isDate(date, inSameDayAs: selected)
         let future = date > .now
-        let shade: Double = day.count == 0 ? 0 : day.count < 6 ? 0.25 : day.count < 20 ? 0.5 : 0.8
+        let shade: Double = day.count == 0 ? 0 : day.count < 3 ? 0.25 : day.count < 6 ? 0.5 : 0.8
         return Button { selected = cal.startOfDay(for: date) } label: {
             VStack(spacing: 2) {
                 Text(model.lang.num(cal.component(.day, from: date)))
@@ -173,49 +173,22 @@ struct HistoryView: View {
     @ViewBuilder
     private func details(_ t: HistoryTexts) -> some View {
         let lang = model.lang
-        let data = AzkarData.shared
         let day = days[AzkarHistory.dayKey(selected)] ?? AzkarHistory.Day()
+        let readings = day.readings.compactMap(Reading.init(key:))
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .firstTextBaseline) {
                 Text(cal.isDateInToday(selected) ? t.today : fullDate(selected)).font(.headline)
                 Spacer()
                 Text(Hijri.format(lang, Hijri.of(selected))).font(.caption).foregroundStyle(.secondary)
             }
-            if day.count == 0 && day.readings.isEmpty {
+            if readings.isEmpty {
                 Text(t.nothing).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 6)
             } else {
-                if !day.readings.isEmpty {
-                    Text(t.readings).font(.footnote.weight(.semibold)).textCase(.uppercase).foregroundStyle(.secondary)
-                    ForEach(day.readings, id: \.self) { key in
-                        if let r = Reading(key: key) {
-                            Button { model.show(r, split: split) } label: {
-                                Label(data.title(r, model.s, lang), systemImage: "checkmark.seal.fill")
-                                    .frame(maxWidth: .infinity, alignment: .leading).contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain).foregroundStyle(Theme.accent)
-                        }
-                    }
-                }
-                Text("\(t.azkar) · \(lang.num(day.count))").font(.footnote.weight(.semibold)).textCase(.uppercase).foregroundStyle(.secondary)
-                    .padding(.top, 4)
+                Text("\(t.completed) · \(lang.num(readings.count))").font(.footnote.weight(.semibold)).textCase(.uppercase).foregroundStyle(.secondary)
                 VStack(spacing: 0) {
-                    ForEach(Array(day.zikr.enumerated()), id: \.element) { i, id in
-                        if let z = data.zikrById[id], let r = data.reading(ofZikr: id) {
-                            Button { model.show(r, focus: id, split: split) } label: {
-                                HStack(alignment: .top, spacing: 10) {
-                                    Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.accent).padding(.top, 4)
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        Text(z.ar).font(.amiri(17)).lineLimit(2)
-                                            .environment(\.layoutDirection, .rightToLeft)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        Text(data.title(r, model.s, lang)).font(.caption).foregroundStyle(.secondary)
-                                    }
-                                }
-                                .padding(.vertical, 8).contentShape(Rectangle())
-                            }
-                            .buttonStyle(.plain)
-                            if i < day.zikr.count - 1 { Divider() }
-                        }
+                    ForEach(Array(readings.enumerated()), id: \.element) { i, r in
+                        readingRow(r)
+                        if i < readings.count - 1 { Divider().padding(.leading, 44) }
                     }
                 }
             }
@@ -223,6 +196,36 @@ struct HistoryView: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .glassCard(cornerRadius: 22)
+    }
+
+    /// One completed reading: its category's icon, its title, and the category it belongs to.
+    private func readingRow(_ r: Reading) -> some View {
+        let data = AzkarData.shared
+        let s = model.s
+        let look: (symbol: String, color: Color, category: String?) = {
+            switch r {
+            case .morning: return ("sun.max.fill", .orange, nil)
+            case .evening: return ("moon.fill", .indigo, nil)
+            case .chapter(let id):
+                guard let cat = data.categories.first(where: { $0.chapters.contains(id) }) else { return ("sparkles", .teal, nil) }
+                return (categorySymbol(cat.key), categoryHue(cat.key), s.category(cat.key))
+            }
+        }()
+        return Button { model.show(r, split: split) } label: {
+            HStack(spacing: 12) {
+                SymbolSquare(symbol: look.symbol, color: look.color, size: 32)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(data.title(r, s, model.lang)).foregroundStyle(.primary).lineLimit(2)
+                    if let c = look.category { Text(c).font(.caption).foregroundStyle(.secondary) }
+                }
+                Spacer(minLength: 8)
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(Theme.accent)
+            }
+            .padding(.vertical, 8)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: Helpers

@@ -1,12 +1,12 @@
 import Foundation
 
-/// Daily record of finished azkar, kept on the device: for each day ("2026-11-06"), the dhikr ids
-/// finished that day and the readings completed in full (e.g. "morning", "evening", "c28").
+/// Daily record of completed azkar, kept on the device: for each day ("2026-11-06"), the readings
+/// completed in full (e.g. "morning", "evening", "c28" — any chapter of any category).
 enum AzkarHistory {
     struct Day: Codable, Equatable {
-        var zikr: [Int] = []
+        var zikr: [Int] = []          // kept for data saved by v1.0.12; no longer shown
         var readings: [String] = []
-        var count: Int { zikr.count }
+        var count: Int { readings.count }
     }
 
     private static let key = "azkar_history"
@@ -32,17 +32,12 @@ enum AzkarHistory {
         if let data = try? JSONEncoder().encode(days) { SharedStore.defaults.set(data, forKey: key) }
     }
 
-    /// A dhikr reached its last repetition.
-    static func markZikr(_ id: Int, at date: Date = .now) {
-        update(date) { if !$0.zikr.contains(id) { $0.zikr.append(id) } }
-    }
-
     /// A whole reading (morning, evening, a chapter) was completed.
     static func markReading(_ key: String, at date: Date = .now) {
         update(date) { if !$0.readings.contains(key) { $0.readings.append(key) } }
     }
 
-    /// Consecutive days with at least one finished dhikr, ending today (or yesterday).
+    /// Consecutive days with at least one completed reading, ending today (or yesterday).
     static func currentStreak(_ days: [String: Day], now: Date = .now) -> Int {
         let cal = Calendar.current
         var date = now

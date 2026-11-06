@@ -90,8 +90,14 @@ final class AppModel {
         let today = Calendar.current.startOfDay(for: .now)
         if progressDay != today { progress = [:]; progressDay = today }
         let new = max(0, min(value, z.repeatCount))
-        if new == 0 && remaining(z) != 0 { AzkarHistory.markZikr(z.id) }   // the Record page
+        let finished = new == 0 && remaining(z) != 0
         progress[z.id] = new
+        // The Record page: a reading (morning, evening, any chapter of any category) whose every
+        // dhikr is now done, wherever it was finished (reader, favourites, ʿUmrah guide).
+        if finished, let r = AzkarData.shared.reading(ofZikr: z.id),
+           AzkarData.shared.items(r).allSatisfy({ remaining($0) == 0 }) {
+            AzkarHistory.markReading(r.key)
+        }
     }
 
     var s: L10n { L10n.of(lang) }

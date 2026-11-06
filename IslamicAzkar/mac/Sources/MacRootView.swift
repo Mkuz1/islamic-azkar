@@ -266,7 +266,11 @@ enum MacNavTest {
         // BUG-004: a dhikr completed in a reading is completed everywhere.
         let first = AzkarData.shared.morning[0]
         await step("16-shared-progress", { model.setRemaining(first, 0) }, expect: { model.remaining(first) == 0 })
-        await step("16b-history-with-record", { model.homePath = [.history] }, expect: { model.homePath.count == 1 })
+        await step("16b-history-with-record", {
+            for z in AzkarData.shared.morning { model.setRemaining(z, 0) }
+            for z in AzkarData.shared.items(.chapter(28)) { model.setRemaining(z, 0) }
+            model.homePath = [.history]
+        }, expect: { AzkarHistory.day(.now).readings.contains("morning") && AzkarHistory.day(.now).readings.contains("c28") })
         await step("16c-reader-counter", { model.homePath = []; model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
         // BUG-003: dark appearance (screenshot to review).
         await step("17-dark-home", { model.homePath = []; model.theme = .dark }, expect: { model.theme == .dark })
