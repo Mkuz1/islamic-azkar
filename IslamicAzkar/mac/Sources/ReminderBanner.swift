@@ -141,10 +141,10 @@ private struct BannerCard: View {
                     .background(Theme.accent.opacity(0.10), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
             HStack(spacing: 10) {
-                Button(action: onClose) { Text(laterTitle).frame(maxWidth: .infinity) }
-                    .buttonStyle(.bordered).controlSize(.large)
-                Button(action: onRead) { Text(MacTexts.of(lang).readNow).frame(maxWidth: .infinity) }
-                    .buttonStyle(.borderedProminent).controlSize(.large).tint(Theme.accent)
+                Button(action: onClose) { Text(laterTitle) }
+                    .buttonStyle(BannerButtonStyle(prominent: false))
+                Button(action: onRead) { Text(MacTexts.of(lang).readNow) }
+                    .buttonStyle(BannerButtonStyle(prominent: true))
                     .keyboardShortcut(.defaultAction)
             }
         }
@@ -167,5 +167,22 @@ private struct BannerCard: View {
         case .en: return "Later"
         case .fr: return "Plus tard"
         }
+    }
+}
+
+/// The card's buttons keep their colours even though the app is not the active one (the system
+/// styles turn grey then): green with white text for Read now, a soft fill for Later.
+private struct BannerButtonStyle: ButtonStyle {
+    let prominent: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.system(size: 14, weight: .semibold))
+            .foregroundStyle(prominent ? Color.white : Color.primary)
+            .frame(maxWidth: .infinity, minHeight: 34)
+            .background(prominent ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Color.primary.opacity(0.08)),
+                        in: Capsule())
+            .contentShape(Capsule())
+            .opacity(configuration.isPressed ? 0.75 : 1)
     }
 }
