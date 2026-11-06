@@ -139,7 +139,7 @@ fun HistoryScreen() {
                 if (readings.isEmpty()) {
                     Text(t.nothing, color = g.text2, fontSize = 15.sp, modifier = Modifier.padding(vertical = 6.dp))
                 } else {
-                    val head = "${t.completed} · ${lang.digits(readings.size)}"
+                    val head = "${t.completed} (${lang.digits(readings.size)})"
                     Text(if (lang == Lang.AR) head else head.uppercase(), color = g.text2, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                     readings.forEachIndexed { i, r ->
                         ReadingRow(r) { app.push(Route.Reader(r)) }
@@ -158,7 +158,7 @@ private fun Stat(value: String, label: String, icon: ImageVector, modifier: Modi
         Icon(icon, null, tint = g.accent, modifier = Modifier.size(20.dp))
         Spacer(Modifier.height(4.dp))
         Text(value, color = g.text, fontSize = 22.sp, fontWeight = FontWeight.SemiBold)
-        Text(label, color = g.text2, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 2)
+        Text(label, color = g.text2, fontSize = 12.sp, lineHeight = 15.sp, maxLines = 3)
     }
 }
 

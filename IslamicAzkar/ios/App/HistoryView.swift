@@ -74,7 +74,7 @@ struct HistoryView: View {
         VStack(alignment: .leading, spacing: 4) {
             Image(systemName: symbol).foregroundStyle(Theme.accent)
             Text(value).font(.title2.weight(.semibold)).monospacedDigit()
-            Text(label).font(.caption).foregroundStyle(.secondary).lineLimit(2).fixedSize(horizontal: false, vertical: true)
+            Text(label).font(.caption).foregroundStyle(.secondary).lineLimit(3).fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, minHeight: 92, alignment: .topLeading)
         .padding(12)
@@ -162,7 +162,7 @@ struct HistoryView: View {
             if readings.isEmpty {
                 Text(t.nothing).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 6)
             } else {
-                Text("\(t.completed) · \(lang.num(readings.count))").font(.footnote.weight(.semibold)).textCase(.uppercase).foregroundStyle(.secondary)
+                Text("\(t.completed) (\(lang.num(readings.count)))").font(.footnote.weight(.semibold)).textCase(.uppercase).foregroundStyle(.secondary)
                 VStack(spacing: 0) {
                     ForEach(Array(readings.enumerated()), id: \.element) { i, r in
                         readingRow(r)
