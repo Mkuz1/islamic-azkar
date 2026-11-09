@@ -23,8 +23,20 @@ enum MacCI {
         guard !started else { return }
         started = true
         if UserDefaults.standard.bool(forKey: "ciMenu") { MenuPanelPreviewWindow.show() }
-        if let key = UserDefaults.standard.string(forKey: "ciBanner"), let r = Reading(key: key) {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { ReminderBanner.show(r) }
+        if let key = UserDefaults.standard.string(forKey: "ciBanner") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                if let r = Reading(key: key) { ReminderBanner.show(r) }
+                else {   // a dhikr reminder through the day, as the notification delegate receives it
+                    let s = L10n.of(SharedStore.lang)
+                    let z = AzkarData.shared.shortAzkar[3]
+                    ReminderBanner.show(notification: "azkar.general.540", title: s.notifGeneralTitle,
+                                        body: z.meaning(SharedStore.lang).isEmpty ? z.ar : "\(z.ar)\n\(z.meaning(SharedStore.lang))", link: nil)
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                let w = ReminderBanner.window
+                launchTrace("banner on screen: visible=\(w?.isVisible ?? false) occluded=\(!(w?.occlusionState.contains(.visible) ?? false)) alpha=\(w?.alphaValue ?? 0) frame=\(w?.frame.debugDescription ?? "none") screen=\(NSScreen.main?.visibleFrame.debugDescription ?? "?")")
+            }
         }
         guard let path = UserDefaults.standard.string(forKey: "ciShot") else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 6) {

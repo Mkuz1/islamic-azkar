@@ -13,11 +13,51 @@ enum ReminderBanner {
     /// For CI screenshots.
     static var window: NSWindow? { panel }
 
+    /// What the card shows.
+    struct Content {
+        var title: String
+        var body: String
+        var preview: String?   // a short dhikr in Arabic
+        var morning: Bool
+        var link: URL
+    }
+
+    /// The morning or evening azkar reminder.
     static func show(_ reading: Reading) {
+        let s = L10n.of(SharedStore.lang)
+        let morning = reading == .morning
+        let preview = AzkarData.shared.items(reading).map(\.ar).first { (12...140).contains($0.count) && !$0.contains("﴿") }
+        show(Content(title: morning ? s.notifMorningTitle : s.notifEveningTitle,
+                     body: morning ? s.notifMorningBody : s.notifEveningBody,
+                     preview: preview, morning: morning, link: DeepLink.url(reading)))
+    }
+
+    /// Any of the app's reminders, as it arrives while the app runs (morning, evening, the dhikr
+    /// reminders through the day, the test): shown on screen instead of only in Notification Center.
+    static func show(notification id: String, title: String, body: String, link: String?) {
+        let day = Calendar.current.ordinality(of: .day, in: .era, for: .now) ?? 0
+        if id == "azkar.morning" || id == "azkar.evening" {
+            // The 30-second check may have shown it already.
+            let key = "mac_banner_\(id)"
+            if SharedStore.defaults.integer(forKey: key) == day, panel != nil { return }
+            SharedStore.defaults.set(day, forKey: key)
+        }
+        let url = link.flatMap(URL.init(string:)) ?? DeepLink.url(Reading.recommended())
+        // The dhikr reminders carry the dhikr itself: Arabic on the first line, the meaning after it.
+        let lines = body.components(separatedBy: "\n")
+        let general = id.hasPrefix("azkar.general.")
+        show(Content(title: title,
+                     body: general ? (lines.dropFirst().joined(separator: " ")) : body,
+                     preview: general ? lines.first : nil,
+                     morning: id != "azkar.evening" && (id != "azkar.test" || Reading.recommended() != .evening),
+                     link: url))
+    }
+
+    static func show(_ content: Content) {
         dismiss(animated: false)
         let lang = SharedStore.lang
-        let view = BannerCard(reading: reading, lang: lang,
-                              onRead: { read(reading) },
+        let view = BannerCard(content: content, lang: lang,
+                              onRead: { open(content.link) },
                               onClose: { dismiss() })
             .environment(\.layoutDirection, lang.isRTL ? .rightToLeft : .leftToRight)
             .environment(\.locale, lang.locale)
@@ -70,9 +110,9 @@ enum ReminderBanner {
         }, completionHandler: { p.orderOut(nil) })
     }
 
-    private static func read(_ reading: Reading) {
+    private static func open(_ link: URL) {
         dismiss()
-        MacNotifications.shared.open?(DeepLink.url(reading))
+        MacNotifications.shared.open?(link)
         if let w = NSApp.windows.first(where: { $0.identifier?.rawValue.hasPrefix("main") == true && $0.canBecomeMain }) {
             w.deminiaturize(nil)
             w.makeKeyAndOrderFront(nil)
@@ -91,7 +131,7 @@ private final class BannerPanel: NSPanel {
 
 /// The card: app icon and the reminder, a short dhikr from the reading, and Read now / Later.
 private struct BannerCard: View {
-    let reading: Reading
+    let content: ReminderBanner.Content
     let lang: Lang
     let onRead: () -> Void
     let onClose: () -> Void
@@ -99,8 +139,8 @@ private struct BannerCard: View {
 
     var body: some View {
         let s = L10n.of(lang)
-        let morning = reading == .morning
-        let preview = AzkarData.shared.items(reading).map(\.ar).first { (12...140).contains($0.count) && !$0.contains("﴿") }
+        let morning = content.morning
+        let preview = content.preview
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .top, spacing: 12) {
                 ZStack(alignment: .bottomTrailing) {
@@ -119,10 +159,12 @@ private struct BannerCard: View {
                         Text("·").foregroundStyle(.tertiary)
                         Text(Date.now, style: .time).font(.caption).foregroundStyle(.secondary)
                     }
-                    Text(morning ? s.notifMorningTitle : s.notifEveningTitle)
+                    Text(content.title)
                         .font(.system(size: 17, weight: .bold))
-                    Text(morning ? s.notifMorningBody : s.notifEveningBody)
-                        .font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                    if !content.body.isEmpty {
+                        Text(content.body)
+                            .font(.callout).foregroundStyle(.secondary).lineLimit(3).fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 Spacer(minLength: 0)
                 Button(action: onClose) {
@@ -134,7 +176,7 @@ private struct BannerCard: View {
             }
             if let preview {
                 Text(preview)
-                    .font(.amiri(17)).lineLimit(2).multilineTextAlignment(.center)
+                    .font(.amiri(17)).lineLimit(3).multilineTextAlignment(.center)
                     .environment(\.layoutDirection, .rightToLeft)
                     .frame(maxWidth: .infinity)
                     .padding(.horizontal, 12).padding(.vertical, 10)

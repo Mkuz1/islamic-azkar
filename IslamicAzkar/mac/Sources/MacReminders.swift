@@ -16,8 +16,14 @@ final class MacNotifications: NSObject, UNUserNotificationCenterDelegate {
     var open: ((URL) -> Void)?
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
-        // The app's own card is on screen already for azkar reminders.
-        notification.request.identifier.hasPrefix("azkar.") ? [.list] : [.banner, .list, .sound]
+        let id = notification.request.identifier
+        guard id.hasPrefix("azkar.") else { return [.banner, .list, .sound] }
+        // The app runs: show its own card at the top of the screen (macOS may keep a running menu-bar
+        // app's banners in Notification Center), and keep the notification in the list.
+        let c = notification.request.content
+        let link = c.userInfo["link"] as? String
+        await MainActor.run { ReminderBanner.show(notification: id, title: c.title, body: c.body, link: link) }
+        return [.list]
     }
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
@@ -82,14 +88,14 @@ enum MacReminders {
     /// Returns false when notifications are off for the app (then System Settings is opened).
     @MainActor
     static func sendTest() async -> Bool {
-        // The on-screen card does not need the notification permission: it always shows.
-        let shown = Reading.recommended() == .evening ? Reading.evening : .morning
-        Task { try? await Task.sleep(for: .seconds(3)); ReminderBanner.show(shown) }
         let center = UNUserNotificationCenter.current()
         _ = try? await center.requestAuthorization(options: [.alert, .sound, .badge])
         let settings = await center.notificationSettings()
         guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional,
               settings.alertSetting != .disabled else {
+            // The on-screen card does not need the notification permission.
+            let shown = Reading.recommended() == .evening ? Reading.evening : .morning
+            Task { try? await Task.sleep(for: .seconds(3)); ReminderBanner.show(shown) }
             if let url = URL(string: "x-apple.systempreferences:com.apple.Notifications-Settings.extension?id=\(Bundle.main.bundleIdentifier ?? "")") {
                 NSWorkspace.shared.open(url)
             }

@@ -89,6 +89,9 @@ jobs:
           check tap-home-ar home ar -ciTap home
           check banner-en home en -ciBanner morning
           check banner-ar home ar -ciBanner evening
+          check banner-general-en home en -ciBanner general
+          grep -h "banner on screen" shots/banner-*.log || true
+          grep -q "banner on screen: visible=true occluded=false alpha=1.0" shots/banner-en.log || { echo "::error::the reminder card is not visible on screen"; FAILED=1; }
           # Navigation smoke test: sidebar sections, open / back, category, favourites, tasbih, settings, guide.
           mkdir -p shots/nav
           "$APP/Contents/MacOS/Islamic Azkar" -ciScreen home -ciLang en -ciNav 1 -ciShotDir "$PWD/shots/nav" -ciTrace 1 > shots/nav.log 2>&1 &
