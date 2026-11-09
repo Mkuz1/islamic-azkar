@@ -95,7 +95,7 @@ jobs:
           PID=$!
           for i in $(seq 1 60); do kill -0 $PID 2>/dev/null || break; sleep 1; done
           if kill -0 $PID 2>/dev/null; then echo "::error::navigation test did not finish"; kill $PID; FAILED=1; NAV=timeout
-          else wait $PID; NAV=$?; fi
+          else NAV=0; wait $PID || NAV=$?; fi
           echo "--- navigation test (exit $NAV)"; grep "nav " shots/nav.log || cat shots/nav.log
           [ "$NAV" = 0 ] || FAILED=1
           for f in shots/nav/*.png; do [ -f "$f" ] && cp "$f" "shots/nav-$(basename "$f")"; done
