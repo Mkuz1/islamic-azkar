@@ -1,0 +1,38 @@
+# Deploys the website API Worker (api/: tester sign-ups and the azkar record sync) to Cloudflare.
+# Uses the same repository secrets as the website: CLOUDFLARE_API_TOKEN (needs "Workers Scripts:
+# Edit", "Workers KV Storage:Edit" and "Workers Routes:Edit" on islamicazkar.net) and CLOUDFLARE_ACCOUNT_ID.
+name: API
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["api/**", ".github/workflows/api.yml"]
+
+concurrency:
+  group: api-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: api
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the code
+        run: node --check src/index.js
+      - name: Deploy the Worker
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx --yes wrangler@3.114.0 deploy
+      - name: Smoke test (create a sync code, then sync with it)
+        run: |
+          sleep 5
+          NEW=$(curl -sS -X POST https://islamicazkar.net/api/sync/new -H 'content-type: application/json' -d '{"days":{}}')
+          echo "$NEW"
+          CODE=$(echo "$NEW" | python3 -c 'import json,sys; print(json.load(sys.stdin)["code"])')
+          curl -sS -X POST https://islamicazkar.net/api/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{}}" | tee /dev/stderr | grep -q '"days"'
