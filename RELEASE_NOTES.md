@@ -1,8 +1,5 @@
-- Mac: every reminder now appears on screen as a card at the top centre — morning, evening and the dhikr reminders through the day — even when macOS keeps the app's notifications in Notification Center.
-- Delete your synced data any time at islamicazkar.net/delete.
+- Mac: the dhikr reminders through the day now appear on screen as a card at the top centre, like the morning and evening reminders, and every reminder arrives on time even when the app is in the background.
 
-- ماك: كل تذكير يظهر الآن على الشاشة في بطاقة أعلى المنتصف — أذكار الصباح والمساء وتذكيرات الذكر خلال اليوم — حتى لو كان النظام يحفظ إشعارات التطبيق في مركز الإشعارات.
-- يمكنك حذف بياناتك المزامَنة في أي وقت من islamicazkar.net/delete.
+- ماك: تذكيرات الذكر خلال اليوم تظهر الآن على الشاشة في بطاقة أعلى المنتصف، مثل تذكيرات الصباح والمساء، وكل التذكيرات تصل في وقتها حتى والتطبيق في الخلفية.
 
-- Mac : chaque rappel apparaît maintenant à l'écran dans une carte en haut au centre — matin, soir et les rappels de dhikr de la journée — même si macOS garde les notifications de l'application dans le Centre de notifications.
-- Supprimez vos données synchronisées à tout moment sur islamicazkar.net/delete.
+- Mac : les rappels de dhikr de la journée apparaissent maintenant à l'écran dans une carte en haut au centre, comme ceux du matin et du soir, et chaque rappel arrive à l'heure même quand l'application est en arrière-plan.
