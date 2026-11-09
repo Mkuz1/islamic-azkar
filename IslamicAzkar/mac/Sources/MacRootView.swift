@@ -275,6 +275,12 @@ enum MacNavTest {
         // BUG-003: dark appearance (screenshot to review).
         await step("17-dark-home", { model.homePath = []; model.theme = .dark }, expect: { model.theme == .dark })
         await step("18-dark-reader", { model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
+        // Sync between devices, against the live server: turn it on, then sync with the code.
+        await step("19-sync-on", { Task { try? await AzkarSync.start() } }, expect: { true })
+        try? await Task.sleep(for: .seconds(4))
+        let synced = AzkarSync.code != nil && AzkarSync.lastSync != nil
+        launchTrace("nav 19-sync \(synced ? "ok" : "FAILED") code \(AzkarSync.code.map(AzkarSync.display) ?? "none")")
+        if !synced { failures += 1 }
         launchTrace("nav done, failures: \(failures)")
         exit(failures == 0 ? 0 : 3)
     }
