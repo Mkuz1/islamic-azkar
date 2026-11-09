@@ -21,7 +21,8 @@
       tapCount: "اضغط للعدّ", reset: "تصفير", total: n => `المجموع: ${num(n)}`, target: "العدد",
       getApp: "التطبيقات", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات، مسبحة، وسجلّ يومي بالأذكار التي أتممتها.",
       record: "سجلّي", recTitle: "سجلّ الأذكار", recSub: "الأذكار التي أتممتها كل يوم", activeDays: "أيام الذكر هذا الشهر", monthDone: "أذكار أتممتها هذا الشهر", inRow: "أيام متتالية",
-      nothingDay: "لم تُتمّ أذكارًا في هذا اليوم.", dayDone: "الأذكار المكتملة", today: "اليوم", prevMonth: "الشهر السابق", nextMonth: "الشهر التالي",
+      nothingDay: "لم تُتمّ أذكارًا في هذا اليوم.", dayDone: "الأذكار المكتملة", today: "اليوم",       prayerTimes: "مواقيت الصلاة", prayerNames: ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"], nextPrayer: "الصلاة القادمة", inTime: x => `بعد ${x}`, setPlace: "اختر مدينتك لعرض مواقيت الصلاة", useLoc: "استخدام موقعي الحالي", locating: "جارٍ تحديد الموقع…", locFail: "تعذّر تحديد الموقع، اختر مدينة من القائمة", orCity: "أو اختر مدينة", myLoc: "موقعي", method: "طريقة الحساب", hanafi: "العصر على المذهب الحنفي", change: "تغيير", methods: ["رابطة العالم الإسلامي", "أم القرى (مكة)", "الهيئة المصرية العامة للمساحة", "أمريكا الشمالية (ISNA)", "جامعة العلوم الإسلامية، كراتشي", "الخليج", "دبي · دلوك (الشؤون الإسلامية بدبي)", "فرنسا (١٢°)", "تركيا (ديانت)"],
+      prevMonth: "الشهر السابق", nextMonth: "الشهر التالي",
       syncTitle: "المزامنة بين الأجهزة", syncIntro: "اعرض سجلّ أذكارك على كل أجهزتك: آيفون وآيباد وماك وأندرويد والموقع. بلا حساب ولا بريد: رمز خاص يربط أجهزتك، ثم تتم المزامنة تلقائيًا.", syncOn: "تفعيل المزامنة", syncHave: "أو أدخل رمزًا من جهاز آخر", syncLink: "ربط", syncCode: "رمز المزامنة", syncHint: "أدخل هذا الرمز على أجهزتك الأخرى: الإعدادات ← المزامنة في التطبيق، أو سجلّي ← المزامنة هنا. احتفظ به لنفسك.", syncNow: "زامن الآن", syncLast: "آخر مزامنة", syncNever: "لم تتم بعد", syncStop: "إيقاف المزامنة في هذا المتصفح", syncStopQ: "إيقاف المزامنة هنا؟ يبقى سجلّك في هذا المتصفح وعلى أجهزتك الأخرى.", syncBad: "الرمز غير صحيح. تأكد منه وحاول مرة أخرى.", syncOff: "تعذّر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.", syncLinked: "تم ربط هذا المتصفح", week: ["أحد", "اثن", "ثلا", "أرب", "خمي", "جمع", "سبت"],
       apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", mac: "نسخة ماك", macNote: "ملف DMG · macOS 15 أو أحدث: مواقيت الصلاة في شريط القوائم، وتذكير يظهر أعلى الشاشة", join: "انضم إلى المختبِرين",
       joinText: "التطبيق في مرحلة الاختبار على Google Play. سجّل بريد Gmail المرتبط بمتجرك لنضيفك إلى المختبِرين ونرسل لك رابط التثبيت.",
@@ -48,7 +49,8 @@
       tapCount: "Tap to count", reset: "Reset", total: n => `Total: ${n}`, target: "Target",
       getApp: "The apps", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders, a tasbih, and a daily record of the azkar you complete.",
       record: "Record", recTitle: "Azkar record", recSub: "The azkar you completed each day", activeDays: "Days with azkar this month", monthDone: "Azkar completed this month", inRow: "Days in a row",
-      nothingDay: "No azkar completed on this day.", dayDone: "Azkar completed", today: "Today", prevMonth: "Previous month", nextMonth: "Next month",
+      nothingDay: "No azkar completed on this day.", dayDone: "Azkar completed", today: "Today",       prayerTimes: "Prayer times", prayerNames: ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"], nextPrayer: "Next prayer", inTime: x => `in ${x}`, setPlace: "Choose your city to see the prayer times", useLoc: "Use my current location", locating: "Finding your location…", locFail: "Couldn’t find your location. Choose a city instead.", orCity: "Or choose a city", myLoc: "My location", method: "Calculation method", hanafi: "Hanafi Asr", change: "Change", methods: ["Muslim World League", "Umm al-Qura (Makkah)", "Egyptian General Authority", "North America (ISNA)", "University of Islamic Sciences, Karachi", "Gulf region", "Dubai · Dulook DXB (IACAD)", "France (12°)", "Turkey (Diyanet)"],
+      prevMonth: "Previous month", nextMonth: "Next month",
       syncTitle: "Sync between devices", syncIntro: "See your azkar record on all your devices: iPhone, iPad, Mac, Android and the website. No account or email: a private code links your devices, then they sync automatically.", syncOn: "Turn on sync", syncHave: "or enter a code from another device", syncLink: "Link", syncCode: "Sync code", syncHint: "Enter this code on your other devices: Settings → Sync in the app, or Record → Sync here. Keep it to yourself.", syncNow: "Sync now", syncLast: "Last synced", syncNever: "not yet", syncStop: "Stop syncing in this browser", syncStopQ: "Stop syncing here? Your record stays in this browser and on your other devices.", syncBad: "That code isn't right. Check it and try again.", syncOff: "Couldn't connect. Check your internet and try again.", syncLinked: "This browser is linked", week: ["S", "M", "T", "W", "T", "F", "S"],
       apk: "Download the app", apkNote: "APK file · Android 8 or later", mac: "Mac app", macNote: "DMG file · macOS 15 or later: prayer times in the menu bar and reminders at the top of the screen", join: "Join the testers",
       joinText: "The app is in testing on Google Play. Leave the Gmail address you use on the Play Store and we’ll add you as a tester and send you the install link.",
@@ -75,7 +77,8 @@
       tapCount: "Touchez pour compter", reset: "Remettre à zéro", total: n => `Total : ${n}`, target: "Objectif",
       getApp: "Les applications", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels, un chapelet et un historique quotidien des adhkar terminés.",
       record: "Historique", recTitle: "Historique des adhkar", recSub: "Les adhkar terminés chaque jour", activeDays: "Jours avec des adhkar ce mois-ci", monthDone: "Adhkar terminés ce mois-ci", inRow: "Jours d'affilée",
-      nothingDay: "Aucun dhikr terminé ce jour-là.", dayDone: "Adhkar terminés", today: "Aujourd'hui", prevMonth: "Mois précédent", nextMonth: "Mois suivant",
+      nothingDay: "Aucun dhikr terminé ce jour-là.", dayDone: "Adhkar terminés", today: "Aujourd'hui",       prayerTimes: "Horaires de prière", prayerNames: ["Fajr", "Lever du soleil", "Dhohr", "Asr", "Maghrib", "Icha"], nextPrayer: "Prochaine prière", inTime: x => `dans ${x}`, setPlace: "Choisissez votre ville pour voir les horaires de prière", useLoc: "Utiliser ma position actuelle", locating: "Recherche de votre position…", locFail: "Position introuvable. Choisissez plutôt une ville.", orCity: "Ou choisissez une ville", myLoc: "Ma position", method: "Méthode de calcul", hanafi: "Asr selon l’école hanafite", change: "Modifier", methods: ["Ligue islamique mondiale", "Umm al-Qura (La Mecque)", "Autorité générale égyptienne", "Amérique du Nord (ISNA)", "Université des sciences islamiques, Karachi", "Région du Golfe", "Dubaï · Dulook DXB (IACAD)", "France (12°)", "Turquie (Diyanet)"],
+      prevMonth: "Mois précédent", nextMonth: "Mois suivant",
       syncTitle: "Synchronisation entre appareils", syncIntro: "Retrouvez votre historique d'adhkar sur tous vos appareils : iPhone, iPad, Mac, Android et le site. Sans compte ni e-mail : un code privé relie vos appareils, puis tout se synchronise automatiquement.", syncOn: "Activer la synchronisation", syncHave: "ou saisissez le code d'un autre appareil", syncLink: "Relier", syncCode: "Code de synchronisation", syncHint: "Saisissez ce code sur vos autres appareils : Réglages → Synchronisation dans l'application, ou Historique → Synchronisation ici. Gardez-le pour vous.", syncNow: "Synchroniser", syncLast: "Dernière synchronisation", syncNever: "pas encore", syncStop: "Arrêter la synchronisation dans ce navigateur", syncStopQ: "Arrêter la synchronisation ici ? Votre historique reste dans ce navigateur et sur vos autres appareils.", syncBad: "Ce code n'est pas valide. Vérifiez-le et réessayez.", syncOff: "Connexion impossible. Vérifiez Internet et réessayez.", syncLinked: "Ce navigateur est relié", week: ["D", "L", "M", "M", "J", "V", "S"],
       apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", mac: "Version Mac", macNote: "Fichier DMG · macOS 15 ou plus récent : horaires de prière dans la barre des menus et rappels en haut de l'écran", join: "Devenir testeur",
       joinText: "L’application est en test sur Google Play. Laissez l’adresse Gmail de votre Play Store : nous vous ajouterons aux testeurs et vous enverrons le lien d’installation.",
@@ -146,7 +149,7 @@
   const guessLang = () => { const l = (navigator.language || "en").slice(0, 2); return l === "ar" ? "ar" : l === "fr" ? "fr" : "en"; };
   let lang = new URLSearchParams(location.search).get("lang") || store.get("lang", guessLang());
   if (!T[lang]) lang = "en";
-  let prefs = Object.assign({ scale: 1, tr: true, mean: true, theme: "system" }, store.get("prefs", {}));
+  let prefs = Object.assign({ scale: 1, tr: true, mean: true, theme: "system", place: null, method: 6, hanafi: false }, store.get("prefs", {}));
   let favs = new Set(store.get("favs", []));
   let data = null, index = null;
 
@@ -219,6 +222,25 @@
     } catch { return ""; }
   }
 
+  // ───────────── Prayer times (same calculation as the apps; Dubai · Dulook by default) ─────────────
+  const P = window.AzkarPrayer;
+  const clock = m => { const h = Math.floor(m / 60) % 24, mi = m % 60; return num(String(h).padStart(2, "0")) + ":" + num(String(mi).padStart(2, "0")); };
+  const placeName = p => p ? (p.mine ? s().myLoc : lang === "ar" ? p.ar : p.name) : "";
+  function prayerCard() {
+    const t = s(), p = prefs.place;
+    if (!P) return "";
+    if (!p) return `<button class="prayer-card glass press empty-p" id="pick-place">${svg("mosque")}<span>${t.setPlace}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</button>`;
+    const n = P.next(p, prefs.method, prefs.hanafi);
+    const left = `${num(Math.floor(n.inMinutes / 60))}:${num(String(n.inMinutes % 60).padStart(2, "0"))}`;
+    const cells = n.times.map((m, i) => `<div class="pt ${i === n.index ? "on" : ""} ${i === 1 ? "sr" : ""}"><small>${t.prayerNames[i]}</small><b>${clock(m)}</b></div>`).join("");
+    return `<section class="prayer-card glass" id="prayer-card">
+      <div class="pc-head"><div><small>${t.nextPrayer}</small><b>${t.prayerNames[n.index]} <span class="pc-time">${clock(n.times[n.index] ?? 0)}</span></b><span>${t.inTime(left)}</span></div>
+        <button class="pill press" id="pick-place">${svg("mosque")}${esc(placeName(p))}</button></div>
+      <div class="pt-row">${cells}</div>
+      <small class="pc-method">${t.methods[prefs.method] || ""}</small></section>`;
+  }
+  setInterval(() => { const c = document.getElementById("prayer-card"); if (c) c.outerHTML = prayerCard(); }, 30000);
+
   function home() {
     const t = s(), now = momentKey();
     const tiles = [
@@ -242,6 +264,7 @@
         <div class="ornament"><i></i>${svg("spark", true).replace("<svg", '<svg width="12" height="12"')}<i></i></div>
         <span class="date">${esc(hijri())}</span>
       </section>
+      ${prayerCard()}
       <label class="search glass">${svg("search")}<input id="q" type="search" placeholder="${t.search}" autocomplete="off"></label>
       <div id="results"></div>
       <div id="home-body">
@@ -570,15 +593,33 @@
           <p class="ar" style="margin:0">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</p></div>
         ${lang === "ar" ? "" : `<button class="row" data-toggle="tr" style="width:100%"><span class="t"><b>${t.showTr}</b></span><span class="switch ${prefs.tr ? "on" : ""}"></span></button>
         <button class="row" data-toggle="mean" style="width:100%"><span class="t"><b>${t.showMean}</b></span><span class="switch ${prefs.mean ? "on" : ""}"></span></button>`}
+        <div class="row" style="display:block"><b>${t.prayerTimes}</b>
+          <button class="pill press" id="use-loc" style="margin-top:8px">${svg("mosque")}${t.useLoc}</button><small class="loc-msg" style="display:block;color:var(--text2);margin-top:6px"></small>
+          <label class="pick"><span>${t.orCity}</span><select id="city"><option value="">—</option>${P ? P.CITIES.map((c, i) => `<option value="${i}" ${prefs.place && !prefs.place.mine && prefs.place.name === c.name ? "selected" : ""}>${esc(lang === "ar" ? c.ar : c.name)}</option>`).join("") : ""}</select></label>
+          <label class="pick"><span>${t.method}</span><select id="method">${t.methods.map((m, i) => `<option value="${i}" ${prefs.method === i ? "selected" : ""}>${esc(m)}</option>`).join("")}</select></label>
+          <button class="row" data-toggle="hanafi" style="width:100%;padding-inline:0"><span class="t"><b style="font-weight:500">${t.hanafi}</b></span><span class="switch ${prefs.hanafi ? "on" : ""}"></span></button></div>
         <div class="row" style="display:block"><b>${t.theme}</b><div class="seg" style="margin-top:8px;display:flex">${["system", "light", "dark"].map(k => `<button style="flex:1" data-theme-set="${k}" class="${prefs.theme === k ? "on" : ""}">${t[k]}</button>`).join("")}</div></div>
         <button class="btn press" style="width:100%;margin-top:12px" id="close-sheet">${t.close}</button></div>`;
     };
     render();
     document.body.appendChild(scrim);
     scrim.addEventListener("input", ev => { if (ev.target.id === "scale") { prefs.scale = +ev.target.value; applyPrefs(); } });
+    scrim.addEventListener("change", ev => {
+      if (ev.target.id === "city" && ev.target.value !== "") { prefs.place = { ...P.CITIES[+ev.target.value] }; applyPrefs(); }
+      if (ev.target.id === "method") { prefs.method = +ev.target.value; applyPrefs(); }
+    });
     scrim.addEventListener("click", ev => {
       const el = ev.target.closest("button");
-      if (ev.target === scrim || (el && el.id === "close-sheet")) return scrim.remove();
+      if (ev.target === scrim || (el && el.id === "close-sheet")) { scrim.remove(); route(); return; }
+      if (el && el.id === "use-loc") {
+        const msg = scrim.querySelector(".loc-msg"); msg.textContent = t.locating;
+        if (!navigator.geolocation) { msg.textContent = t.locFail; return; }
+        navigator.geolocation.getCurrentPosition(pos => {
+          prefs.place = { mine: true, ar: "", name: "", lat: +pos.coords.latitude.toFixed(4), lng: +pos.coords.longitude.toFixed(4), tz: Intl.DateTimeFormat().resolvedOptions().timeZone };
+          applyPrefs(); msg.textContent = `${t.myLoc} ✓`;
+        }, () => { msg.textContent = t.locFail; }, { maximumAge: 3600000, timeout: 15000 });
+        return;
+      }
       if (!el) return;
       if (el.dataset.toggle) { prefs[el.dataset.toggle] = !prefs[el.dataset.toggle]; applyPrefs(); render(); }
       if (el.dataset.themeSet) { prefs.theme = el.dataset.themeSet; applyPrefs(); render(); }
@@ -630,7 +671,7 @@
     const btn = ev.target.closest("button");
     const langBtn = ev.target.closest("[data-lang]");
     if (langBtn) { lang = langBtn.dataset.lang; applyLang(); route(); return; }
-    if (btn && btn.id === "open-settings") return openSettings();
+    if (btn && (btn.id === "open-settings" || btn.id === "pick-place")) return openSettings();
     if (btn && btn.dataset.month) { recMonth = Math.min(0, recMonth + +btn.dataset.month); route(); return; }
     if (btn && btn.dataset.day) { recDay = btn.dataset.day; route(); return; }
     if (btn && btn.id === "sync-now") { btn.disabled = true; syncNow(true); return; }
