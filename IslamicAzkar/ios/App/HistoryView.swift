@@ -55,6 +55,9 @@ struct HistoryView: View {
         .navigationBarTitleDisplayModeLarge()
         .onAppear { days = AzkarHistory.all() }
         .onChange(of: model.progress) { _, _ in days = AzkarHistory.all() }
+        .onReceive(NotificationCenter.default.publisher(for: AzkarSync.changed)) { _ in days = AzkarHistory.all() }
+        .task { await AzkarSync.syncNow() }
+        .refreshable { await AzkarSync.syncNow() }
     }
 
     // MARK: Summary

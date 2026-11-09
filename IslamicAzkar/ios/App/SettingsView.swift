@@ -130,6 +130,8 @@ struct SettingsView: View {
             }
             #endif
 
+            SyncSection()
+
             Section(m.ourApps) {
                 Button { openURL(mushafURL) } label: {
                     HStack(spacing: 14) {

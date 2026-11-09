@@ -1,6 +1,5 @@
 {
-  // Website API for islamicazkar.net: tester sign-ups (POST /api/register) and the azkar record
-  // sync between devices (POST /api/sync/new, POST /api/sync; stored in the same KV under "sync:").
+  // Website API for islamicazkar.net: tester sign-ups (POST /api/register).
   "name": "islamic-azkar-api",
   "main": "src/index.js",
   "compatibility_date": "2026-06-01",

@@ -202,6 +202,23 @@ final class AppModel {
 
     func handle(url: URL) {
         if url == DeepLink.tasbih { showDedication = false; tab = .tasbih; return }
+        // A sync QR scanned with the camera: link this device, then show the record.
+        if url.scheme == DeepLink.scheme, url.host == "sync" {
+            let code = url.lastPathComponent
+            showDedication = false
+            Task { @MainActor in
+                do {
+                    try await AzkarSync.link(code)
+                    toast = SyncTexts.of(lang).linked
+                    #if os(macOS)
+                    tab = .home; homePath = [.history]
+                    #else
+                    tab = .record
+                    #endif
+                } catch { toast = SyncTexts.of(lang).badCode }
+            }
+            return
+        }
         if let (r, focus) = DeepLink.parse(url) { open(r, focus: focus) }
     }
 
@@ -297,9 +314,10 @@ struct IslamicAzkarApp: App {
                 delegate.model = model
                 #endif
                 Reminders.reschedule(model)
+                Task { await AzkarSync.syncNow() }
             }
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active { model.reloadTasbihFromStore() }
+                if phase == .active { model.reloadTasbihFromStore(); Task { await AzkarSync.syncNow() } }
             }
         }
         #if os(macOS)

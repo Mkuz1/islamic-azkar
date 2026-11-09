@@ -34,7 +34,26 @@ enum AzkarHistory {
 
     /// A whole reading (morning, evening, a chapter) was completed.
     static func markReading(_ key: String, at date: Date = .now) {
+        let isNew = !day(date).readings.contains(key)
         update(date) { if !$0.readings.contains(key) { $0.readings.append(key) } }
+        if isNew { Task { await AzkarSync.syncNow() } }   // show it on the other devices
+    }
+
+    /// Day → completed readings, as sent to the other devices.
+    static func readingsByDay() -> [String: [String]] {
+        all().compactMapValues { $0.readings.isEmpty ? nil : $0.readings }
+    }
+
+    /// Adds readings completed on the other devices.
+    static func merge(_ remote: [String: [String]]) {
+        var days = all()
+        var changed = false
+        for (key, list) in remote {
+            var day = days[key] ?? Day()
+            for r in list where !day.readings.contains(r) { day.readings.append(r); changed = true }
+            days[key] = day
+        }
+        if changed, let data = try? JSONEncoder().encode(days) { SharedStore.defaults.set(data, forKey: Self.key) }
     }
 
     /// Consecutive days with at least one completed reading, ending today (or yesterday).

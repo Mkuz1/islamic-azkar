@@ -16,6 +16,8 @@ final class MenuClock {
         timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
             self?.now = Date()
             MainActor.assumeIsolated { MacReminders.check() }   // the on-screen reminder card
+            // Every 5 minutes: take in azkar completed on the other devices.
+            if Int(Date().timeIntervalSince1970 / 30) % 10 == 0 { Task { await AzkarSync.syncNow() } }
         }
     }
 }

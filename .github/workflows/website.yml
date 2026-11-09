@@ -37,8 +37,15 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         # --branch main publishes to production (islamicazkar.net) whichever git branch this runs on.
-        run: npx --yes wrangler@3.114.0 pages deploy website --project-name islamic-azkar --branch main --commit-dirty=true
+        # Run inside website/ so wrangler.toml (the KV binding for the /sync function) is used.
+        working-directory: website
+        run: npx --yes wrangler@3.114.0 pages deploy . --project-name islamic-azkar --branch main --commit-dirty=true
       - name: Smoke test
         run: |
           sleep 20
           curl -fsS "https://islamicazkar.net/data/azkar.json?check=$GITHUB_RUN_ID" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('guides'), 'live site has no Umrah guide yet'; print('live:', len(d['chapters']), 'chapters')"
+          # Sync between devices: create a code, then sync with it.
+          NEW=$(curl -sS -X POST https://islamicazkar.net/sync/new -H 'content-type: application/json' -d '{"days":{}}')
+          echo "sync/new: $NEW"
+          CODE=$(echo "$NEW" | python3 -c 'import json,sys; print(json.load(sys.stdin)["code"])')
+          curl -sS -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{\"2026-01-01\":[\"morning\"]}}" | tee /dev/stderr | grep -q '2026-01-01'

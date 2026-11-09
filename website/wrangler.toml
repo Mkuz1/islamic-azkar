@@ -1,0 +1,9 @@
+# Cloudflare Pages project for islamicazkar.net (deployed by .github/workflows/website.yml).
+# Pages Functions in functions/: /sync keeps the azkar record in sync between a person's devices.
+name = "islamic-azkar"
+pages_build_output_dir = "."
+compatibility_date = "2026-06-01"
+
+[[kv_namespaces]]
+binding = "SYNC"
+id = "efa3e078b0b14d4792ccd43944982756"
