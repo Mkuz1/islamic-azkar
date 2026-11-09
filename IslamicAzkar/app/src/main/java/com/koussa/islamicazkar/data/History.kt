@@ -47,6 +47,30 @@ object AzkarHistory {
         o.put(today, day)
         sp.edit().putString(KEY, o.toString()).apply()
         version.intValue++
+        AzkarSync.syncInBackground(ctx)   // show it on the other devices
+    }
+
+    /** Adds readings completed on the other devices ([remote]: day → array of readings). */
+    fun merge(ctx: Context, remote: JSONObject) {
+        val sp = Settings.prefs(ctx)
+        val o = runCatching { JSONObject(sp.getString(KEY, null) ?: "{}") }.getOrDefault(JSONObject())
+        var changed = false
+        remote.keys().forEach { k ->
+            val add = remote.optJSONArray(k) ?: return@forEach
+            val day = o.optJSONObject(k) ?: JSONObject().put("zikr", JSONArray()).put("readings", JSONArray())
+            val readings = day.optJSONArray("readings") ?: JSONArray()
+            val have = (0 until readings.length()).map { readings.getString(it) }.toMutableSet()
+            for (i in 0 until add.length()) {
+                val r = add.getString(i)
+                if (have.add(r)) { readings.put(r); changed = true }
+            }
+            day.put("readings", readings)
+            o.put(k, day)
+        }
+        if (changed) {
+            sp.edit().putString(KEY, o.toString()).apply()
+            android.os.Handler(android.os.Looper.getMainLooper()).post { version.intValue++ }
+        }
     }
 
     /** Consecutive days with at least one completed reading, ending today (or yesterday). */

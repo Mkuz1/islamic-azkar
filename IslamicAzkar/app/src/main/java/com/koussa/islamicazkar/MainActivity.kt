@@ -18,6 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import com.koussa.islamicazkar.data.Reading
 import com.koussa.islamicazkar.data.Settings
 import com.koussa.islamicazkar.data.ThemeMode
@@ -40,7 +42,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         Reminders.reschedule(this)
         com.koussa.islamicazkar.widget.WidgetTicker.schedule(this)
-        if (savedInstanceState == null) { deepLink = parse(intent); openTab = tabOf(intent) }
+        if (savedInstanceState == null) { deepLink = parse(intent); openTab = tabOf(intent); syncLink(intent) }
 
         setContent {
             val st = settings
@@ -85,11 +87,30 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         parse(intent)?.let { deepLink = it }
         tabOf(intent)?.let { openTab = it }
+        syncLink(intent)
+    }
+
+    /** islamicazkar://sync/CODE (a sync QR scanned with the camera): link this device, then show the record. */
+    private fun syncLink(intent: Intent?) {
+        val uri = intent?.data ?: return
+        if (uri.scheme != "islamicazkar" || uri.host != "sync") return
+        val code = uri.lastPathSegment ?: return
+        val texts = com.koussa.islamicazkar.ui.SyncTexts.of(settings.lang)
+        lifecycleScope.launch {
+            try {
+                com.koussa.islamicazkar.data.AzkarSync.link(this@MainActivity, code)
+                openTab = 3
+                android.widget.Toast.makeText(this@MainActivity, texts.linked, android.widget.Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(this@MainActivity, if (e is com.koussa.islamicazkar.data.AzkarSync.UnknownCode) texts.badCode else texts.offline, android.widget.Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     override fun onResume() {
         super.onResume()
         settings.reloadTasbih() // the tasbih widget may have counted while we were away
+        com.koussa.islamicazkar.data.AzkarSync.syncInBackground(this)   // azkar completed on the other devices
     }
 
     private fun parse(intent: Intent?): Pair<Reading, Int?>? {

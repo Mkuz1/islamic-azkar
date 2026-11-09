@@ -211,6 +211,8 @@ fun SettingsScreen() {
         item { PrayerSettings() }
 
 
+        item { SyncSection() }
+
         // Widgets (their own page; the tab bar holds the Record tab).
         item { Spacer(Modifier.height(22.dp)) }
         item {

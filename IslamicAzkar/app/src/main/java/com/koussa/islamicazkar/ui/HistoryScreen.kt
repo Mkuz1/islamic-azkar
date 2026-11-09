@@ -92,6 +92,8 @@ fun HistoryScreen() {
     val t = HistoryTexts.of(lang)
     val version by AzkarHistory.version
     val days = remember(version) { AzkarHistory.all(ctx) }
+    // Take in azkar completed on the other devices.
+    androidx.compose.runtime.LaunchedEffect(Unit) { com.koussa.islamicazkar.data.AzkarSync.syncNow(ctx) }
 
     var monthOffset by rememberSaveable { mutableIntStateOf(0) }    // 0 = this month, -1 = last month…
     var selectedKey by rememberSaveable { mutableStateOf(AzkarHistory.dayKey()) }
