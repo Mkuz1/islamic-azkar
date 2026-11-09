@@ -35,22 +35,31 @@ enum ReminderBanner {
     /// Any of the app's reminders, as it arrives while the app runs (morning, evening, the dhikr
     /// reminders through the day, the test): shown on screen instead of only in Notification Center.
     static func show(notification id: String, title: String, body: String, link: String?) {
-        let day = Calendar.current.ordinality(of: .day, in: .era, for: .now) ?? 0
-        if id == "azkar.morning" || id == "azkar.evening" {
-            // The 30-second check may have shown it already.
-            let key = "mac_banner_\(id)"
-            if SharedStore.defaults.integer(forKey: key) == day, panel != nil { return }
-            SharedStore.defaults.set(day, forKey: key)
-        }
+        // The app's own 30-second check and the notification can both bring the same reminder.
+        guard claim(id) else { return }
+        show(content(id: id, title: title, body: body, link: link))
+    }
+
+    static func content(id: String, title: String, body: String, link: String?) -> Content {
         let url = link.flatMap(URL.init(string:)) ?? DeepLink.url(Reading.recommended())
         // The dhikr reminders carry the dhikr itself: Arabic on the first line, the meaning after it.
         let lines = body.components(separatedBy: "\n")
         let general = id.hasPrefix("azkar.general.")
-        show(Content(title: title,
-                     body: general ? (lines.dropFirst().joined(separator: " ")) : body,
-                     preview: general ? lines.first : nil,
-                     morning: id != "azkar.evening" && (id != "azkar.test" || Reading.recommended() != .evening),
-                     link: url))
+        return Content(title: title,
+                       body: general ? (lines.dropFirst().joined(separator: " ")) : body,
+                       preview: general ? lines.first : nil,
+                       morning: id != "azkar.evening" && (id != "azkar.test" || Reading.recommended() != .evening),
+                       link: url)
+    }
+
+    /// True the first time a reminder is shown today (the test reminder always shows).
+    static func claim(_ id: String) -> Bool {
+        guard id != "azkar.test" else { return true }
+        let day = Calendar.current.ordinality(of: .day, in: .era, for: .now) ?? 0
+        let key = "mac_banner_\(id)"
+        if SharedStore.defaults.integer(forKey: key) == day { return false }
+        SharedStore.defaults.set(day, forKey: key)
+        return true
     }
 
     static func show(_ content: Content) {

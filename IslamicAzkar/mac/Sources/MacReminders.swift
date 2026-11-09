@@ -64,12 +64,42 @@ enum MacReminders {
     @MainActor
     static func check(at now: Date = .now) {
         let m = minutes(now)
-        let day = Calendar.current.ordinality(of: .day, in: .era, for: now) ?? 0
         for due in configured where m >= due.at && m - due.at < 30 {
-            let key = "mac_banner_\(due.id)"
-            guard d.integer(forKey: key) != day else { continue }
-            d.set(day, forKey: key)
+            guard ReminderBanner.claim(due.id) else { continue }
             if !DailyAzkar.doneToday(due.reading) { ReminderBanner.show(due.reading) }
+        }
+        // The dhikr reminders through the day: the app shows them itself, at their times, since macOS
+        // does not tell a background app when its notifications arrive.
+        for slot in generalSlots where m >= slot && m - slot < 10 {
+            let id = "azkar.general.\(slot)"
+            guard ReminderBanner.claim(id) else { continue }
+            showGeneral(id)
+        }
+    }
+
+    /// Minutes after midnight of the dhikr reminders through the day (as Reminders schedules them).
+    private static var generalSlots: [Int] {
+        guard d.bool(forKey: "general_on") else { return [] }
+        let every = max(1, d.object(forKey: "general_every") == nil ? 3 : d.integer(forKey: "general_every"))
+        let from = d.object(forKey: "general_from") == nil ? 9 * 60 : d.integer(forKey: "general_from")
+        let to = max(d.object(forKey: "general_to") == nil ? 21 * 60 : d.integer(forKey: "general_to"), from)
+        return Array(stride(from: from, through: to, by: every * 60).prefix(48))
+    }
+
+    /// The card for a dhikr reminder, with the same dhikr as its scheduled notification.
+    private static func showGeneral(_ id: String) {
+        UNUserNotificationCenter.current().getPendingNotificationRequests { pending in
+            let c = pending.first { $0.identifier == id }?.content
+            let title = c?.title ?? L10n.of(SharedStore.lang).notifGeneralTitle
+            let body = c?.body ?? {
+                let z = AzkarData.shared.shortAzkar.randomElement()!
+                let meaning = z.meaning(SharedStore.lang)
+                return meaning.isEmpty ? z.ar : "\(z.ar)\n\(meaning)"
+            }()
+            let link = c?.userInfo["link"] as? String
+            DispatchQueue.main.async {
+                ReminderBanner.show(ReminderBanner.content(id: id, title: title, body: body, link: link))
+            }
         }
     }
 

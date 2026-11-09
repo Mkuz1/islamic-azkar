@@ -12,13 +12,21 @@ final class MenuClock {
     var now = Date()
     private var timer: Timer?
 
+    /// Keeps macOS from napping the app in the background, which would delay the reminder cards.
+    private let activity = ProcessInfo.processInfo.beginActivity(
+        options: [.userInitiatedAllowingIdleSystemSleep, .latencyCritical], reason: "Showing azkar reminders on time")
+
     private init() {
-        timer = Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { [weak self] _ in
+        timer = Timer(timeInterval: 30, repeats: true) { [weak self] _ in
             self?.now = Date()
             MainActor.assumeIsolated { MacReminders.check() }   // the on-screen reminder card
             // Every 5 minutes: take in azkar completed on the other devices.
             if Int(Date().timeIntervalSince1970 / 30) % 10 == 0 { Task { await AzkarSync.syncNow() } }
         }
+        timer?.tolerance = 2
+        RunLoop.main.add(timer!, forMode: .common)   // also while a menu is open
+        // Right after launch too, not only 30 s later.
+        DispatchQueue.main.async { MainActor.assumeIsolated { MacReminders.check() } }
     }
 }
 

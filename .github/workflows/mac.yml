@@ -90,6 +90,9 @@ jobs:
           check banner-en home en -ciBanner morning
           check banner-ar home ar -ciBanner evening
           check banner-general-en home en -ciBanner general
+          check general-due-en home en -ciGeneralDue 1
+          grep -h "general due" shots/general-due-en.log || true
+          grep -q "general due: banner visible=true occluded=false alpha=1.0" shots/general-due-en.log || { echo "::error::a due dhikr reminder did not show its card"; FAILED=1; }
           grep -h "banner on screen" shots/banner-*.log || true
           grep -q "banner on screen: visible=true occluded=false alpha=1.0" shots/banner-en.log || { echo "::error::the reminder card is not visible on screen"; FAILED=1; }
           # Navigation smoke test: sidebar sections, open / back, category, favourites, tasbih, settings, guide.

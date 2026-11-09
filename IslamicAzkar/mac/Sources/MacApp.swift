@@ -23,6 +23,22 @@ enum MacCI {
         guard !started else { return }
         started = true
         if UserDefaults.standard.bool(forKey: "ciMenu") { MenuPanelPreviewWindow.show() }
+        // `-ciGeneralDue 1`: a dhikr reminder through the day is due now; the app's own check must put
+        // its card on screen (no notification involved, as when the app is in the background).
+        if UserDefaults.standard.bool(forKey: "ciGeneralDue") {
+            let c = Calendar.current.dateComponents([.hour, .minute], from: .now)
+            let m = (c.hour ?? 0) * 60 + (c.minute ?? 0)
+            let d = SharedStore.defaults
+            d.set(true, forKey: "general_on"); d.set(1, forKey: "general_every")
+            d.set(m, forKey: "general_from"); d.set(m, forKey: "general_to")
+            d.removeObject(forKey: "mac_banner_azkar.general.\(m)")
+            NSApp.deactivate()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { MacReminders.check() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4) {
+                let w = ReminderBanner.window
+                launchTrace("general due: banner visible=\(w?.isVisible ?? false) occluded=\(!(w?.occlusionState.contains(.visible) ?? false)) alpha=\(w?.alphaValue ?? 0)")
+            }
+        }
         if let key = UserDefaults.standard.string(forKey: "ciBanner") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 if let r = Reading(key: key) { ReminderBanner.show(r) }
