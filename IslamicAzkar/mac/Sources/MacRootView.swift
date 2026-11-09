@@ -224,10 +224,15 @@ enum MacNavTest {
         guard d.bool(forKey: "ciNav"), let dir = d.string(forKey: "ciShotDir"), !started else { return }
         started = true
         var failures = 0
+        // The window content (and this task) is rebuilt on a language change, which cancels the task:
+        // Task.sleep would then return at once, so wait with a timer instead.
+        func pause(_ seconds: Double) async {
+            await withCheckedContinuation { c in DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { c.resume() } }
+        }
         func step(_ name: String, _ action: () -> Void, expect: () -> Bool) async {
             let start = Date()
             action()
-            try? await Task.sleep(for: .milliseconds(1200))
+            await pause(1.2)
             let ok = expect()
             if !ok { failures += 1 }
             capture("\(dir)/\(name).png")
@@ -277,7 +282,7 @@ enum MacNavTest {
         await step("18-dark-reader", { model.show(.morning, split: false) }, expect: { model.homePath.count == 1 })
         // Sync between devices, against the live server: turn it on, then sync with the code.
         await step("19-sync-on", { Task { try? await AzkarSync.start() } }, expect: { true })
-        try? await Task.sleep(for: .seconds(4))
+        for _ in 0..<20 where AzkarSync.lastSync == nil { await pause(0.5) }   // up to 10 s for the server
         let synced = AzkarSync.code != nil && AzkarSync.lastSync != nil
         launchTrace("nav 19-sync \(synced ? "ok" : "FAILED") code \(AzkarSync.code.map(AzkarSync.display) ?? "none")")
         if !synced { failures += 1 }
