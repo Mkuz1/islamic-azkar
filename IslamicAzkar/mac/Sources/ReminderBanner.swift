@@ -161,6 +161,7 @@ private struct BannerCard: View {
                     }
                     Text(content.title)
                         .font(.system(size: 17, weight: .bold))
+                        .lineLimit(2).fixedSize(horizontal: false, vertical: true)
                     if !content.body.isEmpty {
                         Text(content.body)
                             .font(.callout).foregroundStyle(.secondary).lineLimit(3).fixedSize(horizontal: false, vertical: true)
