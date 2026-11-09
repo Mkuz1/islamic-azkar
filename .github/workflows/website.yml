@@ -32,6 +32,13 @@ jobs:
           fi
       - name: Check the azkar data
         run: python3 -c "import json; d=json.load(open('website/data/azkar.json')); print(len(d['chapters']), 'chapters,', len(d.get('guides', [])), 'guide(s)')"
+      - name: Version the script and style links
+        # Cloudflare's browser cache can keep app.js / style.css for hours after a deploy; a
+        # version in the link makes browsers fetch the new files at once.
+        run: |
+          V=${GITHUB_SHA::8}
+          sed -i -E "s#(href|src)=\"(style\.css|app\.js|prayer\.js)\"#\1=\"\2?v=$V\"#g" website/index.html
+          grep -E "\?v=$V" website/index.html
       - name: Deploy to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -44,6 +51,10 @@ jobs:
         run: |
           sleep 20
           curl -fsS "https://islamicazkar.net/data/azkar.json?check=$GITHUB_RUN_ID" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('guides'), 'live site has no Umrah guide yet'; print('live:', len(d['chapters']), 'chapters')"
+          # The live page links this deploy's script, and that script has the newest features.
+          V=${GITHUB_SHA::8}
+          curl -fsS "https://islamicazkar.net/?check=$GITHUB_RUN_ID" | grep -q "app.js?v=$V" || { echo "::error::islamicazkar.net does not serve this deploy's page yet"; exit 1; }
+          curl -fsS "https://islamicazkar.net/app.js?v=$V" | grep -q "function record()" && echo "live app.js: $V"
           # Sync between devices: create a code, then sync with it.
           NEW=$(curl -sS -X POST https://islamicazkar.net/sync/new -H 'content-type: application/json' -d '{"days":{}}')
           echo "sync/new: $NEW"
