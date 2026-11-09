@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delete your data · Islamic Azkar</title>
+<meta name="description" content="Delete the azkar record that Islamic Azkar keeps for syncing between your devices.">
+<link rel="icon" href="/img/icon.png">
+<style>
+  :root { --bg: #f7f4ec; --card: #fff; --text: #1c2622; --muted: #5f6b66; --accent: #1e6b52; --gold: #b08a3e; --line: rgba(0,0,0,.12); }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0a1c15; --card: #12271e; --text: #eef3f0; --muted: #a9b8b1; --accent: #5dc79c; --gold: #d9b66c; --line: rgba(255,255,255,.14); } }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 -apple-system, "Segoe UI", Roboto, "Noto Sans Arabic", sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 36px 20px 64px; }
+  header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  header img { width: 44px; height: 44px; border-radius: 11px; }
+  h1 { font-size: 26px; margin: 0; } h2 { font-size: 18px; margin: 26px 0 6px; color: var(--accent); }
+  .muted { color: var(--muted); } a { color: var(--accent); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; margin: 18px 0; }
+  label { display: block; font-weight: 600; margin-bottom: 8px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  input { flex: 1; min-width: 200px; font: 600 18px ui-monospace, Menlo, monospace; letter-spacing: .06em; text-transform: uppercase;
+    padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  button { font: inherit; font-weight: 600; padding: 10px 18px; border-radius: 999px; border: 0; background: #c62828; color: #fff; cursor: pointer; }
+  button:disabled { opacity: .5; cursor: default; }
+  #msg { margin-top: 10px; font-weight: 600; } #msg.ok { color: var(--accent); } #msg.err { color: #d32f2f; }
+  section[lang="ar"] { direction: rtl; text-align: right; }
+  hr { border: 0; border-top: 1px solid color-mix(in srgb, var(--gold) 40%, transparent); margin: 34px 0; }
+</style>
+</head>
+<body>
+<main>
+  <header><img src="/img/icon.png" alt=""><div><h1>Delete your data</h1><div class="muted">Islamic Azkar · islamicazkar.net</div></div></header>
+
+  <p>Islamic Azkar has no accounts. The only data it keeps on our server is the azkar record of people who turn on <b>Sync between devices</b>: the dates and which azkar were completed in full on each date, stored under their private sync code. Everything else stays on your device.</p>
+
+  <div class="card">
+    <form id="f">
+      <label for="code">Your sync code · رمز المزامنة · Votre code de synchronisation</label>
+      <div class="row">
+        <input id="code" name="code" placeholder="XXXX-XXXX-XXXX" autocomplete="off" spellcheck="false" autocapitalize="characters" dir="ltr" required>
+        <button id="go" type="submit">Delete my data</button>
+      </div>
+      <div id="msg" role="status"></div>
+    </form>
+  </div>
+
+  <h2>How it works</h2>
+  <ul>
+    <li>Find your code in the app: <b>Settings → Sync between devices</b> (on the website: <b>Record → Sync</b>).</li>
+    <li>Enter it above and press <b>Delete my data</b>. The record stored for that code is erased from our server at once and permanently.</li>
+    <li>Then tap <b>Stop syncing on this device</b> on each of your devices, otherwise a device that still has the code will not sync again (the code no longer exists) but keeps its own copy locally.</li>
+    <li>The record kept on your devices is removed when you uninstall the app or clear its data (on the website: clear the site's data in your browser).</li>
+    <li>Lost your code? Email <a href="mailto:mohamad@koussa.org?subject=Islamic%20Azkar%20data%20deletion">mohamad@koussa.org</a> and we will help. We keep no backups of deleted records.</li>
+  </ul>
+  <p class="muted">See also the <a href="/privacy/">privacy policy</a>.</p>
+
+  <hr>
+  <section lang="ar">
+    <h2>حذف بياناتك</h2>
+    <p>لا يحتوي تطبيق «أذكار إسلامية» على حسابات. البيانات الوحيدة المحفوظة على خادمنا هي سجلّ الأذكار لمن فعّل <b>المزامنة بين الأجهزة</b>: التواريخ والأذكار التي أُتمّت كاملة، محفوظة تحت رمز المزامنة الخاص.</p>
+    <p>أدخل رمزك في الخانة أعلاه (تجده في الإعدادات ← المزامنة بين الأجهزة) واضغط «Delete my data»، فيُحذف السجلّ من خادمنا فورًا ونهائيًا. ثم اختر «إيقاف المزامنة على هذا الجهاز» على أجهزتك. فقدت رمزك؟ راسلنا على <a href="mailto:mohamad@koussa.org">mohamad@koussa.org</a>.</p>
+  </section>
+  <hr>
+  <section lang="fr">
+    <h2>Supprimer vos données</h2>
+    <p>Islamic Azkar n’a pas de comptes. Les seules données conservées sur notre serveur sont l’historique d’adhkar des personnes qui activent la <b>synchronisation entre appareils</b> : les dates et les adhkar terminés, sous leur code privé.</p>
+    <p>Saisissez votre code ci-dessus (Réglages → Synchronisation entre appareils) et appuyez sur « Delete my data » : l’historique est effacé de notre serveur immédiatement et définitivement. Puis choisissez « Arrêter la synchronisation » sur vos appareils. Code perdu ? Écrivez à <a href="mailto:mohamad@koussa.org">mohamad@koussa.org</a>.</p>
+  </section>
+</main>
+<script>
+  const f = document.getElementById("f"), msg = document.getElementById("msg"), go = document.getElementById("go");
+  f.addEventListener("submit", async e => {
+    e.preventDefault();
+    const code = f.code.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    if (code.length !== 12) { msg.className = "err"; msg.textContent = "Enter the 12-character code (e.g. ABCD-EFGH-JKMN)."; return; }
+    if (!confirm("Permanently delete the azkar record stored for this code?")) return;
+    go.disabled = true; msg.className = ""; msg.textContent = "…";
+    try {
+      const r = await fetch("/sync/delete", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ code }) });
+      if (r.status === 404) { msg.className = "err"; msg.textContent = "No data is stored for this code (it may already be deleted)."; }
+      else if (!r.ok) throw 0;
+      else { msg.className = "ok"; msg.textContent = "Done. Your data has been deleted. · تم حذف بياناتك. · Vos données ont été supprimées."; f.reset(); }
+    } catch { msg.className = "err"; msg.textContent = "Couldn't connect. Please try again."; }
+    go.disabled = false;
+  });
+</script>
+</body>
+</html>

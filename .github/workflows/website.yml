@@ -60,3 +60,7 @@ jobs:
           echo "sync/new: $NEW"
           CODE=$(echo "$NEW" | python3 -c 'import json,sys; print(json.load(sys.stdin)["code"])')
           curl -sS -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{\"2026-01-01\":[\"morning\"]}}" | tee /dev/stderr | grep -q '2026-01-01'
+          # Data deletion (the Play Store link): delete that code's record, then it must be gone.
+          curl -fsS https://islamicazkar.net/delete/ | grep -q "Delete your data"
+          curl -sS -X POST https://islamicazkar.net/sync/delete -H 'content-type: application/json' -d "{\"code\":\"$CODE\"}" | tee /dev/stderr | grep -q '"deleted":true'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{}}")" = 404 && echo "deleted record is gone"

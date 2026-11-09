@@ -2,6 +2,7 @@
 // website). Cloudflare Pages Function at islamicazkar.net/sync:
 //   POST /sync/new  {days?}        → {code, days}  creates a private 12-character sync code
 //   POST /sync      {code, days}   → {days}        merges this device's record and returns the whole
+//   POST /sync/delete {code}       → {deleted}     erases the record kept for that code (islamicazkar.net/delete)
 // No account: only the record (day → completed readings) is kept, in KV under a hash of the code.
 
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";   // no 0/O, 1/I/L
@@ -79,6 +80,17 @@ async function merge(request, env, headers) {
   return json({ days }, 200, headers);
 }
 
+async function erase(request, env, headers) {
+  let body;
+  try { body = await request.json(); } catch { return json({ error: "bad_request" }, 400, headers); }
+  const code = normalizeCode(body.code);
+  if (code.length !== 12) return json({ error: "unknown_code" }, 404, headers);
+  const key = await storageKey(code);
+  if (!(await env.SYNC.get(key))) return json({ error: "unknown_code" }, 404, headers);
+  await env.SYNC.delete(key);
+  return json({ deleted: true }, 200, headers);
+}
+
 export async function onRequest({ request, env, params }) {
   const headers = cors(request);
   if (request.method === "OPTIONS") return new Response(null, { status: 204, headers });
@@ -86,6 +98,7 @@ export async function onRequest({ request, env, params }) {
   if (!env.SYNC) return json({ error: "not_configured" }, 503, headers);
   const path = (params.path || []).join("/");
   if (path === "new") return create(request, env, headers);
+  if (path === "delete") return erase(request, env, headers);
   if (path === "") return merge(request, env, headers);
   return json({ error: "not_found" }, 404, headers);
 }
