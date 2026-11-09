@@ -17,7 +17,7 @@
   --rim: rgba(255, 255, 255, .7); --rim-dark: rgba(0, 0, 0, .06);
   --text: #1c2622; --text2: #5f6b66; --text3: #8c9792;
   --accent: #1e6b52; --accent-soft: rgba(30, 107, 82, .12); --on-accent: #fff;
-  --gold: #b8913f; --gold-soft: rgba(214, 179, 106, .2);
+  --gold: #b08a3e; --gold-soft: rgba(214, 179, 106, .2);
   --fill: rgba(118, 118, 128, .12); --sep: rgba(60, 60, 67, .14);
   --shadow: 0 12px 34px rgba(26, 54, 44, .10), 0 2px 6px rgba(26, 54, 44, .06);
   --scale: 1;
@@ -32,7 +32,7 @@
     --rim: rgba(255, 255, 255, .16); --rim-dark: rgba(0, 0, 0, .3);
     --text: #eef3f0; --text2: #a9b8b1; --text3: #77857f;
     --accent: #5dc79c; --accent-soft: rgba(93, 199, 156, .16); --on-accent: #062018;
-    --gold: #d6b36a; --gold-soft: rgba(214, 179, 106, .18);
+    --gold: #d9b66c; --gold-soft: rgba(214, 179, 106, .18);
     --fill: rgba(255, 255, 255, .08); --sep: rgba(255, 255, 255, .1);
     --shadow: 0 14px 40px rgba(0, 0, 0, .35);
     color-scheme: dark;
@@ -46,7 +46,7 @@
   --rim: rgba(255, 255, 255, .16); --rim-dark: rgba(0, 0, 0, .3);
   --text: #eef3f0; --text2: #a9b8b1; --text3: #77857f;
   --accent: #5dc79c; --accent-soft: rgba(93, 199, 156, .16); --on-accent: #062018;
-  --gold: #d6b36a; --gold-soft: rgba(214, 179, 106, .18);
+  --gold: #d9b66c; --gold-soft: rgba(214, 179, 106, .18);
   --fill: rgba(255, 255, 255, .08); --sep: rgba(255, 255, 255, .1);
   --shadow: 0 14px 40px rgba(0, 0, 0, .35);
   color-scheme: dark;
