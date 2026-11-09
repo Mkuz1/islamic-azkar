@@ -20,8 +20,9 @@
       textSize: "حجم الخط", showTr: "إظهار النطق", showMean: "إظهار المعنى", theme: "المظهر", system: "تلقائي", light: "فاتح", dark: "داكن", close: "إغلاق",
       tapCount: "اضغط للعدّ", reset: "تصفير", total: n => `المجموع: ${num(n)}`, target: "العدد",
       getApp: "التطبيقات", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات، مسبحة، وسجلّ يومي بالأذكار التي أتممتها.",
-      record: "سجلّي", recTitle: "سجلّ الأذكار", recSub: "الأذكار التي أتممتها كل يوم، محفوظة في هذا المتصفح", activeDays: "أيام الذكر هذا الشهر", monthDone: "أذكار أتممتها هذا الشهر", inRow: "أيام متتالية",
-      nothingDay: "لم تُتمّ أذكارًا في هذا اليوم.", dayDone: "الأذكار المكتملة", today: "اليوم", prevMonth: "الشهر السابق", nextMonth: "الشهر التالي", week: ["أحد", "اثن", "ثلا", "أرب", "خمي", "جمع", "سبت"],
+      record: "سجلّي", recTitle: "سجلّ الأذكار", recSub: "الأذكار التي أتممتها كل يوم", activeDays: "أيام الذكر هذا الشهر", monthDone: "أذكار أتممتها هذا الشهر", inRow: "أيام متتالية",
+      nothingDay: "لم تُتمّ أذكارًا في هذا اليوم.", dayDone: "الأذكار المكتملة", today: "اليوم", prevMonth: "الشهر السابق", nextMonth: "الشهر التالي",
+      syncTitle: "المزامنة بين الأجهزة", syncIntro: "اعرض سجلّ أذكارك على كل أجهزتك: آيفون وآيباد وماك وأندرويد والموقع. بلا حساب ولا بريد: رمز خاص يربط أجهزتك، ثم تتم المزامنة تلقائيًا.", syncOn: "تفعيل المزامنة", syncHave: "أو أدخل رمزًا من جهاز آخر", syncLink: "ربط", syncCode: "رمز المزامنة", syncHint: "أدخل هذا الرمز على أجهزتك الأخرى: الإعدادات ← المزامنة في التطبيق، أو سجلّي ← المزامنة هنا. احتفظ به لنفسك.", syncNow: "زامن الآن", syncLast: "آخر مزامنة", syncNever: "لم تتم بعد", syncStop: "إيقاف المزامنة في هذا المتصفح", syncStopQ: "إيقاف المزامنة هنا؟ يبقى سجلّك في هذا المتصفح وعلى أجهزتك الأخرى.", syncBad: "الرمز غير صحيح. تأكد منه وحاول مرة أخرى.", syncOff: "تعذّر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.", syncLinked: "تم ربط هذا المتصفح", week: ["أحد", "اثن", "ثلا", "أرب", "خمي", "جمع", "سبت"],
       apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", mac: "نسخة ماك", macNote: "ملف DMG · macOS 15 أو أحدث: مواقيت الصلاة في شريط القوائم، وتذكير يظهر أعلى الشاشة", join: "انضم إلى المختبِرين",
       joinText: "التطبيق في مرحلة الاختبار على Google Play. سجّل بريد Gmail المرتبط بمتجرك لنضيفك إلى المختبِرين ونرسل لك رابط التثبيت.",
       emailPh: "name@gmail.com", send: "سجّلني", sending: "جارٍ الإرسال…", badEmail: "أدخل عنوان بريد صحيحًا",
@@ -46,8 +47,9 @@
       textSize: "Text size", showTr: "Show transliteration", showMean: "Show meaning", theme: "Appearance", system: "Auto", light: "Light", dark: "Dark", close: "Close",
       tapCount: "Tap to count", reset: "Reset", total: n => `Total: ${n}`, target: "Target",
       getApp: "The apps", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders, a tasbih, and a daily record of the azkar you complete.",
-      record: "Record", recTitle: "Azkar record", recSub: "The azkar you completed each day, kept in this browser", activeDays: "Days with azkar this month", monthDone: "Azkar completed this month", inRow: "Days in a row",
-      nothingDay: "No azkar completed on this day.", dayDone: "Azkar completed", today: "Today", prevMonth: "Previous month", nextMonth: "Next month", week: ["S", "M", "T", "W", "T", "F", "S"],
+      record: "Record", recTitle: "Azkar record", recSub: "The azkar you completed each day", activeDays: "Days with azkar this month", monthDone: "Azkar completed this month", inRow: "Days in a row",
+      nothingDay: "No azkar completed on this day.", dayDone: "Azkar completed", today: "Today", prevMonth: "Previous month", nextMonth: "Next month",
+      syncTitle: "Sync between devices", syncIntro: "See your azkar record on all your devices: iPhone, iPad, Mac, Android and the website. No account or email: a private code links your devices, then they sync automatically.", syncOn: "Turn on sync", syncHave: "or enter a code from another device", syncLink: "Link", syncCode: "Sync code", syncHint: "Enter this code on your other devices: Settings → Sync in the app, or Record → Sync here. Keep it to yourself.", syncNow: "Sync now", syncLast: "Last synced", syncNever: "not yet", syncStop: "Stop syncing in this browser", syncStopQ: "Stop syncing here? Your record stays in this browser and on your other devices.", syncBad: "That code isn't right. Check it and try again.", syncOff: "Couldn't connect. Check your internet and try again.", syncLinked: "This browser is linked", week: ["S", "M", "T", "W", "T", "F", "S"],
       apk: "Download the app", apkNote: "APK file · Android 8 or later", mac: "Mac app", macNote: "DMG file · macOS 15 or later: prayer times in the menu bar and reminders at the top of the screen", join: "Join the testers",
       joinText: "The app is in testing on Google Play. Leave the Gmail address you use on the Play Store and we’ll add you as a tester and send you the install link.",
       emailPh: "name@gmail.com", send: "Sign me up", sending: "Sending…", badEmail: "Enter a valid email address",
@@ -72,8 +74,9 @@
       textSize: "Taille du texte", showTr: "Afficher la translittération", showMean: "Afficher la traduction", theme: "Apparence", system: "Auto", light: "Clair", dark: "Sombre", close: "Fermer",
       tapCount: "Touchez pour compter", reset: "Remettre à zéro", total: n => `Total : ${n}`, target: "Objectif",
       getApp: "Les applications", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels, un chapelet et un historique quotidien des adhkar terminés.",
-      record: "Historique", recTitle: "Historique des adhkar", recSub: "Les adhkar terminés chaque jour, gardés dans ce navigateur", activeDays: "Jours avec des adhkar ce mois-ci", monthDone: "Adhkar terminés ce mois-ci", inRow: "Jours d'affilée",
-      nothingDay: "Aucun dhikr terminé ce jour-là.", dayDone: "Adhkar terminés", today: "Aujourd'hui", prevMonth: "Mois précédent", nextMonth: "Mois suivant", week: ["D", "L", "M", "M", "J", "V", "S"],
+      record: "Historique", recTitle: "Historique des adhkar", recSub: "Les adhkar terminés chaque jour", activeDays: "Jours avec des adhkar ce mois-ci", monthDone: "Adhkar terminés ce mois-ci", inRow: "Jours d'affilée",
+      nothingDay: "Aucun dhikr terminé ce jour-là.", dayDone: "Adhkar terminés", today: "Aujourd'hui", prevMonth: "Mois précédent", nextMonth: "Mois suivant",
+      syncTitle: "Synchronisation entre appareils", syncIntro: "Retrouvez votre historique d'adhkar sur tous vos appareils : iPhone, iPad, Mac, Android et le site. Sans compte ni e-mail : un code privé relie vos appareils, puis tout se synchronise automatiquement.", syncOn: "Activer la synchronisation", syncHave: "ou saisissez le code d'un autre appareil", syncLink: "Relier", syncCode: "Code de synchronisation", syncHint: "Saisissez ce code sur vos autres appareils : Réglages → Synchronisation dans l'application, ou Historique → Synchronisation ici. Gardez-le pour vous.", syncNow: "Synchroniser", syncLast: "Dernière synchronisation", syncNever: "pas encore", syncStop: "Arrêter la synchronisation dans ce navigateur", syncStopQ: "Arrêter la synchronisation ici ? Votre historique reste dans ce navigateur et sur vos autres appareils.", syncBad: "Ce code n'est pas valide. Vérifiez-le et réessayez.", syncOff: "Connexion impossible. Vérifiez Internet et réessayez.", syncLinked: "Ce navigateur est relié", week: ["D", "L", "M", "M", "J", "V", "S"],
       apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", mac: "Version Mac", macNote: "Fichier DMG · macOS 15 ou plus récent : horaires de prière dans la barre des menus et rappels en haut de l'écran", join: "Devenir testeur",
       joinText: "L’application est en test sur Google Play. Laissez l’adresse Gmail de votre Play Store : nous vous ajouterons aux testeurs et vous enverrons le lien d’installation.",
       emailPh: "nom@gmail.com", send: "M’inscrire", sending: "Envoi…", badEmail: "Saisissez une adresse e-mail valide",
@@ -127,6 +130,7 @@
   // Always the newest APK: GitHub redirects /releases/latest/download/<asset> to the latest release's file.
   const APK_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.apk";
   const DMG_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.dmg";
+  const SYNC_URL = /(^|\.)islamicazkar\.net$|\.pages\.dev$/.test(location.hostname) ? "/sync" : "https://islamicazkar.net/sync";
   const REGISTER_URL = /(^|\.)islamicazkar\.net$/.test(location.hostname) ? "/api/register" : "https://islamicazkar.net/api/register";
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
   const CAT_STYLE = {
@@ -366,6 +370,58 @@
     const h = store.get("history", {}), k = dayKey(new Date()), list = h[k] || [];
     if (!list.includes(key)) list.push(key);
     h[k] = list; store.set("history", h);
+    syncNow();   // show it on the other devices
+  }
+
+  // Sync with the person's other devices (same private code and protocol as the apps).
+  const normCode = c => String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const showCode = c => c.match(/.{1,4}/g).join("-");
+  async function syncPost(path, body) {
+    let r;
+    try { r = await fetch(SYNC_URL + path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); }
+    catch { throw "offline"; }
+    if (r.status === 404) throw "unknown";
+    if (!r.ok) throw "offline";
+    return r.json();
+  }
+  function takeIn(days) {
+    const h = store.get("history", {});
+    let changed = false;
+    for (const [k, list] of Object.entries(days || {})) {
+      const have = h[k] || [];
+      for (const x of list) if (!have.includes(x)) { have.push(x); changed = true; }
+      h[k] = have;
+    }
+    store.set("history", h); store.set("syncLast", Date.now());
+    return changed;
+  }
+  let syncing = false;
+  async function syncNow(force) {
+    const code = store.get("syncCode", null);
+    if (!code || (syncing && !force)) return;
+    syncing = true;
+    try {
+      const r = await syncPost("", { code, days: store.get("history", {}) });
+      if ((takeIn(r.days) || force) && location.hash.startsWith("#/record")) route();
+    } catch (e) {
+      if (e === "unknown") { store.set("syncCode", null); if (location.hash.startsWith("#/record")) route(); }
+    } finally { syncing = false; }
+  }
+  function syncCard() {
+    const t = s(), code = store.get("syncCode", null), last = store.get("syncLast", 0);
+    if (code) {
+      const when = last ? new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit" }).format(new Date(last)) : t.syncNever;
+      return `<div class="sync glass" id="sync"><h3>${svg("reset")}${t.syncTitle}</h3>
+        <small>${t.syncCode}</small><div class="sync-code" dir="ltr">${showCode(code)}</div><p>${t.syncHint}</p>
+        <div class="sync-acts"><button class="pill primary press" id="sync-now">${t.syncNow}</button><small>${t.syncLast}: ${num(when)}</small></div>
+        <button class="link-btn" id="sync-stop">${t.syncStop}</button><small class="sync-msg" role="status"></small></div>`;
+    }
+    return `<div class="sync glass" id="sync"><h3>${svg("reset")}${t.syncTitle}</h3><p>${t.syncIntro}</p>
+      <button class="pill primary press" id="sync-on">${t.syncOn}</button>
+      <form id="sync-form" class="sync-form"><label>${t.syncHave}</label><div class="join-row">
+        <input name="code" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX" aria-label="${t.syncCode}">
+        <button class="pill press" type="submit">${t.syncLink}</button></div></form>
+      <small class="sync-msg" role="status"></small></div>`;
   }
   function streakDays(h) {
     const d = new Date();
@@ -422,7 +478,8 @@
         <div class="cal-grid">${t.week.map(w => `<span class="wd">${w}</span>`).join("")}${cells}</div>
       </div>
       <div class="section">${esc(dayTitle)}${sel.length ? ` · ${t.dayDone} (${num(sel.length)})` : ""}</div>
-      ${rows ? `<div class="group glass">${rows}</div>` : `<div class="empty glass card" style="padding:24px">${t.nothingDay}</div>`}`);
+      ${rows ? `<div class="group glass">${rows}</div>` : `<div class="empty glass card" style="padding:24px">${t.nothingDay}</div>`}
+      <div style="height:22px"></div>${syncCard()}`);
   }
 
   function tasbih() {
@@ -561,7 +618,7 @@
       };
     } else if (parts[0] === "fav") html = favorites();
     else if (parts[0] === "tasbih") html = tasbih();
-    else if (parts[0] === "record") html = record();
+    else if (parts[0] === "record") { html = record(); after = () => syncNow(); }
     else if (parts[0] === "umrah") { html = guide(); after = () => updateProgress("umrah"); }
     else html = notFound();
     app.innerHTML = html;
@@ -576,6 +633,15 @@
     if (btn && btn.id === "open-settings") return openSettings();
     if (btn && btn.dataset.month) { recMonth = Math.min(0, recMonth + +btn.dataset.month); route(); return; }
     if (btn && btn.dataset.day) { recDay = btn.dataset.day; route(); return; }
+    if (btn && btn.id === "sync-now") { btn.disabled = true; syncNow(true); return; }
+    if (btn && btn.id === "sync-stop") { if (confirm(s().syncStopQ)) { store.set("syncCode", null); store.set("syncLast", 0); route(); } return; }
+    if (btn && btn.id === "sync-on") {
+      btn.disabled = true;
+      syncPost("/new", { days: store.get("history", {}) })
+        .then(r => { store.set("syncCode", r.code); takeIn(r.days); route(); })
+        .catch(() => { btn.disabled = false; document.querySelector(".sync-msg").textContent = s().syncOff; });
+      return;
+    }
     const stepLink = ev.target.closest("[data-step]");
     if (stepLink) { ev.preventDefault(); document.getElementById(`step-${stepLink.dataset.step}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
     if (btn && btn.id === "join-toggle") {
@@ -621,6 +687,16 @@
   });
   app.addEventListener("input", ev => { if (ev.target.id === "q") search(ev.target.value); });
   app.addEventListener("submit", async ev => {
+    if (ev.target.id === "sync-form") {
+      ev.preventDefault();
+      const code = normCode(ev.target.code.value), msg = document.querySelector(".sync-msg");
+      if (code.length !== 12) { msg.textContent = s().syncBad; return; }
+      try {
+        const r = await syncPost("", { code, days: store.get("history", {}) });
+        store.set("syncCode", code); takeIn(r.days); route(); toast(s().syncLinked);
+      } catch (e) { msg.textContent = e === "unknown" ? s().syncBad : s().syncOff; }
+      return;
+    }
     if (ev.target.id !== "join") return;
     ev.preventDefault();
     const form = ev.target, t = s(), msg = form.querySelector(".join-msg"), send = form.querySelector("button[type=submit]");
@@ -636,6 +712,7 @@
     }
   });
   window.addEventListener("hashchange", route);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) syncNow(); });
 
   // ───────────── Boot ─────────────
   applyLang(); applyPrefs();
@@ -648,5 +725,6 @@
     d.evening.forEach(z => add(z, "evening", () => s().evening));
     d.chapters.forEach(c => c.items.forEach(z => add(z, `c${c.id}`, () => chapterTitle(c))));
     route();
+    syncNow();
   }).catch(() => { app.innerHTML = `<div class="loading">Could not load azkar.</div>`; });
 })();
