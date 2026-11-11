@@ -159,7 +159,7 @@ fun DedicationScreen(onContinue: () -> Unit, onOpen: (Reading) -> Unit = {}) {
             var fit by remember(maxWidth, maxHeight, lang) { mutableFloatStateOf(1f) }
             var viewH by remember { mutableIntStateOf(0) }
             LaunchedEffect(scroll.maxValue, viewH) {
-                if (scroll.maxValue > 2 && viewH > 0 && kw * fit > 0.5f) {
+                if (scroll.maxValue > 2 && viewH > 300 && kw * fit > 0.5f) {
                     fit = maxOf(fit * viewH / (viewH + scroll.maxValue) * 0.98f, 0.5f / kw)
                 }
             }

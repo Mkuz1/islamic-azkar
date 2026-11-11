@@ -132,7 +132,8 @@ struct DedicationView: View {
     }
 
     private func shrink(_ height: CGFloat, available: CGFloat, kw: CGFloat) {
-        guard height > available + 1, kw * fit > 0.5 else { return }
+        // Ignore the first layout passes, before the screen size is known.
+        guard available > 320, height > available + 1, kw * fit > 0.5 else { return }
         fit = max(fit * (available / height) * 0.98, 0.5 / kw)
     }
 }
