@@ -151,8 +151,12 @@ fun DedicationScreen(onContinue: () -> Unit, onOpen: (Reading) -> Unit = {}) {
         ) {
             // The card follows the window: full width on phones, a centred column on
             // unfolded foldables and tablets (narrower in Arabic, as in the Mushaf).
-            val cardWidth = min(maxWidth, if (lang == Lang.AR) 520.dp else 760.dp)
-            val kw = (cardWidth / 560.dp).coerceIn(0.78f, 1.12f)
+            // Phones: the card follows the width. Tablets and unfolded foldables: it grows with the
+            // screen, then `fit` shrinks it if it would overflow.
+            val large = maxWidth >= 600.dp && maxHeight >= 600.dp
+            val grow = if (large) minOf(maxWidth / 640.dp, maxHeight / 760.dp, 1.7f).coerceAtLeast(1f) else 1f
+            val cardWidth = min(maxWidth, (if (lang == Lang.AR) 520.dp else 760.dp) * grow)
+            val kw = if (large) grow * 1.05f else (cardWidth / 560.dp).coerceIn(0.78f, 1.12f)
             // If the card is taller than the screen (short phones, landscape), shrink everything until
             // it fits instead of scrolling.
             val scroll = rememberScrollState()

@@ -18,8 +18,12 @@ struct DedicationView: View {
         let data = AzkarData.shared
 
         GeometryReader { geo in
-            let cardWidth = min(geo.size.width - 32, lang == .ar ? 520 : 760)
-            let kw = min(max(cardWidth / 560, 0.78), 1.12)
+            // Phones: the card follows the width. iPads and large windows: it grows with the screen
+            // (it would otherwise look small in the middle), then `fit` shrinks it if it overflows.
+            let large = geo.size.width >= 600 && geo.size.height >= 600
+            let grow = large ? min(geo.size.width / 640, geo.size.height / 760, 1.7) : 1
+            let cardWidth = min(geo.size.width - (large ? 64 : 32), (lang == .ar ? 520 : 760) * max(grow, 1))
+            let kw = large ? max(grow, 1) * 1.05 : min(max(cardWidth / 560, 0.78), 1.12)
             let k = max(kw * fit, 0.5)
             let available = geo.size.height - 24
 
