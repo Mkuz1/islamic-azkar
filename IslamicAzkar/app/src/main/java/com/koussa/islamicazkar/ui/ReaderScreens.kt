@@ -124,11 +124,8 @@ fun ReaderScreen(reading: Reading, focus: Int?) {
         if (allDone && totalReps > 0 && remaining.isNotEmpty()) {
             delay(450)
             com.koussa.islamicazkar.data.AzkarHistory.markReading(ctx, reading.key())   // the Record tab
-            val streak = when (reading) {
-                Reading.Morning -> app.settings.recordCompletion("morning")
-                Reading.Evening -> app.settings.recordCompletion("evening")
-                else -> null
-            }
+            // From the record itself (the Record tab), which also holds the other devices' days.
+            val streak = maxOf(com.koussa.islamicazkar.data.AzkarHistory.streak(ctx, reading.key()), 1)
             app.celebration = Celebration(
                 reading = reading, title = title, azkar = items.size, repetitions = totalReps,
                 streak = streak, encouragement = (System.currentTimeMillis() / 86_400_000L).toInt() + items.size,

@@ -21,10 +21,14 @@ struct HomeView: View {
 
                     SectionLabel(text: s.recommendedNow).padding(.top, 8)
                     let columns = Array(repeating: GridItem(.flexible(), spacing: 14), count: sizeClass == .regular ? 4 : 2)
-                    LazyVGrid(columns: columns, spacing: 14) {
-                        ForEach(todayTiles, id: \.reading) { t in
-                            Button { model.show(t.reading, split: split) } label: { TodayCard(tile: t) }
-                                .buttonStyle(PressStyle())
+                    // Re-evaluated every minute (and when the app comes back), so "Now" follows the clock
+                    // even when the app was last opened hours ago.
+                    TimelineView(.everyMinute) { ctx in
+                        LazyVGrid(columns: columns, spacing: 14) {
+                            ForEach(todayTiles(at: ctx.date), id: \.reading) { t in
+                                Button { model.show(t.reading, split: split) } label: { TodayCard(tile: t) }
+                                    .buttonStyle(PressStyle())
+                            }
                         }
                     }
                     .padding(.horizontal, 16).padding(.top, 6)
@@ -95,9 +99,9 @@ struct HomeView: View {
         let now: Bool
     }
 
-    private var todayTiles: [Tile] {
+    private func todayTiles(at date: Date) -> [Tile] {
         let s = model.s
-        let rec = Reading.recommended()
+        let rec = Reading.recommended(at: date)
         return [
             Tile(reading: .morning, title: s.morningAzkar, symbol: "sun.max.fill", color: .orange, count: data.morning.count, now: rec == .morning),
             Tile(reading: .evening, title: s.eveningAzkar, symbol: "moon.haze.fill", color: .indigo, count: data.evening.count, now: rec == .evening),

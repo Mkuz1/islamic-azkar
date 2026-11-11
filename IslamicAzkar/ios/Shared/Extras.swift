@@ -408,13 +408,12 @@ enum TasbihHistory {
 enum Streaks {
     /// Records that `key` (e.g. "morning") was completed today; returns the consecutive-day count.
     static func record(_ key: String) -> Int {
-        let d = SharedStore.defaults
-        let today = Int((Date.now.timeIntervalSince1970 + Double(TimeZone.current.secondsFromGMT())) / 86_400)
-        let last = d.object(forKey: "streak_day_\(key)") == nil ? Int.min / 2 : d.integer(forKey: "streak_day_\(key)")
-        let count = d.integer(forKey: "streak_\(key)")
-        let next = today - last == 0 ? max(count, 1) : today - last == 1 ? count + 1 : 1
-        d.set(today, forKey: "streak_day_\(key)")
         AzkarHistory.markReading(key)
+        // From the record itself (the Record tab's calendar), which also holds the days completed
+        // on the other devices, through Favourites or the ʿUmrah guide.
+        let next = max(AzkarHistory.streak(key), 1)
+        let d = SharedStore.defaults
+        d.set(Int((Date.now.timeIntervalSince1970 + Double(TimeZone.current.secondsFromGMT())) / 86_400), forKey: "streak_day_\(key)")
         d.set(next, forKey: "streak_\(key)")
         return next
     }

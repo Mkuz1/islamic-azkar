@@ -101,10 +101,11 @@ enum DailyAzkar {
 
     static func doneToday(_ r: Reading) -> Bool {
         let d = SharedStore.defaults
-        return d.object(forKey: "streak_day_\(r.key)") != nil && d.integer(forKey: "streak_day_\(r.key)") == today
+        let legacy = d.object(forKey: "streak_day_\(r.key)") != nil && d.integer(forKey: "streak_day_\(r.key)") == today
+        return legacy || AzkarHistory.day(.now).readings.contains(r.key)
     }
 
-    static func streak(_ r: Reading) -> Int { SharedStore.defaults.integer(forKey: "streak_\(r.key)") }
+    static func streak(_ r: Reading) -> Int { AzkarHistory.streak(r.key) }
 }
 
 /// The panel that opens from the menu bar icon.

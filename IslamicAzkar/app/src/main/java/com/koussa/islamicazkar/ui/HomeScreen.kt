@@ -73,7 +73,17 @@ fun HomeScreen() {
     val s = Glass.s
     val lang = Glass.lang
     var query by rememberSaveable { mutableStateOf("") }
-    val moment = remember { currentMoment() }
+    // Follows the clock: "Now" is re-evaluated every 30 s and whenever the app comes back to the front.
+    var moment by remember { mutableStateOf(currentMoment()) }
+    androidx.compose.runtime.LaunchedEffect(Unit) {
+        while (true) { moment = currentMoment(); kotlinx.coroutines.delay(30_000) }
+    }
+    val lifecycle = androidx.compose.ui.platform.LocalLifecycleOwner.current.lifecycle
+    androidx.compose.runtime.DisposableEffect(lifecycle) {
+        val obs = androidx.lifecycle.LifecycleEventObserver { _, e -> if (e == androidx.lifecycle.Lifecycle.Event.ON_RESUME) moment = currentMoment() }
+        lifecycle.addObserver(obs)
+        onDispose { lifecycle.removeObserver(obs) }
+    }
     val listState = rememberLazyListState()
     CollapsingTitle(s.appName, listState)
 

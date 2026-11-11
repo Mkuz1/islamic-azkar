@@ -446,6 +446,14 @@
         <button class="pill press" type="submit">${t.syncLink}</button></div></form>
       <small class="sync-msg" role="status"></small></div>`;
   }
+  /** Consecutive days on which `key` was completed, ending today (or yesterday). */
+  function readingStreak(key) {
+    const h = store.get("history", {}), d = new Date();
+    if (!(h[dayKey(d)] || []).includes(key)) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while ((h[dayKey(d)] || []).includes(key)) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
   function streakDays(h) {
     const d = new Date();
     if (!(h[dayKey(d)] || []).length) d.setDate(d.getDate() - 1);
@@ -554,12 +562,9 @@
     const t = s(), r = readingOf(key), counts = progressOf(key);
     if (counts.__celebrated) return;
     counts.__celebrated = true; saveProgress(key, counts);
-    const st = store.get("streaks", {}), prev = st[key] || {}, d = today();
-    const y = new Date(); y.setDate(y.getDate() - 1);
-    const yd = `${y.getFullYear()}-${y.getMonth() + 1}-${y.getDate()}`;
-    const streak = prev.last === d ? prev.n : prev.last === yd ? prev.n + 1 : 1;
-    st[key] = { last: d, n: streak }; store.set("streaks", st);
     markRecord(key);
+    // From the record itself (the Record page), which also holds the other devices' days.
+    const streak = key === "umrah" ? 1 : Math.max(readingStreak(key), 1);
     const reps = r.items.reduce((a, z) => a + Math.max(1, z.n || 1), 0);
     const e = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
     const next = key === "morning" ? t.seeEvening : key === "evening" ? t.seeMorning : "";
@@ -753,7 +758,11 @@
     }
   });
   window.addEventListener("hashchange", route);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) syncNow(); });
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    syncNow();
+    if (!location.hash || location.hash === "#/") route();   // "Now" follows the clock
+  });
 
   // ───────────── Boot ─────────────
   applyLang(); applyPrefs();

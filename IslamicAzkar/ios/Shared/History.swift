@@ -56,6 +56,20 @@ enum AzkarHistory {
         if changed, let data = try? JSONEncoder().encode(days) { SharedStore.defaults.set(data, forKey: Self.key) }
     }
 
+    /// Consecutive days on which `key` (e.g. "morning", "c28") was completed, ending today (or
+    /// yesterday, if it is not done yet today). Counts every device's completions (the record syncs).
+    static func streak(_ key: String, now: Date = .now) -> Int {
+        let days = all(), cal = Calendar.current
+        var date = now
+        if days[dayKey(date)]?.readings.contains(key) != true { date = cal.date(byAdding: .day, value: -1, to: date) ?? date }
+        var n = 0
+        while days[dayKey(date)]?.readings.contains(key) == true {
+            n += 1
+            date = cal.date(byAdding: .day, value: -1, to: date) ?? date
+        }
+        return n
+    }
+
     /// Consecutive days with at least one completed reading, ending today (or yesterday).
     static func currentStreak(_ days: [String: Day], now: Date = .now) -> Int {
         let cal = Calendar.current

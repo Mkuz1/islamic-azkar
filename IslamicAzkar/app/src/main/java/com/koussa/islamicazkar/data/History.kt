@@ -73,6 +73,22 @@ object AzkarHistory {
         }
     }
 
+    /**
+     * Consecutive days on which [key] (e.g. "morning", "c28") was completed, ending today (or
+     * yesterday, if it is not done yet today). Counts every device's completions (the record syncs).
+     */
+    fun streak(ctx: Context, key: String): Int {
+        val days = all(ctx)
+        val c = Calendar.getInstance()
+        if (days[dayKey(c)]?.contains(key) != true) c.add(Calendar.DAY_OF_MONTH, -1)
+        var n = 0
+        while (days[dayKey(c)]?.contains(key) == true) {
+            n++
+            c.add(Calendar.DAY_OF_MONTH, -1)
+        }
+        return n
+    }
+
     /** Consecutive days with at least one completed reading, ending today (or yesterday). */
     fun currentStreak(days: Map<String, List<String>>): Int {
         val c = Calendar.getInstance()
