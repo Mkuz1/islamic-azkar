@@ -1,5 +1,11 @@
-- Mac: the dhikr reminders through the day now appear on screen as a card at the top centre, like the morning and evening reminders, and every reminder arrives on time even when the app is in the background.
+- The completion message now shows your real number of consecutive days for any azkar you finish — counted from your record, including the days you completed them on your other devices.
+- "Now" on the home screen follows the time of day, even if the app was last opened the night before.
+- The opening page fits every screen, from small phones to iPads and tablets.
 
-- ماك: تذكيرات الذكر خلال اليوم تظهر الآن على الشاشة في بطاقة أعلى المنتصف، مثل تذكيرات الصباح والمساء، وكل التذكيرات تصل في وقتها حتى والتطبيق في الخلفية.
+- رسالة الإتمام تعرض الآن عدد أيامك المتتالية الصحيح لأي أذكار تُتمّها — من سجلّك، بما فيها الأيام التي أتممتها على أجهزتك الأخرى.
+- علامة «الآن» في الرئيسية تتبع وقت اليوم، حتى لو فُتح التطبيق آخر مرة في الليلة السابقة.
+- الصفحة الافتتاحية تناسب كل الشاشات، من الهواتف الصغيرة إلى الآيباد والأجهزة اللوحية.
 
-- Mac : les rappels de dhikr de la journée apparaissent maintenant à l'écran dans une carte en haut au centre, comme ceux du matin et du soir, et chaque rappel arrive à l'heure même quand l'application est en arrière-plan.
+- Le message de fin affiche maintenant votre vrai nombre de jours d'affilée pour tous les adhkar terminés — d'après votre historique, y compris les jours terminés sur vos autres appareils.
+- « Maintenant » sur l'accueil suit l'heure de la journée, même si l'application a été ouverte la veille au soir.
+- La page d'ouverture s'adapte à tous les écrans, des petits téléphones aux iPad et tablettes.

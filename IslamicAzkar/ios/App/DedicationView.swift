@@ -83,13 +83,14 @@ struct DedicationView: View {
                         .pickerStyle(.segmented)
                         .labelsHidden()
                         .environment(\.colorScheme, .dark)   // white labels on the dark green
-                        .frame(maxWidth: 260)
+                        .controlSize(k > 1.2 ? .large : .regular)
+                        .frame(maxWidth: 260 * max(k, 1))
                         .environment(\.layoutDirection, .leftToRight)
                         .padding(.top, 24 * k)
 
                         Button(action: onContinue) {
-                            Text(text.begin).font(.headline).foregroundStyle(Color(red: 0.08, green: 0.16, blue: 0.12))
-                                .padding(.horizontal, 28).padding(.vertical, 4)
+                            Text(text.begin).font(.system(size: 17 * max(k, 1), weight: .semibold)).foregroundStyle(Color(red: 0.08, green: 0.16, blue: 0.12))
+                                .padding(.horizontal, 28 * max(k, 1)).padding(.vertical, 4 * max(k, 1))
                         }
                         .prominentGlassButton()
                         .tint(gold)
@@ -101,7 +102,7 @@ struct DedicationView: View {
                                 onOpen(recommended)
                             } label: {
                                 Text("\(data.title(recommended, model.s, lang)) · \(model.s.azkar(data.items(recommended).count))")
-                                    .font(.footnote).foregroundStyle(.white.opacity(0.72))
+                                    .font(.system(size: 13 * max(k, 1))).foregroundStyle(.white.opacity(0.72))
                             }
                             .buttonStyle(.plain)
                         }
