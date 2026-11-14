@@ -28,6 +28,9 @@ import com.koussa.islamicazkar.ui.glass.AzkarTheme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.input.key.Key
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.annotation.GraphicsMode
@@ -81,6 +84,40 @@ class ScreenshotTest {
         listOf("evening", "c28").forEach { k -> com.koussa.islamicazkar.data.AzkarHistory.markReading(ctx, k) }
         it.selectTab(3)
     }
+    // Google TV / Android TV: 1080p TV (960 x 540 dp), driven by the remote's D-pad.
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
+    @Test fun tvHomeEn() = shot("30_tv_home_en", Lang.EN, ThemeMode.DARK, { AzkarApp(it) })
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
+    @Test fun tvHomeFocusAr() = tvShot("31_tv_home_focus_ar", Lang.AR, listOf(Key.DirectionDown, Key.DirectionDown, Key.DirectionDown)) { }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
+    @Test fun tvTabsFocusEn() = tvShot("32_tv_tabs_focus_en", Lang.EN, listOf(Key.DirectionDown, Key.DirectionUp, Key.DirectionUp, Key.DirectionRight)) { }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
+    @Test fun tvReaderEn() = tvShot("33_tv_reader_en", Lang.EN, listOf(Key.DirectionDown, Key.DirectionDown)) { it.open(Reading.Morning) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
+    @Test fun tvRecordAr() = tvShot("34_tv_record_ar", Lang.AR, listOf(Key.DirectionDown)) {
+        listOf("morning", "c28").forEach { k -> com.koussa.islamicazkar.data.AzkarHistory.markReading(ctx, k) }
+        it.selectTab(3)
+    }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
+    @Test fun tvDedication() = shot("35_tv_dedication_en", Lang.EN, ThemeMode.DARK, { DedicationScreen(onContinue = {}) })
+
+    /** A TV screen after pressing these remote keys (the focused control shows its highlight). */
+    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
+    private fun tvShot(name: String, lang: Lang, keys: List<Key>, setup: (AppState) -> Unit) {
+        val st = Settings.get(ctx)
+        st.updateLang(lang); st.updateTheme(ThemeMode.DARK)
+        val app = AppState(st).also(setup)
+        rule.mainClock.autoAdvance = false
+        rule.setContent { AzkarTheme(st.theme, st.lang) { AzkarApp(app) } }
+        rule.mainClock.advanceTimeBy(1500)
+        for (k in keys) {
+            rule.onRoot().performKeyInput { pressKey(k) }
+            rule.mainClock.advanceTimeBy(400)
+        }
+        rule.mainClock.advanceTimeBy(800)
+        rule.onRoot().captureRoboImage(File(out, "$name.png").path)
+    }
+
     @Test fun homePrayerAr() = shot("02b_home_prayer_ar", Lang.AR, ThemeMode.LIGHT, { AzkarApp(it) }) { it.settings.updatePlace(com.koussa.islamicazkar.data.Cities.all.first { c -> c.name == "Beirut" }) }
     @Test fun shareSheet() = shot("10_share_sheet_en", Lang.EN, ThemeMode.LIGHT, { AzkarApp(it) }) {
         it.open(Reading.Morning)

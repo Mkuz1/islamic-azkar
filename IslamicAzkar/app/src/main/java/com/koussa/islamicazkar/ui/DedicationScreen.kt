@@ -60,6 +60,7 @@ import com.koussa.islamicazkar.data.Lang
 import com.koussa.islamicazkar.data.Reading
 import com.koussa.islamicazkar.data.Settings
 import com.koussa.islamicazkar.ui.glass.ArabicFont
+import com.koussa.islamicazkar.ui.glass.tvClickable
 import com.koussa.islamicazkar.ui.glass.ArabicUiFont
 import com.koussa.islamicazkar.ui.glass.CalligraphyFont
 import com.koussa.islamicazkar.ui.glass.Glass
@@ -303,7 +304,7 @@ private fun LanguagePicker(current: Lang, onSelect: (Lang) -> Unit) {
                     modifier = Modifier
                         .clip(RoundedCornerShape(7.dp))
                         .background(if (sel) Color.White.copy(alpha = 0.16f) else Color.Transparent)
-                        .clickable(remember { MutableInteractionSource() }, null) { onSelect(l) }
+                        .then(Modifier.tvClickable { onSelect(l) })
                         .padding(horizontal = 14.dp, vertical = 5.dp),
                 )
             }

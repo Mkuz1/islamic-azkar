@@ -195,12 +195,19 @@ fun AzkarApp(state: AppState) {
                 TopBlur(backdrop, Modifier.align(Alignment.TopCenter))
                 InlineTitle(state.inlineTitle, Modifier.align(Alignment.TopCenter))
 
+                val tv = isTv()
                 if (state.showBack) {
-                    BackChrome(Modifier.align(Alignment.TopStart).statusBarsPadding().padding(start = 16.dp, top = 6.dp)) { state.pop() }
+                    BackChrome(
+                        if (tv) Modifier.align(Alignment.TopStart).padding(start = 48.dp, top = 30.dp)
+                        else Modifier.align(Alignment.TopStart).statusBarsPadding().padding(start = 16.dp, top = 6.dp),
+                    ) { state.pop() }
                 }
 
                 // With a separating hinge, keep the bar on one screen instead of straddling the gap.
-                val barModifier = if (bookHinge != null && gap > 0.dp) {
+                // On TV the bar sits at the top, where the remote's Up button reaches it from any page.
+                val barModifier = if (tv) {
+                    Modifier.align(Alignment.TopCenter).padding(top = 24.dp).widthIn(max = 620.dp).fillMaxWidth()
+                } else if (bookHinge != null && gap > 0.dp) {
                     Modifier.align(Alignment.BottomStart).width(leftWidth)
                 } else {
                     Modifier.align(Alignment.BottomCenter).widthIn(max = 520.dp).fillMaxWidth()
@@ -215,7 +222,7 @@ fun AzkarApp(state: AppState) {
                     ),
                     selected = state.tab,
                     onSelect = state::selectTab,
-                    modifier = barModifier
+                    modifier = if (tv) barModifier.padding(horizontal = 18.dp) else barModifier
                         .navigationBarsPadding()
                         .padding(horizontal = 18.dp, vertical = 10.dp),
                 )

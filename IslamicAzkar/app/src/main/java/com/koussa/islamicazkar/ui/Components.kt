@@ -79,9 +79,17 @@ import com.koussa.islamicazkar.ui.glass.ProgressRing
 import com.koussa.islamicazkar.ui.glass.pane
 import com.koussa.islamicazkar.ui.glass.pressable
 
-/** Content padding that clears the status bar (and the floating back button) and the floating tab bar. */
+/** Google TV / Android TV (Chromecast with Google TV, smart TVs): driven by the remote. */
+@Composable
+fun isTv(): Boolean =
+    (androidx.compose.ui.platform.LocalConfiguration.current.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK) ==
+        android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+
+/** Content padding that clears the status bar (and the floating back button) and the floating tab bar.
+ *  On TV the tab bar sits at the top and content keeps inside the TV-safe margins. */
 @Composable
 fun screenPadding(hasBack: Boolean = false, horizontal: Dp = 16.dp): PaddingValues {
+    if (isTv()) return PaddingValues(start = horizontal + 32.dp, end = horizontal + 32.dp, top = 104.dp, bottom = 40.dp)
     val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     return PaddingValues(start = horizontal, end = horizontal, top = top + if (hasBack) 60.dp else 12.dp, bottom = bottom + 100.dp)

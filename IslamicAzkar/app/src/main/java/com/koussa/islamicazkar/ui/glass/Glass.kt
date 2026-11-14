@@ -37,6 +37,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -224,16 +228,56 @@ fun Modifier.pane(shape: Shape): Modifier = composed {
     glass(shape, blurRadius = 18.dp, tint = g.pane, fallback = g.paneFallback)
 }
 
-/** iOS-style press feedback: a slight dim, and a gentle squish for prominent controls. */
+/** iOS-style press feedback: a slight dim, and a gentle squish for prominent controls. With a TV
+ *  remote, a keyboard or a game pad, the control in focus is also lifted and outlined ([focusRing]). */
 fun Modifier.pressable(onClick: () -> Unit, enabled: Boolean = true, squish: Boolean = false): Modifier = composed {
     val source = remember { MutableInteractionSource() }
     val pressed by source.collectIsPressedAsState()
     val s by animateFloatAsState(if (pressed && squish) 0.96f else 1f, spring(dampingRatio = 0.6f, stiffness = Spring.StiffnessMedium), label = "press")
     val a by animateFloatAsState(if (pressed) 0.55f else 1f, spring(stiffness = Spring.StiffnessHigh), label = "dim")
     this
+        .focusRing(source)
         .scale(s)
         .alpha(a)
         .clickable(interactionSource = source, indication = null, enabled = enabled, onClick = onClick)
+}
+
+/** A clickable with no touch ripple but with the focus highlight for remotes and keyboards. */
+fun Modifier.tvClickable(onClick: () -> Unit): Modifier = composed {
+    val src = remember { MutableInteractionSource() }
+    focusRing(src).clickable(src, null, onClick = onClick)
+}
+
+/**
+ * Focus highlight for the TV remote (D-pad), keyboards and game pads: the focused control is
+ * lifted a little and drawn with a bright outline and a soft fill. Touch screens never focus
+ * these controls, so phones look exactly as before.
+ */
+fun Modifier.focusRing(source: MutableInteractionSource): Modifier = composed {
+    val g = Glass.colors
+    val focused by source.collectIsFocusedAsState()
+    val t by animateFloatAsState(if (focused) 1f else 0f, spring(dampingRatio = 0.8f, stiffness = 600f), label = "focus")
+    val ring = if (g.dark) Color.White else g.accent
+    this
+        .graphicsLayer {
+            // Small controls lift more than large cards (at most ~10 dp wider).
+            val lift = if (size.width > 0f) minOf(0.06f, 10.dp.toPx() / size.width) else 0f
+            scaleX = 1f + lift * t; scaleY = 1f + lift * t
+            shadowElevation = 10.dp.toPx() * t
+            shape = RoundedCornerShape(16.dp); clip = false
+        }
+        .drawWithContent {
+            drawContent()
+            if (t > 0.01f) {
+                val sw = 3.dp.toPx()
+                val r = minOf(16.dp.toPx(), size.minDimension / 2)
+                drawRoundRect(ring.copy(alpha = 0.12f * t), cornerRadius = CornerRadius(r))
+                drawRoundRect(
+                    ring.copy(alpha = t), topLeft = Offset(sw / 2, sw / 2), size = Size(size.width - sw, size.height - sw),
+                    cornerRadius = CornerRadius(maxOf(r - sw / 2, 0f)), style = Stroke(sw),
+                )
+            }
+        }
 }
 
 /** Round glass button for the navigation layer (back, close, language). */
@@ -298,11 +342,13 @@ fun GlassSegmented(options: List<String>, selected: Int, modifier: Modifier = Mo
         )
         Row(Modifier.fillMaxSize()) {
             options.forEachIndexed { i, label ->
+                val src = remember { MutableInteractionSource() }
                 Box(
                     Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .clickable(remember { MutableInteractionSource() }, null) { onSelect(i) },
+                        .focusRing(src)
+                        .clickable(src, null) { onSelect(i) },
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
@@ -341,11 +387,13 @@ fun GlassTabBar(items: List<TabItem>, selected: Int, modifier: Modifier = Modifi
         Row(Modifier.fillMaxSize()) {
             items.forEachIndexed { i, item ->
                 val sel = i == selected
+                val src = remember { MutableInteractionSource() }
                 Column(
                     Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .clickable(remember { MutableInteractionSource() }, null) { onSelect(i) },
+                        .focusRing(src)
+                        .clickable(src, null) { onSelect(i) },
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center,
                 ) {
