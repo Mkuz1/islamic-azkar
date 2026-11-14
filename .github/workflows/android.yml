@@ -42,7 +42,7 @@ jobs:
         run: |
           ./gradlew --no-daemon testPlayDebugUnitTest -Proborazzi.test.record=true --tests '*ScreenshotTest.record*' --tests '*ScreenshotTest.widgetsTab*' --tests '*ScreenshotTest.settings' --tests '*ScreenshotTest.homeArLight' --tests '*ScreenshotTest.tv*' || true
           ls app/build/shots || exit 0
-          mkdir -p /tmp/ashots && cp app/build/shots/*.png /tmp/ashots/
+          mkdir -p /tmp/ashots && cp app/build/shots/*.png /tmp/ashots/ && cp app/build/shots/*.txt /tmp/ashots/ 2>/dev/null || true
           cd /tmp/ashots && git init -q && git checkout -q -b android-shots && git add . \
             && git -c user.name=ci -c user.email=ci@localhost commit -qm "Android screenshots ${GITHUB_SHA::7}" \
             && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" android-shots && echo "pushed" || true

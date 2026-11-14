@@ -88,7 +88,7 @@ class ScreenshotTest {
     @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
     @Test fun tvHomeEn() = shot("30_tv_home_en", Lang.EN, ThemeMode.DARK, { AzkarApp(it) })
     @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
-    @Test fun tvHomeFocusAr() = tvShot("31_tv_home_focus_ar", Lang.AR, listOf(Key.DirectionDown, Key.DirectionDown, Key.DirectionDown)) { }
+    @Test fun tvHomeFocusAr() = tvShot("31_tv_home_focus_ar", Lang.AR, listOf(Key.DirectionDown, Key.DirectionDown, Key.DirectionDown, Key.DirectionDown, Key.DirectionDown)) { }
     @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
     @Test fun tvTabsFocusEn() = tvShot("32_tv_tabs_focus_en", Lang.EN, listOf(Key.DirectionDown, Key.DirectionUp, Key.DirectionUp, Key.DirectionRight)) { }
     @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
@@ -115,10 +115,16 @@ class ScreenshotTest {
             AzkarTheme(st.theme, st.lang) { AzkarApp(app) }
         }
         rule.mainClock.advanceTimeBy(1500)
+        val trace = StringBuilder()
+        fun focused(): String = rule.onAllNodes(androidx.compose.ui.test.isFocused(), useUnmergedTree = false).fetchSemanticsNodes()
+            .joinToString { n -> (n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.Text)?.joinToString(" ")
+                ?: n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.ContentDescription)?.joinToString(" ") ?: "?") + " @" + n.boundsInRoot }
         for (k in keys) {
             rule.onRoot().performKeyInput { pressKey(k) }
             rule.mainClock.advanceTimeBy(400)
+            trace.append("$k -> ${focused()}\n")
         }
+        File(out, "$name.focus.txt").writeText(trace.toString())
         rule.mainClock.advanceTimeBy(800)
         rule.onRoot().captureRoboImage(File(out, "$name.png").path)
     }
