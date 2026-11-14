@@ -197,7 +197,7 @@ fun AzkarApp(state: AppState) {
 
             CompositionLocalProvider(LocalBackdrop provides backdrop) {
                 TopBlur(backdrop, Modifier.align(Alignment.TopCenter))
-                InlineTitle(state.inlineTitle, Modifier.align(Alignment.TopCenter))
+                if (!isTv()) InlineTitle(state.inlineTitle, Modifier.align(Alignment.TopCenter))   // on TV the tab bar is there
 
                 val tv = isTv()
                 if (state.showBack) {

@@ -1,11 +1,5 @@
-- The completion message now shows your real number of consecutive days for any azkar you finish — counted from your record, including the days you completed them on your other devices.
-- "Now" on the home screen follows the time of day, even if the app was last opened the night before.
-- The opening page fits every screen, from small phones to iPads and tablets.
+- Android TV and Google TV (including Chromecast with Google TV): the app now appears on the TV home screen and works fully with the remote — move with the arrows, press OK to open or count, Back to go back. The selected item is highlighted, and the tabs sit at the top of the screen.
 
-- رسالة الإتمام تعرض الآن عدد أيامك المتتالية الصحيح لأي أذكار تُتمّها — من سجلّك، بما فيها الأيام التي أتممتها على أجهزتك الأخرى.
-- علامة «الآن» في الرئيسية تتبع وقت اليوم، حتى لو فُتح التطبيق آخر مرة في الليلة السابقة.
-- الصفحة الافتتاحية تناسب كل الشاشات، من الهواتف الصغيرة إلى الآيباد والأجهزة اللوحية.
+- أندرويد TV وGoogle TV (ومنها Chromecast مع Google TV): يظهر التطبيق الآن في الشاشة الرئيسية للتلفاز ويعمل بالكامل بجهاز التحكم — تنقّل بالأسهم، واضغط «موافق» للفتح أو العدّ، و«رجوع» للعودة. العنصر المحدد مميَّز، والتبويبات في أعلى الشاشة.
 
-- Le message de fin affiche maintenant votre vrai nombre de jours d'affilée pour tous les adhkar terminés — d'après votre historique, y compris les jours terminés sur vos autres appareils.
-- « Maintenant » sur l'accueil suit l'heure de la journée, même si l'application a été ouverte la veille au soir.
-- La page d'ouverture s'adapte à tous les écrans, des petits téléphones aux iPad et tablettes.
+- Android TV et Google TV (dont Chromecast avec Google TV) : l'application apparaît maintenant sur l'écran d'accueil du téléviseur et fonctionne entièrement avec la télécommande — flèches pour se déplacer, OK pour ouvrir ou compter, Retour pour revenir. L'élément sélectionné est mis en évidence et les onglets sont en haut de l'écran.
