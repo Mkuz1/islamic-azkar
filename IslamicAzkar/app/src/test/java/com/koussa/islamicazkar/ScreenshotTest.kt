@@ -102,6 +102,8 @@ class ScreenshotTest {
     @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
     @Test fun tvDedication() = shot("35_tv_dedication_en", Lang.EN, ThemeMode.DARK, { DedicationScreen(onContinue = {}) })
 
+    private var fm: androidx.compose.ui.focus.FocusManager? = null
+
     /** A TV screen after pressing these remote keys (the focused control shows its highlight). */
     @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
     private fun tvShot(name: String, lang: Lang, keys: List<Key>, setup: (AppState) -> Unit) {
@@ -111,6 +113,7 @@ class ScreenshotTest {
         rule.mainClock.autoAdvance = false
         rule.setContent {
             // A TV is in key (non-touch) mode; the test runner starts in touch mode.
+            fm = androidx.compose.ui.platform.LocalFocusManager.current
             val im = androidx.compose.ui.platform.LocalInputModeManager.current
             androidx.compose.runtime.SideEffect { im.requestInputMode(androidx.compose.ui.input.InputMode.Keyboard) }
             AzkarTheme(st.theme, st.lang) { AzkarApp(app) }
@@ -125,6 +128,16 @@ class ScreenshotTest {
             rule.mainClock.advanceTimeBy(400)
             trace.append("$k -> ${focused()}\n")
         }
+        val focusables = rule.onAllNodes(androidx.compose.ui.test.isFocusable()).fetchSemanticsNodes()
+        trace.append("focusable nodes: ${focusables.size}\n")
+        focusables.take(25).forEach { n ->
+            trace.append("  " + (n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.Text)?.joinToString(" ")
+                ?: n.config.getOrNull(androidx.compose.ui.semantics.SemanticsProperties.ContentDescription)?.joinToString(" ") ?: "?") + " @" + n.boundsInRoot + "\n")
+        }
+        var moved = false
+        rule.runOnIdle { moved = fm!!.moveFocus(androidx.compose.ui.focus.FocusDirection.Down) }
+        rule.mainClock.advanceTimeBy(400)
+        trace.append("moveFocus(Down) = $moved -> ${focused()}\n")
         File(out, "$name.focus.txt").writeText(trace.toString())
         rule.mainClock.advanceTimeBy(800)
         rule.onRoot().captureRoboImage(File(out, "$name.png").path)
