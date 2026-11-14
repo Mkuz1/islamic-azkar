@@ -37,6 +37,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.type
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.graphicsLayer
@@ -240,6 +243,19 @@ fun Modifier.pressable(onClick: () -> Unit, enabled: Boolean = true, squish: Boo
         .scale(s)
         .alpha(a)
         .clickable(interactionSource = source, indication = null, enabled = enabled, onClick = onClick)
+}
+
+/** For single-line text fields: the remote's Up / Down leave the field instead of moving the cursor. */
+fun Modifier.dpadLeavesField(): Modifier = composed {
+    val fm = androidx.compose.ui.platform.LocalFocusManager.current
+    onPreviewKeyEvent { e ->
+        if (e.type != androidx.compose.ui.input.key.KeyEventType.KeyDown) return@onPreviewKeyEvent false
+        when (e.key) {
+            androidx.compose.ui.input.key.Key.DirectionDown -> fm.moveFocus(androidx.compose.ui.focus.FocusDirection.Down)
+            androidx.compose.ui.input.key.Key.DirectionUp -> fm.moveFocus(androidx.compose.ui.focus.FocusDirection.Up)
+            else -> false
+        }
+    }
 }
 
 /** A clickable with no touch ripple but with the focus highlight for remotes and keyboards. */

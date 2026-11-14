@@ -51,6 +51,7 @@ import com.koussa.islamicazkar.data.AzkarSync
 import com.koussa.islamicazkar.data.Lang
 import com.koussa.islamicazkar.ui.glass.Glass
 import com.koussa.islamicazkar.ui.glass.pressable
+import com.koussa.islamicazkar.ui.glass.dpadLeavesField
 import kotlinx.coroutines.launch
 import java.text.DateFormat
 import java.util.Date
@@ -182,7 +183,7 @@ fun SyncSection() {
                             if (typed.isEmpty()) Text(t.enterCode, color = g.text3, fontSize = 16.sp)
                             inner()
                         },
-                        modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp)).background(g.fillGray).padding(horizontal = 12.dp, vertical = 10.dp),
+                        modifier = Modifier.weight(1f).dpadLeavesField().clip(RoundedCornerShape(10.dp)).background(g.fillGray).padding(horizontal = 12.dp, vertical = 10.dp),
                     )
                     Spacer(Modifier.width(10.dp))
                     val ready = !busy && AzkarSync.normalize(typed).length == 12
