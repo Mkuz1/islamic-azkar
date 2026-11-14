@@ -188,7 +188,11 @@ fun AzkarApp(state: AppState) {
             Box(Modifier.fillMaxSize().backdropSource(backdrop)) {
                 // Content panes refract the wallpaper; floating chrome refracts everything.
                 Box(Modifier.fillMaxSize().backdropSource(wallpaper)) { LiquidWallpaper() }
-                CompositionLocalProvider(LocalBackdrop provides wallpaper) { Pane(state.current) }
+                // On TV the pages start below the tab bar: the remote's Down from the bar must find
+                // the page's content below it (a list under the bar would count as overlapping it).
+                CompositionLocalProvider(LocalBackdrop provides wallpaper) {
+                    Box(if (isTv()) Modifier.fillMaxSize().padding(top = 96.dp) else Modifier.fillMaxSize()) { Pane(state.current) }
+                }
             }
 
             CompositionLocalProvider(LocalBackdrop provides backdrop) {

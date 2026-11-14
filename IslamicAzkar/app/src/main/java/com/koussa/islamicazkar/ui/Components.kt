@@ -89,7 +89,7 @@ fun isTv(): Boolean =
  *  On TV the tab bar sits at the top and content keeps inside the TV-safe margins. */
 @Composable
 fun screenPadding(hasBack: Boolean = false, horizontal: Dp = 16.dp): PaddingValues {
-    if (isTv()) return PaddingValues(start = horizontal + 32.dp, end = horizontal + 32.dp, top = 104.dp, bottom = 40.dp)
+    if (isTv()) return PaddingValues(start = horizontal + 32.dp, end = horizontal + 32.dp, top = 8.dp, bottom = 40.dp)
     val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     return PaddingValues(start = horizontal, end = horizontal, top = top + if (hasBack) 60.dp else 12.dp, bottom = bottom + 100.dp)
