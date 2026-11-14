@@ -102,13 +102,18 @@ class ScreenshotTest {
     @Test fun tvDedication() = shot("35_tv_dedication_en", Lang.EN, ThemeMode.DARK, { DedicationScreen(onContinue = {}) })
 
     /** A TV screen after pressing these remote keys (the focused control shows its highlight). */
-    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class)
+    @OptIn(androidx.compose.ui.test.ExperimentalTestApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
     private fun tvShot(name: String, lang: Lang, keys: List<Key>, setup: (AppState) -> Unit) {
         val st = Settings.get(ctx)
         st.updateLang(lang); st.updateTheme(ThemeMode.DARK)
         val app = AppState(st).also(setup)
         rule.mainClock.autoAdvance = false
-        rule.setContent { AzkarTheme(st.theme, st.lang) { AzkarApp(app) } }
+        rule.setContent {
+            // A TV is in key (non-touch) mode; the test runner starts in touch mode.
+            val im = androidx.compose.ui.platform.LocalInputModeManager.current
+            androidx.compose.runtime.SideEffect { im.requestInputMode(androidx.compose.ui.input.InputMode.Keyboard) }
+            AzkarTheme(st.theme, st.lang) { AzkarApp(app) }
+        }
         rule.mainClock.advanceTimeBy(1500)
         for (k in keys) {
             rule.onRoot().performKeyInput { pressKey(k) }
