@@ -52,7 +52,10 @@ jobs:
           r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]
              and any(d["identifier"]==t for d in x.get("supportedDeviceTypes",[]))]
           print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"] if r else "")' "$1"; }
+          # store/appstore/SHOTS may say "only=<folder>" to redo one device (saved to appstore-raw-<folder>).
+          ONLY=$(grep -o 'only=[^ ]*' ../../store/appstore/SHOTS | cut -d= -f2 || true)
           shoot() { # folder devicetype-pattern
+            [ -z "$ONLY" ] || [ "$ONLY" = "$1" ] || return 0
             local NAME=$1 T R; T=$(dtype "$2")
             [ -n "$T" ] || { echo "::warning::no simulator for $NAME ($2)"; return; }
             R=$(rtfor "$T"); [ -n "$R" ] || R=$RT
@@ -61,6 +64,9 @@ jobs:
             xcrun simctl boot "$D"; xcrun simctl bootstatus "$D" -b
             xcrun simctl status_bar "$D" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
             xcrun simctl install "$D" "$APP"
+            # Foldables have two screens: the inner (unfolded) and the outer (folded) one.
+            local DISPLAYS; DISPLAYS=$(xcrun simctl io "$D" screenshot /tmp/probe.png 2>&1 | grep -o -- '--display=[0-9]*' | cut -d= -f2 | tr '\n' ' ')
+            echo "displays: ${DISPLAYS:-one}"
             mkdir -p "raw/$NAME"
             for l in en ar fr; do
               for s in "home 0" "reader 0" "celebration 0" "record 1" "tasbih 1" "guide 0" "dedication 1" "widgets 0"; do
@@ -69,16 +75,24 @@ jobs:
                 xcrun simctl terminate "$D" $BUNDLE >/dev/null 2>&1 || true
                 xcrun simctl launch "$D" $BUNDLE -ciScreen $1 -ciLang $l -ciDark $2 -ciScroll none >/dev/null
                 sleep 8
-                xcrun simctl io "$D" screenshot "raw/$NAME/$l-$1.png" >/dev/null && echo "$NAME $l $1"
+                if [ -z "$DISPLAYS" ]; then
+                  xcrun simctl io "$D" screenshot "raw/$NAME/$l-$1.png" >/dev/null && echo "$NAME $l $1"
+                else
+                  for n in $DISPLAYS; do
+                    mkdir -p "raw/$NAME-$n"
+                    xcrun simctl io "$D" screenshot --display=$n "raw/$NAME-$n/$l-$1.png" >/dev/null && echo "$NAME display $n $l $1"
+                  done
+                fi
               done
             done
             xcrun simctl shutdown "$D" || true
-            sips -g pixelWidth -g pixelHeight "raw/$NAME/en-home.png" | tail -2
+            for f in raw/$NAME*/en-home.png; do echo "$f"; sips -g pixelWidth -g pixelHeight "$f" | tail -2; done
           }
           shoot "iPhone-6.9" "^iPhone 1[6-9] Pro Max$"
           shoot "iPhone-6.3" "^iPhone 1[6-9] Pro$"
           shoot "iPad-13" "^iPad Pro 13-inch"
           shoot "iPhone-Duo" "iPhone Duo"
-          cd raw && git init -q && git checkout -q -b appstore-raw && git add . \
+          BR=appstore-raw${ONLY:+-$ONLY}
+          cd raw && git init -q && git checkout -q -b "$BR" && git add . \
             && git -c user.name=ci -c user.email=ci@localhost commit -qm "App Store raw screenshots ${GITHUB_SHA::7}" \
-            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" appstore-raw && echo "pushed to appstore-raw"
+            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$BR" && echo "pushed to $BR"
