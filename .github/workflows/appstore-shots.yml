@@ -38,17 +38,26 @@ jobs:
           BUNDLE=com.koussa.IslamicAzkar
           echo "--- device types"; xcrun simctl list devicetypes | grep -Ei "iphone|ipad" | tail -40
           RT=$(xcrun simctl list runtimes -j | python3 -c 'import json,sys; r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]]; print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"])')
-          echo "runtime $RT"
+          echo "runtime $RT"; xcrun simctl list runtimes
           # name of a device type matching a pattern (newest first)
           dtype() { xcrun simctl list devicetypes -j | python3 -c '
           import json,sys,re
           p=re.compile(sys.argv[1]); t=[d for d in json.load(sys.stdin)["devicetypes"] if p.search(d["name"])]
           print(t[-1]["identifier"] if t else "")' "$1"; }
           mkdir -p raw
+          # newest iOS runtime that supports a device type (the iPhone Duo can have its own runtime)
+          rtfor() { xcrun simctl list runtimes -j | python3 -c '
+          import json,sys
+          t=sys.argv[1]
+          r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]
+             and any(d["identifier"]==t for d in x.get("supportedDeviceTypes",[]))]
+          print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"] if r else "")' "$1"; }
           shoot() { # folder devicetype-pattern
-            local NAME=$1 T; T=$(dtype "$2")
+            local NAME=$1 T R; T=$(dtype "$2")
             [ -n "$T" ] || { echo "::warning::no simulator for $NAME ($2)"; return; }
-            local D; D=$(xcrun simctl create "$NAME" "$T" "$RT")
+            R=$(rtfor "$T"); [ -n "$R" ] || R=$RT
+            echo "== $NAME: $T on $R"
+            local D; D=$(xcrun simctl create "$NAME" "$T" "$R")
             xcrun simctl boot "$D"; xcrun simctl bootstatus "$D" -b
             xcrun simctl status_bar "$D" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
             xcrun simctl install "$D" "$APP"

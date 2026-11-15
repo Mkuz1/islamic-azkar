@@ -45,7 +45,7 @@ jobs:
           DEVICE=$(xcrun simctl list devices available -j | python3 -c '
           import json,sys
           d=json.load(sys.stdin)["devices"]
-          ios=sorted([k for k in d if "iOS" in k], key=lambda k: [int(x) for x in k.split("iOS-")[1].split("-")])
+          ios=sorted([k for k in d if "iOS" in k and all(x.isdigit() for x in k.split("iOS-")[1].split("-"))], key=lambda k: [int(x) for x in k.split("iOS-")[1].split("-")])
           phones=[x for x in d[ios[-1]] if x["name"].startswith("iPhone") and "Pro Max" not in x["name"]]
           pro=[x for x in phones if x["name"].endswith("Pro")]
           print((pro or phones)[-1]["udid"])')
@@ -62,7 +62,7 @@ jobs:
           import json,sys
           kind=sys.argv[1]
           d=json.load(sys.stdin)["devices"]
-          ios=sorted([k for k in d if "iOS" in k], key=lambda k: [int(x) for x in k.split("iOS-")[1].split("-")])
+          ios=sorted([k for k in d if "iOS" in k and all(x.isdigit() for x in k.split("iOS-")[1].split("-"))], key=lambda k: [int(x) for x in k.split("iOS-")[1].split("-")])
           m=[x for x in d[ios[-1]] if (kind in x["name"] if kind=="SE" else x["name"].startswith("iPad"))]
           print(m[0]["udid"] if m else "")' "$kind")
             [ -n "$OTHER" ] || { echo "no $kind simulator"; continue; }
