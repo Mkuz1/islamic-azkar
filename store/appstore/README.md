@@ -8,7 +8,7 @@ Everything for the listing is in this folder:
 | `screenshots/iPhone-6.9/<lang>/` | iPhone 6.9" screenshots (1320 × 2868) |
 | `screenshots/iPhone-6.3/<lang>/` | iPhone 6.3" screenshots (1206 × 2622), the size App Store Connect requires |
 | `screenshots/iPad-13/<lang>/` | iPad 13" screenshots (2064 × 2752), required because the app runs on iPad |
-| `screenshots/iPhone-Duo/<lang>/` | iPhone Duo (unfolded 7.6", 1878 × 2670), if App Store Connect shows a slot for it |
+| `screenshots/iPhone-Duo-*/<lang>/` | iPhone Duo (inner 2007 × 2853 unfolded, outer 1398 × 2034 folded), if App Store Connect shows slots for it |
 | `icon-1024.png` | The App Store icon (also built into the app) |
 
 The app itself is ready for review: no ads, no tracking, a privacy manifest, no GitHub update check
@@ -35,7 +35,7 @@ in App Store builds, and it adapts to every iPhone and iPad, including the iPhon
    `APPSTORE_TEAM_ID`, `APPSTORE_KEY_ID`, `APPSTORE_ISSUER_ID`, and `APPSTORE_KEY_P8`
    (open the `.p8` file in a text editor and paste all of it, including the BEGIN/END lines).
 
-## 2. Upload the app
+## 2. Upload the app (done: build 1.0.19 (19.5) with the new icon is in App Store Connect)
 
 Tell me "upload to the App Store" (or run **Actions → App Store → Run workflow**). GitHub builds
 the App Store version, signs it with your account and uploads it. After 10–30 minutes it appears
