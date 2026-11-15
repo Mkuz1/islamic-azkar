@@ -51,6 +51,9 @@ def call(method, path, body=None, quiet=False):
                 for err in b.get("errors", []):
                     print(f"     {err.get('title')}: {err.get('detail')}"
                           + (f" [{err['source'].get('pointer') or err['source'].get('parameter')}]" if err.get("source") else ""))
+                    for group in (err.get("meta") or {}).get("associatedErrors", {}).values():
+                        for a in group:
+                            print(f"       → {a.get('title') or a.get('code')}: {a.get('detail')}")
             return e.code, b
         except urllib.error.URLError:
             if attempt == 3: raise
@@ -223,8 +226,13 @@ def main(submit):
                 if not step(f"{loc} {folder} set", st < 300):
                     continue
                 sid = b["data"]["id"]
-            else:   # start clean so a re-run doesn't add duplicates
+            else:   # start clean so a re-run doesn't add duplicates (unless they are the same files)
                 st, b = call("GET", f"appScreenshotSets/{sid}/appScreenshots?limit=50")
+                there = [x["attributes"].get("sourceFileChecksum") for x in b.get("data", [])]
+                local = [hashlib.md5(open(os.path.join(d, f), "rb").read()).hexdigest() for f in files[:10]]
+                if there == local:
+                    step(f"{loc} {folder}: {len(local)} screenshots already up to date", True)
+                    continue
                 for s in b.get("data", []):
                     call("DELETE", f"appScreenshots/{s['id']}")
             ok, ids = 0, []
