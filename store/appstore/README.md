@@ -41,7 +41,13 @@ Tell me "upload to the App Store" (or run **Actions → App Store → Run workfl
 the App Store version, signs it with your account and uploads it. After 10–30 minutes it appears
 in App Store Connect → **TestFlight**, where you can install it on your iPhone before release.
 
-## 3. Fill in the listing (App Store Connect → your app → iOS App 1.0)
+## 3. Fill in the listing and submit (done for 1.0.19, submitted for review on 15 Nov 2026)
+
+`tools/appstore_submit.py` does all of this through Apple's API: change `store/appstore/SUBMIT`
+(`submit build=<build>`, or `no-submit` to only update the listing) and push. Only App Privacy is set
+by hand. The review contact number is kept encrypted in `review-phone.enc`.
+
+By hand, if ever needed (App Store Connect → your app → iOS App 1.0):
 
 - **Screenshots**: drag the files from `screenshots/iPhone-6.3/en/` into the iPhone section
   (6.9" accepts the `iPhone-6.9` set too) and `screenshots/iPad-13/en/` into iPad. Then switch the
