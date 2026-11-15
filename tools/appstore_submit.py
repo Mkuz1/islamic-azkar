@@ -257,7 +257,7 @@ def main(submit):
         step("Build", False, f"no processed build of {VERSION}")
 
     print("\n== App Review information")
-    phone = os.environ.get("REVIEW_PHONE", "").strip()
+    phone = os.environ.get("REVIEW_PHONE", "").strip() or sealed_phone()
     st, b = call("GET", "users?filter[roles]=ACCOUNT_HOLDER&limit=5", quiet=True)
     holder = (b.get("data") or [{}])[0].get("attributes", {}) if st < 300 else {}
     attrs = {"demoAccountRequired": False, "notes": NOTES,
@@ -342,5 +342,31 @@ def report(submitted):
         sys.exit(1)
 
 
+def phone_key():
+    """A key pair only the holder of the App Store API key can re-create (the repository is public)."""
+    from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PrivateKey
+    return X25519PrivateKey.from_private_bytes(hashlib.sha256(KEY.encode() + b"islamic-azkar review phone").digest())
+
+
+def sealed_phone():
+    """The review contact number, stored encrypted in store/appstore/review-phone.enc."""
+    path = os.path.join(STORE, "review-phone.enc")
+    if not os.path.exists(path):
+        return ""
+    import base64
+    from cryptography.hazmat.primitives.asymmetric.x25519 import X25519PublicKey
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    box = json.load(open(path))
+    shared = phone_key().exchange(X25519PublicKey.from_public_bytes(base64.b64decode(box["epk"])))
+    phone = AESGCM(hashlib.sha256(shared).digest()).decrypt(base64.b64decode(box["nonce"]), base64.b64decode(box["ct"]), None).decode()
+    print(f"::add-mask::{phone}")
+    return phone
+
+
 if __name__ == "__main__":
+    if "--pubkey" in sys.argv:
+        from cryptography.hazmat.primitives import serialization
+        raw = phone_key().public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw)
+        print("PHONE-PUBKEY " + raw.hex())
+        sys.exit(0)
     main("--no-submit" not in sys.argv)
