@@ -1,0 +1,38 @@
+# Fills in the App Store listing (texts, screenshots, category, age rating, price, review notes),
+# attaches the uploaded build and submits it for App Review, through the App Store Connect API.
+# Triggered by changing store/appstore/SUBMIT; a line "no-submit" there fills in everything but
+# does not submit. Uses the same secrets as appstore.yml (+ APPSTORE_REVIEW_PHONE, optional).
+name: App Store submission
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/appstore/SUBMIT"]
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secrets
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+          PHONE: ${{ secrets.APPSTORE_REVIEW_PHONE }}
+        run: |
+          for v in KEY_ID ISSUER P8; do [ -n "${!v}" ] || { echo "::error::App Store secrets missing"; exit 1; }; done
+          for v in KEY_ID ISSUER; do
+            clean=$(printf '%s' "${!v}" | tr -d '[:space:]'); echo "::add-mask::$clean"; echo "$v=$clean" >> "$GITHUB_ENV"
+          done
+          if [ -n "$PHONE" ]; then p=$(printf '%s' "$PHONE" | tr -d '\r\n'); echo "::add-mask::$p"; echo "REVIEW_PHONE=$p" >> "$GITHUB_ENV"; fi
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          pip install -q pyjwt cryptography
+      - name: Listing, screenshots, build, submission
+        run: |
+          ARGS=""; grep -q no-submit store/appstore/SUBMIT && ARGS=--no-submit
+          BUILD=$(grep -o 'build=[^ ]*' store/appstore/SUBMIT | cut -d= -f2 || true) python3 -u tools/appstore_submit.py $ARGS
