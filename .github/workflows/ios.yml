@@ -19,7 +19,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 45
     defaults:
       run:
@@ -27,13 +27,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Select newest Xcode
-        run: |
-          ls -d /Applications/Xcode*.app
-          XCODE=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
-          sudo xcode-select -s "$XCODE"
-          xcodebuild -version
-          xcrun simctl list runtimes | grep iOS
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
 
       - name: Build for the Simulator
         run: |

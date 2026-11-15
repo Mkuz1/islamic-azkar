@@ -142,18 +142,15 @@ jobs:
 
   ios:
     needs: prepare
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 45
     defaults:
       run:
         working-directory: IslamicAzkar/ios
     steps:
       - uses: actions/checkout@v4
-      - name: Select newest Xcode
-        run: |
-          XCODE=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
-          sudo xcode-select -s "$XCODE"
-          xcodebuild -version
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
       - name: Build unsigned IPA
         run: |
           set -o pipefail
@@ -176,17 +173,15 @@ jobs:
 
   mac:
     needs: prepare
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 45
     defaults:
       run:
         working-directory: IslamicAzkar/mac
     steps:
       - uses: actions/checkout@v4
-      - name: Select newest Xcode
-        run: |
-          XCODE=$(ls -d /Applications/Xcode_*.app | grep -v -i beta | sort -V | tail -1)
-          sudo xcode-select -s "$XCODE"
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
       - name: Build the DMG
         run: |
           set -o pipefail

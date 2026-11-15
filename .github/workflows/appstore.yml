@@ -18,16 +18,15 @@ on:
 
 jobs:
   upload:
-    runs-on: macos-26
+    runs-on: xcode-27
     timeout-minutes: 60
     defaults:
       run:
         working-directory: IslamicAzkar/ios
     steps:
       - uses: actions/checkout@v4
-      - name: Select newest Xcode
-        run: |
-          XC=$(ls -d /Applications/Xcode*.app | sort -V | tail -1); sudo xcode-select -s "$XC"; xcodebuild -version
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
       - name: Check secrets
         env:
           TEAM: ${{ secrets.APPSTORE_TEAM_ID }}
