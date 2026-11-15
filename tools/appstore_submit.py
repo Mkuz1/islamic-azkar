@@ -76,7 +76,13 @@ def patch_dropping(path, typ, oid, attrs, rels=None):
         bad = [e["source"]["pointer"].rsplit("/", 1)[-1] for e in b.get("errors", [])
                if e.get("source", {}).get("pointer", "").startswith("/data/attributes/")]
         bad = [a for a in bad if a in attrs]
-        if not bad:
+        # questions Apple added since: answer "no"
+        import re
+        missing = [m for e in b.get("errors", []) for m in re.findall(r"attribute '(\w+)'", e.get("detail", ""))]
+        missing = [m for m in missing if m not in attrs]
+        for m in missing:
+            attrs[m] = False
+        if not bad and not missing:
             for err in b.get("errors", []):
                 print(f"     {err.get('title')}: {err.get('detail')}")
             return st, b
@@ -129,7 +135,7 @@ def main(submit):
             "sexualContentOrNudity", "violenceCartoonOrFantasy", "violenceRealistic", "violenceRealisticProlongedGraphicOrSadistic")}
         attrs.update({k: False for k in (
             "gambling", "unrestrictedWebAccess", "lootBox", "messagingAndChat", "parentalControls", "ageAssurance",
-            "userGeneratedContent", "healthOrWellnessTopics", "advertising")})
+            "userGeneratedContent", "healthOrWellnessTopics", "advertising", "socialMedia")})
         st, _ = patch_dropping(f"ageRatingDeclarations/{b['data']['id']}", "ageRatingDeclarations", b["data"]["id"], attrs)
         step("Age rating: none of the content → 4+", st < 300)
     else:

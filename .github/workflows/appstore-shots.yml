@@ -33,7 +33,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          set -uo pipefail
+          set +e -uo pipefail
           APP=$(ls -d build/sim/Build/Products/Debug-iphonesimulator/IslamicAzkar.app)
           BUNDLE=com.koussa.IslamicAzkar
           echo "--- device types"; xcrun simctl list devicetypes | grep -Ei "iphone|ipad" | tail -40
@@ -66,7 +66,7 @@ jobs:
             xcrun simctl status_bar "$D" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
             xcrun simctl install "$D" "$APP"
             # Foldables have two screens: the inner (unfolded) and the outer (folded) one.
-            local DISPLAYS; DISPLAYS=$(xcrun simctl io "$D" screenshot /tmp/probe.png 2>&1 | grep -o -- '--display=[0-9]*' | cut -d= -f2 | tr '\n' ' ')
+            local DISPLAYS; DISPLAYS=$(xcrun simctl io "$D" screenshot /tmp/probe.png 2>&1 | grep -o -- '--display=[0-9]*' | cut -d= -f2 | tr '\n' ' ' || true)
             echo "displays: ${DISPLAYS:-one}"
             mkdir -p "raw/$NAME"
             for l in en ar fr; do
@@ -78,7 +78,7 @@ jobs:
                 xcrun simctl launch "$D" $BUNDLE -ciScreen $1 -ciLang $l -ciDark $2 -ciScroll none >/dev/null
                 sleep 8
                 if [ -z "$DISPLAYS" ]; then
-                  xcrun simctl io "$D" screenshot "raw/$NAME/$l-$1.png" >/dev/null && echo "$NAME $l $1"
+                  xcrun simctl io "$D" screenshot "raw/$NAME/$l-$1.png" >/dev/null && echo "$NAME $l $1" || echo "::warning::$NAME $l $1 failed"
                 else
                   for n in $DISPLAYS; do
                     mkdir -p "raw/$NAME-$n"
@@ -93,7 +93,7 @@ jobs:
           shoot "iPhone-6.9" "^iPhone 1[6-9] Pro Max$"
           shoot "iPhone-6.3" "^iPhone 1[6-9] Pro$"
           shoot "iPad-13" "^iPad Pro 13-inch"
-          shoot "iPhone-Duo" "iPhone Duo"
+          [ -n "$ONLY" ] && shoot "iPhone-Duo" "iPhone Duo"   # only when asked for (its two screens are still flaky)
           BR=appstore-raw${ONLY:+-$ONLY}${SCREENS:+-$(echo $SCREENS | tr " " -)}
           cd raw && git init -q && git checkout -q -b "$BR" && git add . \
             && git -c user.name=ci -c user.email=ci@localhost commit -qm "App Store raw screenshots ${GITHUB_SHA::7}" \
