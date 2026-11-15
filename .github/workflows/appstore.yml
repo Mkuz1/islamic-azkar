@@ -77,11 +77,33 @@ jobs:
           print("Registered bundle IDs:", [d["attributes"]["identifier"] for d in b2.get("data", [])] if st == 200 else st)
           if not apps: sys.exit(1)
           PY
+      - name: Signing (certificate and App Store profiles made with the API key)
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          TEAM: ${{ secrets.APPSTORE_TEAM_ID }}
+        run: |
+          python3 $GITHUB_WORKSPACE/tools/appstore_signing.py setup "$RUNNER_TEMP/sign"
+          # Manual signing with those profiles for the app and the widgets.
+          python3 - "$RUNNER_TEMP/sign/profiles.json" <<'PY'
+          import json, os, re, sys
+          names = json.load(open(sys.argv[1])); team = os.environ["TEAM"].strip()
+          p = "IslamicAzkar.xcodeproj/project.pbxproj"; s = open(p).read()
+          def fix(m):
+              block = m.group(0)
+              bid = re.search(r"PRODUCT_BUNDLE_IDENTIFIER = ([^;]+);", block)
+              if not bid or bid.group(1) not in names: return block
+              block = block.replace("CODE_SIGN_STYLE = Automatic;", "CODE_SIGN_STYLE = Manual;")
+              block = re.sub(r"DEVELOPMENT_TEAM = [^;]+;", f"DEVELOPMENT_TEAM = {team};", block)
+              extra = f'PROVISIONING_PROFILE_SPECIFIER = "{names[bid.group(1)]}";\n\t\t\t\t"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";\n\t\t\t\t'
+              return block.replace("buildSettings = {\n\t\t\t\t", "buildSettings = {\n\t\t\t\t" + extra, 1)
+          s, n = re.subn(r"buildSettings = \{.*?\n\t\t\t\};", fix, s, flags=re.S)
+          open(p, "w").write(s)
+          print("signing set for", sum(1 for b in re.findall(r"PROVISIONING_PROFILE_SPECIFIER", s)), "configurations")
+          PY
       - name: Archive (App Store build)
         env:
           TEAM: ${{ secrets.APPSTORE_TEAM_ID }}
-          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
-          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
         run: |
           set -o pipefail
           # Each upload needs a new build number: the version's build number plus this workflow's run.
@@ -90,33 +112,32 @@ jobs:
           echo "build $BUILD"
           xcodebuild archive -project IslamicAzkar.xcodeproj -scheme IslamicAzkar -configuration Release \
             -destination 'generic/platform=iOS' -archivePath build/IslamicAzkar.xcarchive \
-            DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_STYLE=Automatic CURRENT_PROJECT_VERSION="$BUILD" \
-            SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) APPSTORE' \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8 \
-            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER" | xcbeautify --renderer github-actions
-      - name: Upload to App Store Connect
+            CURRENT_PROJECT_VERSION="$BUILD" SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) APPSTORE' \
+            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/sign/signing.keychain-db" | xcbeautify --renderer github-actions
+      - name: Export the IPA and upload it to App Store Connect
         env:
           TEAM: ${{ secrets.APPSTORE_TEAM_ID }}
           KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
           ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
         run: |
           set -o pipefail
-          cat > ExportOptions-AppStore.plist <<PLIST
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0"><dict>
-            <key>method</key><string>app-store-connect</string>
-            <key>destination</key><string>upload</string>
-            <key>teamID</key><string>$TEAM</string>
-            <key>signingStyle</key><string>automatic</string>
-            <key>uploadSymbols</key><true/>
-            <key>manageAppVersionAndBuildNumber</key><false/>
-          </dict></plist>
-          PLIST
+          python3 - "$RUNNER_TEMP/sign/profiles.json" <<'PY'
+          import json, os, plistlib, sys
+          names = json.load(open(sys.argv[1]))
+          plistlib.dump({"method": "app-store-connect", "destination": "export", "teamID": os.environ["TEAM"].strip(),
+                         "signingStyle": "manual", "signingCertificate": "Apple Distribution",
+                         "provisioningProfiles": names, "uploadSymbols": True,
+                         "manageAppVersionAndBuildNumber": False}, open("ExportOptions-AppStore.plist", "wb"))
+          PY
           xcodebuild -exportArchive -archivePath build/IslamicAzkar.xcarchive \
-            -exportOptionsPlist ExportOptions-AppStore.plist -exportPath build/export \
-            -allowProvisioningUpdates \
-            -authenticationKeyPath ~/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8 \
-            -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER" | xcbeautify --renderer github-actions
+            -exportOptionsPlist ExportOptions-AppStore.plist -exportPath build/export | xcbeautify --renderer github-actions
+          ls -l build/export
+          xcrun altool --upload-app --type ios -f build/export/*.ipa --apiKey "$KEY_ID" --apiIssuer "$ISSUER" --output-format normal
           echo "Uploaded. It appears in App Store Connect → TestFlight after Apple finishes processing (10-30 min)."
+      - name: Remove the temporary certificate and profiles
+        if: always()
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          TEAM: ${{ secrets.APPSTORE_TEAM_ID }}
+        run: python3 $GITHUB_WORKSPACE/tools/appstore_signing.py cleanup "$RUNNER_TEMP/sign" || true
