@@ -54,6 +54,7 @@ jobs:
           print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"] if r else "")' "$1"; }
           # store/appstore/SHOTS may say "only=<folder>" to redo one device (saved to appstore-raw-<folder>).
           ONLY=$(grep -o 'only=[^ ]*' ../../store/appstore/SHOTS | cut -d= -f2 || true)
+          SCREENS=$(grep -o 'screens=[^ ]*' ../../store/appstore/SHOTS | cut -d= -f2 | tr ',' ' ' || true)
           shoot() { # folder devicetype-pattern
             [ -z "$ONLY" ] || [ "$ONLY" = "$1" ] || return 0
             local NAME=$1 T R; T=$(dtype "$2")
@@ -72,6 +73,7 @@ jobs:
               for s in "home 0" "reader 0" "celebration 0" "record 1" "tasbih 1" "guide 0" "dedication 1" "widgets 0"; do
                 set -- $s
                 [ "$1" = widgets ] && [[ "$NAME" == iPad* ]] && continue
+                [ -z "$SCREENS" ] || [[ " $SCREENS " == *" $1 "* ]] || continue
                 xcrun simctl terminate "$D" $BUNDLE >/dev/null 2>&1 || true
                 xcrun simctl launch "$D" $BUNDLE -ciScreen $1 -ciLang $l -ciDark $2 -ciScroll none >/dev/null
                 sleep 8
@@ -92,7 +94,7 @@ jobs:
           shoot "iPhone-6.3" "^iPhone 1[6-9] Pro$"
           shoot "iPad-13" "^iPad Pro 13-inch"
           shoot "iPhone-Duo" "iPhone Duo"
-          BR=appstore-raw${ONLY:+-$ONLY}
+          BR=appstore-raw${ONLY:+-$ONLY}${SCREENS:+-$(echo $SCREENS | tr " " -)}
           cd raw && git init -q && git checkout -q -b "$BR" && git add . \
             && git -c user.name=ci -c user.email=ci@localhost commit -qm "App Store raw screenshots ${GITHUB_SHA::7}" \
             && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$BR" && echo "pushed to $BR"

@@ -150,7 +150,7 @@ final class AppModel {
         if tasbihTotal == 0 { tasbihCount = 21; tasbihTotal = 722; for _ in 0..<39 { TasbihHistory.add() } }
         showDedication = screen == "dedication"
         // Store screenshots: two weeks of azkar in the Record calendar.
-        if screen == "record", AzkarHistory.all().isEmpty {
+        if screen == "record" {   // markReading ignores days already there
             let plan: [[String]] = [["morning", "evening", "c28"], ["morning", "evening"], ["morning", "c28", "c25"],
                                     ["morning", "evening", "c28", "c25"], ["morning", "evening"], ["morning", "evening", "c28"],
                                     ["morning", "c25"], ["morning", "evening"], ["evening", "c28"], ["morning", "evening", "c28"],
