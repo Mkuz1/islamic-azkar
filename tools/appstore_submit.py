@@ -145,10 +145,10 @@ def main(submit):
         step("Age rating", False, "not found")
 
     print("\n== Price and availability")
-    st, b = call("GET", f"apps/{app}/appPriceSchedule", quiet=True)
+    st, b = call("GET", f"apps/{app}/appPriceSchedule/manualPrices?limit=5", quiet=True)
     if st < 300 and b.get("data"):
         step("Price already set", True)
-    else:
+    else:   # (every app has an empty schedule until a price is chosen)
         st, b = call("GET", f"apps/{app}/appPricePoints?filter[territory]=USA&limit=200")
         free = next((p["id"] for p in b.get("data", []) if float(p["attributes"].get("customerPrice") or 0) == 0), None)
         if free:
