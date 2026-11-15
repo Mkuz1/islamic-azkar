@@ -1,0 +1,76 @@
+# App Store screenshots: the app's main screens on the App Store's display sizes, in English, Arabic
+# and French, saved at full resolution to the "appstore-raw" branch. The marketing images (headlines,
+# backgrounds) are composed from them by tools/appstore_screens.py.
+name: App Store screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/appstore/SHOTS", ".github/workflows/appstore-shots.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  shots:
+    runs-on: macos-26
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: IslamicAzkar/ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select newest Xcode
+        run: |
+          XC=$(ls -d /Applications/Xcode*.app | sort -V | tail -1); sudo xcode-select -s "$XC"; xcodebuild -version
+      - name: Build for the Simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project IslamicAzkar.xcodeproj -scheme IslamicAzkar -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO build | xcbeautify --renderer github-actions
+      - name: Screenshots on each display
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          APP=$(ls -d build/sim/Build/Products/Debug-iphonesimulator/IslamicAzkar.app)
+          BUNDLE=com.koussa.IslamicAzkar
+          echo "--- device types"; xcrun simctl list devicetypes | grep -Ei "iphone|ipad" | tail -40
+          RT=$(xcrun simctl list runtimes -j | python3 -c 'import json,sys; r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]]; print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"])')
+          echo "runtime $RT"
+          # name of a device type matching a pattern (newest first)
+          dtype() { xcrun simctl list devicetypes -j | python3 -c '
+          import json,sys,re
+          p=re.compile(sys.argv[1]); t=[d for d in json.load(sys.stdin)["devicetypes"] if p.search(d["name"])]
+          print(t[-1]["identifier"] if t else "")' "$1"; }
+          mkdir -p raw
+          shoot() { # folder devicetype-pattern
+            local NAME=$1 T; T=$(dtype "$2")
+            [ -n "$T" ] || { echo "::warning::no simulator for $NAME ($2)"; return; }
+            local D; D=$(xcrun simctl create "$NAME" "$T" "$RT")
+            xcrun simctl boot "$D"; xcrun simctl bootstatus "$D" -b
+            xcrun simctl status_bar "$D" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
+            xcrun simctl install "$D" "$APP"
+            mkdir -p "raw/$NAME"
+            for l in en ar fr; do
+              for s in "home 0" "reader 0" "celebration 0" "record 1" "tasbih 1" "guide 0" "dedication 1" "widgets 0"; do
+                set -- $s
+                [ "$1" = widgets ] && [[ "$NAME" == iPad* ]] && continue
+                xcrun simctl terminate "$D" $BUNDLE >/dev/null 2>&1 || true
+                xcrun simctl launch "$D" $BUNDLE -ciScreen $1 -ciLang $l -ciDark $2 -ciScroll none >/dev/null
+                sleep 8
+                xcrun simctl io "$D" screenshot "raw/$NAME/$l-$1.png" >/dev/null && echo "$NAME $l $1"
+              done
+            done
+            xcrun simctl shutdown "$D" || true
+            sips -g pixelWidth -g pixelHeight "raw/$NAME/en-home.png" | tail -2
+          }
+          shoot "iPhone-6.9" "^iPhone 1[6-9] Pro Max$"
+          shoot "iPhone-6.3" "^iPhone 1[6-9] Pro$"
+          shoot "iPad-13" "^iPad Pro 13-inch"
+          shoot "iPhone-Duo" "iPhone Duo"
+          cd raw && git init -q && git checkout -q -b appstore-raw && git add . \
+            && git -c user.name=ci -c user.email=ci@localhost commit -qm "App Store raw screenshots ${GITHUB_SHA::7}" \
+            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" appstore-raw && echo "pushed to appstore-raw"

@@ -24,6 +24,15 @@ final class UpdateChecker {
     #endif
     private static let dismissedKey = "update_dismissed"
 
+    /// App Store builds (compiled with APPSTORE) are updated by the App Store: no GitHub check.
+    static var enabled: Bool {
+        #if APPSTORE
+        false
+        #else
+        true
+        #endif
+    }
+
     static var installedVersion: String { Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0" }
 
     var dismissed: String? {
@@ -33,6 +42,7 @@ final class UpdateChecker {
 
     @MainActor
     func check(manual: Bool) async {
+        guard Self.enabled else { return }
         if !manual, let last = lastCheck, Date.now.timeIntervalSince(last) < 12 * 3600 { return }
         lastCheck = .now
         if manual { state = .checking }
@@ -157,6 +167,16 @@ struct UpdateSettingsRow: View {
     private var checker = UpdateChecker.shared
 
     var body: some View {
+        if UpdateChecker.enabled {
+            checkRow
+        } else {
+            // App Store build: just the version (the App Store installs updates).
+            Text(UpdateTexts.of(model.lang).current(UpdateChecker.installedVersion)).foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private var checkRow: some View {
         let t = UpdateTexts.of(model.lang)
         Button {
             if case .available(let r) = checker.state { openURL(r.page) } else { Task { await checker.check(manual: true) } }

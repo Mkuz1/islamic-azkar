@@ -149,6 +149,17 @@ final class AppModel {
         if favorites.isEmpty { favorites = [AzkarData.shared.morning[1].id, AzkarData.shared.evening[3].id, AzkarData.shared.morning[6].id] }
         if tasbihTotal == 0 { tasbihCount = 21; tasbihTotal = 722; for _ in 0..<39 { TasbihHistory.add() } }
         showDedication = screen == "dedication"
+        // Store screenshots: two weeks of azkar in the Record calendar.
+        if screen == "record", AzkarHistory.all().isEmpty {
+            let plan: [[String]] = [["morning", "evening", "c28"], ["morning", "evening"], ["morning", "c28", "c25"],
+                                    ["morning", "evening", "c28", "c25"], ["morning", "evening"], ["morning", "evening", "c28"],
+                                    ["morning", "c25"], ["morning", "evening"], ["evening", "c28"], ["morning", "evening", "c28"],
+                                    ["morning"], ["morning", "evening", "c25"], ["morning", "evening"], ["morning", "evening", "c28"]]
+            for (i, keys) in plan.enumerated() {
+                let day = Calendar.current.date(byAdding: .day, value: -i, to: .now) ?? .now
+                keys.forEach { AzkarHistory.markReading($0, at: day) }
+            }
+        }
         switch screen {
         case "favorites": tab = .favorites
         case "tasbih": tab = .tasbih
