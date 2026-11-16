@@ -1,5 +1,6 @@
 1. SCREEN RECORDING
-A screen recording made on a physical iPhone running the latest iOS is attached to this submission. It starts from launching the app and shows the typical flow: opening page, Home, reading the Morning Azkar with the tap counter, the completion message, the Record calendar, the Tasbih counter, prayer times and location, the widgets, and Settings.
+Screen recording made on a physical iPhone running the latest iOS: https://photos.icloud.com/shared/album/0f421NaHqfcWEmzakkAWsSV5Q
+It starts from launching the app and shows the typical use of the app; section 3 below lists every main feature and where to find it.
 The app has no account registration or login (so no account deletion), no user-generated content shared with others, and no paid content or in-app purchases.
 
 2. PURPOSE AND AUDIENCE
