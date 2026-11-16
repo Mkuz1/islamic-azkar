@@ -208,7 +208,7 @@ class DayAzkarWidget : AzkarListWidget(WidgetSet.DAY)
 class NightAzkarWidget : AzkarListWidget(WidgetSet.NIGHT)
 class TimelineAzkarWidget : AzkarListWidget(WidgetSet.TIMELINE)
 
-/** Wakes the azkar widgets every 15 minutes so each one moves on to the next dhikr. */
+/** Wakes the widgets every 15 minutes: the next dhikr, the prayer countdown, the date after midnight. */
 object WidgetTicker {
     private fun pending(ctx: Context) = PendingIntent.getBroadcast(
         ctx, 7100, Intent(ctx, WidgetTickReceiver::class.java),
@@ -217,7 +217,11 @@ object WidgetTicker {
 
     fun schedule(ctx: Context) {
         val am = ctx.getSystemService(AlarmManager::class.java)
-        if (!AzkarListWidget.hasAny(ctx)) { am.cancel(pending(ctx)); return }
+        // Any of the app's widgets (prayer times, Hijri date, clock, verses… not only the azkar lists).
+        val mgr = AppWidgetManager.getInstance(ctx)
+        val placed = mgr.getInstalledProvidersForPackage(ctx.packageName, null)
+            .any { mgr.getAppWidgetIds(it.provider).isNotEmpty() }
+        if (!placed) { am.cancel(pending(ctx)); return }
         val c = Calendar.getInstance().apply {
             set(Calendar.SECOND, 0); set(Calendar.MILLISECOND, 0)
             add(Calendar.MINUTE, 15 - get(Calendar.MINUTE) % 15)
