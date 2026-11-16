@@ -1,6 +1,7 @@
 import SwiftUI
 import WidgetKit
 import AppIntents
+import CoreLocation
 
 @main
 struct AzkarWidgets: WidgetBundle {
@@ -54,7 +55,7 @@ struct PrayerProvider: TimelineProvider {
         let lang = SharedStore.lang
         var dates: [Date] = [.now]
         for i in 1...24 { dates.append(Date.now.addingTimeInterval(Double(i) * 900)) }
-        if let place = SharedStore.place {
+        if let place = WidgetPlace.current {
             dates += (Prayers.times(place) + Prayers.times(place, day: .now.addingTimeInterval(86_400))).filter { $0 > .now }
         }
         let entries = Array(Set(dates)).sorted().prefix(40).map { DateEntry(date: $0, lang: lang) }
@@ -95,7 +96,7 @@ private struct PrayerEntryView: View {
     @Environment(\.widgetFamily) private var family
     let entry: DateEntry
     var body: some View {
-        PrayerWidgetView(size: WidgetSize(family), place: SharedStore.place, now: entry.date, lang: entry.lang)
+        PrayerWidgetView(size: WidgetSize(family), place: WidgetPlace.current, now: entry.date, lang: entry.lang)
     }
 }
 
@@ -369,5 +370,18 @@ struct CounterWidget: Widget {
         .configurationDisplayName("العدّاد والإحصاء · Counter & weekly stats")
         .description("The counter with your tasbih over the week.")
         .supportedFamilies([.systemMedium])
+    }
+}
+
+/// The place for prayer times: the one chosen in the app, or else the phone's own location (when the
+/// app may use it), so a widget never sits on "set your location" while the phone knows where it is.
+enum WidgetPlace {
+    static var current: Place? {
+        if let p = SharedStore.place { return p }
+        let m = CLLocationManager()
+        guard m.isAuthorizedForWidgetUpdates, let loc = m.location else { return nil }
+        let name: String = switch SharedStore.lang { case .ar: "موقعي"; case .en: "My location"; case .fr: "Ma position" }
+        return Place(nameAr: "موقعي", name: name, lat: loc.coordinate.latitude, lng: loc.coordinate.longitude,
+                     tz: TimeZone.current.identifier)
     }
 }

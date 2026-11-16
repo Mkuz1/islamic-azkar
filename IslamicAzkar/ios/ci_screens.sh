@@ -39,4 +39,22 @@ shot 24-quran-ar quran ar 0
 shot 25-quran-en-dark quran en 1
 shot 26-record-en record en 0
 shot 27-record-ar-dark record ar 1
+shot 28-w-lock-en widgets en 1 lock
+# Any crash during the run: what it was and where (the app's own frames).
+for f in $(ls -t ~/Library/Logs/DiagnosticReports/IslamicAzkar*.ips 2>/dev/null | head -3); do
+  echo "=== crash report $f"
+  python3 - "$f" <<'PY' || head -c 4000 "$f"
+import json, sys
+raw = open(sys.argv[1]).read().split("\n", 1)
+d = json.loads(raw[1])
+print("exception:", d.get("exception"), "| termination:", d.get("termination", {}).get("indicator"))
+for line in d.get("asi", {}).values(): print("asi:", line)
+imgs = d.get("usedImages", [])
+for t in d.get("threads", []):
+    if t.get("triggered"):
+        for fr in t.get("frames", [])[:40]:
+            img = imgs[fr["imageIndex"]].get("name", "?") if fr.get("imageIndex") is not None and fr["imageIndex"] < len(imgs) else "?"
+            print(f"  {img}: {fr.get('symbol', hex(fr.get('imageOffset', 0)))} {fr.get('sourceFile', '')}:{fr.get('sourceLine', '')}")
+PY
+done
 exit 0

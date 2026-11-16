@@ -232,14 +232,54 @@ func normalizeArabic(_ s: String) -> String {
 // MARK: - Shared store (App Group, so widgets see the same values)
 
 enum SharedStore {
-    static let groupID = "group.com.koussa.IslamicAzkar"
+    static let baseGroupID = "group.com.koussa.IslamicAzkar"
     #if os(macOS)
+    static let groupID = baseGroupID
     /// The Mac app has no widget extension and is not signed into the App Group's team: on macOS 15
     /// reading another team's group container is a protected access that can stall launch, so it
     /// keeps its settings in its own defaults.
     static let defaults: UserDefaults = .standard
     #else
-    static let defaults: UserDefaults = UserDefaults(suiteName: groupID) ?? .standard
+    /// The App Group the app and its widgets really share. App Store builds use the base name, but
+    /// an app re-signed for one device (Xcode, Sideloadly, AltStore…) gets a renamed group, and a
+    /// group the app isn't entitled to gives each process its own private store: the widgets then
+    /// never see the location or the settings. So the name is taken from the signing profile.
+    static let groupID: String = {
+        var candidates = provisionedGroups()
+        var bid = Bundle.main.bundleIdentifier ?? ""
+        if bid.hasSuffix(".Widgets") { bid = String(bid.dropLast(".Widgets".count)) }
+        candidates += [baseGroupID, "group." + bid]
+        if bid.hasPrefix("com.koussa.IslamicAzkar."), let tail = bid.split(separator: ".").last { candidates.append("\(baseGroupID).\(tail)") }
+        return candidates.first { FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: $0) != nil } ?? baseGroupID
+    }()
+
+    static let defaults: UserDefaults = {
+        let d = UserDefaults(suiteName: groupID) ?? .standard
+        migrate(into: d)
+        return d
+    }()
+
+    /// App groups in this bundle's embedded profile (present when the app was signed for a device).
+    private static func provisionedGroups() -> [String] {
+        guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+              let data = try? Data(contentsOf: url),
+              let start = data.range(of: Data("<?xml".utf8)),
+              let end = data.range(of: Data("</plist>".utf8), in: start.lowerBound..<data.endIndex),
+              let plist = try? PropertyListSerialization.propertyList(from: data[start.lowerBound..<end.upperBound], format: nil) as? [String: Any],
+              let ent = plist["Entitlements"] as? [String: Any],
+              let groups = ent["com.apple.security.application-groups"] as? [String] else { return [] }
+        return groups.filter { $0.contains("IslamicAzkar") } + groups.filter { !$0.contains("IslamicAzkar") }
+    }
+
+    /// Settings saved before the shared group was found (in the app's own copy) move into it once.
+    private static func migrate(into d: UserDefaults) {
+        guard groupID != baseGroupID, Bundle.main.bundlePath.hasSuffix(".app"),
+              d.object(forKey: "migrated_from_base_group") == nil else { return }
+        if let old = UserDefaults.standard.persistentDomain(forName: baseGroupID) {
+            for (k, v) in old where d.object(forKey: k) == nil { d.set(v, forKey: k) }
+        }
+        d.set(true, forKey: "migrated_from_base_group")
+    }
     #endif
 
     enum Key {
