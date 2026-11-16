@@ -21,10 +21,7 @@ SITE = "https://islamicazkar.net"
 PRIVACY = "https://islamicazkar.net/privacy/"
 SHOTS = {"iPhone-6.9": "APP_IPHONE_67", "iPhone-6.3": "APP_IPHONE_61", "iPad-13": "APP_IPAD_PRO_3GEN_129"}
 LANG = {"en-US": "en", "ar-SA": "ar", "fr-FR": "fr"}
-NOTES = ("Islamic Azkar is a free collection of Islamic remembrances (Hisn al-Muslim) with prayer times, a tasbih "
-         "counter and widgets. No account or sign-in is needed. The optional \"Sync between devices\" (Settings) creates "
-         "an anonymous 12-character code; only the dates of completed azkar are stored, and users can delete them at "
-         "https://islamicazkar.net/delete/. Location is optional and used only on the device for prayer times.")
+NOTES = open(os.path.join(STORE, "review-notes.txt"), encoding="utf-8").read().strip()   # answers to App Review
 
 KID, ISS = os.environ["KEY_ID"].strip(), os.environ["ISSUER"].strip()
 KEY = open(os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{KID}.p8")).read()
@@ -289,7 +286,7 @@ def main(submit):
     if any(s["attributes"]["state"] in ("WAITING_FOR_REVIEW", "IN_REVIEW") for s in subs):
         step("Already waiting for review", True)
         return report(True)
-    sub = next((s["id"] for s in subs if s["attributes"]["state"] == "READY_FOR_REVIEW"), None)
+    sub = next((s["id"] for s in subs if s["attributes"]["state"] in ("READY_FOR_REVIEW", "UNRESOLVED_ISSUES")), None)   # (a reply to App Review reuses its submission)
     if not sub:
         st, b = call("POST", "reviewSubmissions", {"data": {"type": "reviewSubmissions", "attributes": {"platform": "IOS"},
                      "relationships": {"app": {"data": {"type": "apps", "id": app}}}}})
