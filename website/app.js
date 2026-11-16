@@ -239,17 +239,27 @@
       <div class="pt-row">${cells}</div>
       <small class="pc-method">${t.methods[prefs.method] || ""}</small></section>`;
   }
-  setInterval(() => { const c = document.getElementById("prayer-card"); if (c) c.outerHTML = prayerCard(); }, 30000);
+  // Keep the prayer card and the "Now" badge current while the page stays open.
+  function refreshNow() {
+    const c = document.getElementById("prayer-card"); if (c) c.outerHTML = prayerCard();
+    const tl = document.querySelector("#home-body .tiles"); if (tl) tl.innerHTML = homeTiles();
+  }
+  setInterval(refreshNow, 30000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshNow(); });
 
-  function home() {
+  function homeTiles() {
     const t = s(), now = momentKey();
-    const tiles = [
+    return [
       ["morning", "#/read/morning", "sun", "#ff9500", data.morning.length],
       ["evening", "#/read/evening", "moon", "#5856d6", data.evening.length],
       ["sleep", "#/read/c28", "bed", "#007aff", index.chapters.get(28).items.length],
       ["prayer", "#/read/c25", "mosque", "#34c759", index.chapters.get(25).items.length],
     ].map(([k, h, ic, col, n]) => `<a class="tile glass press" href="${h}">${k === now ? `<span class="badge">${t.now}</span>` : ""}
         <span class="sym" style="background:${col}">${svg(ic)}</span><b>${t[k]}</b><small>${t.azkar(n)}</small></a>`).join("");
+  }
+
+  function home() {
+    const t = s(), tiles = homeTiles();
     const cats = data.categories.map(c => {
       const [ic, col] = CAT_STYLE[c.key] || ["spark", "#8e8e93"];
       return `<a class="row press" href="#/cat/${c.key}"><span class="sym" style="background:${col}">${svg(ic)}</span><span class="t"><b>${t.cat[c.key]}</b></span><span class="meta">${num(c.chapters.length)}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>`;

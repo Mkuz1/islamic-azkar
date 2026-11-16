@@ -1,5 +1,8 @@
-- Android TV and Google TV (including Chromecast with Google TV): the app now appears on the TV home screen and works fully with the remote — move with the arrows, press OK to open or count, Back to go back. The selected item is highlighted, and the tabs sit at the top of the screen.
+- A new app icon: "Islamic Azkar" in Arabic calligraphy with a crescent and raised hands, now on Android, Android TV, Mac and the website.
+- The "Now" suggestion on the website's home page follows the time of day, even when the page stays open.
 
-- أندرويد TV وGoogle TV (ومنها Chromecast مع Google TV): يظهر التطبيق الآن في الشاشة الرئيسية للتلفاز ويعمل بالكامل بجهاز التحكم — تنقّل بالأسهم، واضغط «موافق» للفتح أو العدّ، و«رجوع» للعودة. العنصر المحدد مميَّز، والتبويبات في أعلى الشاشة.
+- أيقونة جديدة للتطبيق: «أذكار إسلامية» بالخط العربي مع الهلال واليدين المرفوعتين بالدعاء، الآن على أندرويد وأندرويد TV والماك والموقع.
+- اقتراح «الآن» في الصفحة الرئيسية للموقع يتبع وقت اليوم، حتى لو بقيت الصفحة مفتوحة.
 
-- Android TV et Google TV (dont Chromecast avec Google TV) : l'application apparaît maintenant sur l'écran d'accueil du téléviseur et fonctionne entièrement avec la télécommande — flèches pour se déplacer, OK pour ouvrir ou compter, Retour pour revenir. L'élément sélectionné est mis en évidence et les onglets sont en haut de l'écran.
+- Une nouvelle icône : « Islamic Azkar » en calligraphie arabe, avec le croissant et les mains levées, désormais sur Android, Android TV, Mac et le site.
+- La suggestion « Maintenant » sur l'accueil du site suit l'heure de la journée, même si la page reste ouverte.
