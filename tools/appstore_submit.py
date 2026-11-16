@@ -287,6 +287,15 @@ def main(submit):
         step("Already waiting for review", True)
         return report(True)
     sub = next((s["id"] for s in subs if s["attributes"]["state"] in ("READY_FOR_REVIEW", "UNRESOLVED_ISSUES")), None)   # (a reply to App Review reuses its submission)
+    unresolved = any(s["id"] == sub and s["attributes"]["state"] == "UNRESOLVED_ISSUES" for s in subs)
+    if unresolved:
+        # App Review asked for something: mark its items resolved, then submit the same submission again.
+        st, b = call("GET", f"reviewSubmissions/{sub}/items")
+        for it in b.get("data", []):
+            st, _ = call("PATCH", f"reviewSubmissionItems/{it['id']}", {"data": {"type": "reviewSubmissionItems", "id": it["id"], "attributes": {"resolved": True}}})
+            step(f"Mark App Review's request as answered ({it['attributes'].get('state')})", st < 300)
+        st, b = call("PATCH", f"reviewSubmissions/{sub}", {"data": {"type": "reviewSubmissions", "id": sub, "attributes": {"submitted": True}}})
+        return report(step("Resubmitted for App Review", st < 300))
     if not sub:
         st, b = call("POST", "reviewSubmissions", {"data": {"type": "reviewSubmissions", "attributes": {"platform": "IOS"},
                      "relationships": {"app": {"data": {"type": "apps", "id": app}}}}})
