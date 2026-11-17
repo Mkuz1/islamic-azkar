@@ -108,6 +108,12 @@ def compose(raw_dir, lang, screen, headline, sub, out):
         ow = int(over.width * k * (1.25 if screen == "menu" else 1.15))
         oh = int(over.height * ow / over.width)
         over = over.resize((ow, oh), Image.LANCZOS)
+        # The panel and the card are translucent materials on a Mac; give them their solid backing.
+        card = Image.new("RGBA", (ow, oh), (0, 0, 0, 0))
+        ImageDraw.Draw(card).rounded_rectangle((0, 0, ow - 1, oh - 1), radius=int(ow * (0.045 if screen == "menu" else 0.06)),
+                                               fill=(246, 246, 248, 255) if screen == "menu" else (234, 239, 236, 255))
+        card.alpha_composite(over)
+        over = card
         # Dim the window under it, as the eye goes to the panel or the card.
         dim = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         ImageDraw.Draw(dim).rectangle((wx + pad, top, wx + pad + win_w, H), fill=(0, 0, 0, 70))
