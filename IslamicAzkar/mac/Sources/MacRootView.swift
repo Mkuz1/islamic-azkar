@@ -58,6 +58,12 @@ struct MacRootView: View {
         .frame(minWidth: 860, minHeight: 600)
         .onChange(of: model.tab) { _, _ in if extra != nil, model.tab != .home { extra = nil } }
         .task { await MacNavTest.runIfRequested(model: model, select: { selection.wrappedValue = $0 }, back: back) }
+        .onAppear {
+            // The Record tab of the iPhone app is a sidebar section here (also for -ciScreen record).
+            if model.tab == .record { selection.wrappedValue = .history }
+            // Store screenshots: `-ciDetailOnly 1` hides the sidebar.
+            if UserDefaults.standard.bool(forKey: "ciDetailOnly") { columns = .detailOnly }
+        }
     }
 
     /// Top of the page: Back (and, when the sidebar is hidden, the button to show it again).

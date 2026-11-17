@@ -39,7 +39,7 @@ jobs:
           mkdir -p raw
           shot() { # name screen lang dark [extra args]
             n=$1; sc=$2; l=$3; dk=$4; shift 4
-            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciWindowSize 1280x800 -ciShotScale 2 \
+            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciWindowSize 1280x800 -ciShotScale 2 -ciDetailOnly 1 \
               -ciShot "$PWD/raw/$l-$n.png" "$@" > "raw/$l-$n.log" 2>&1 &
             PID=$!
             for i in $(seq 1 25); do kill -0 $PID 2>/dev/null || break; sleep 1; done
