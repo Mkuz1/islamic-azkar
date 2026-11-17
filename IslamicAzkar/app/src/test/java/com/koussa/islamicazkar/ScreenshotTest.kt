@@ -102,6 +102,46 @@ class ScreenshotTest {
     @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi")
     @Test fun tvDedication() = shot("35_tv_dedication_en", Lang.EN, ThemeMode.DARK, { DedicationScreen(onContinue = {}) })
 
+    // Google Play TV screenshots (1920 × 1080): the main screens in each language, no focus ring.
+    private fun tvStore(n: Int, screen: String, lang: Lang, setup: (AppState) -> Unit) =
+        shot("tvstore_${lang.name.lowercase()}_${n}_$screen", lang, ThemeMode.DARK, { AzkarApp(it) }) {
+            it.settings.updatePlace(com.koussa.islamicazkar.data.Cities.all.first { c -> c.name == "Makkah" })
+            setup(it)
+        }
+
+    /** Two weeks of completed azkar, so the Record calendar looks lived-in. */
+    private fun seedRecord() {
+        val plan = listOf(listOf("morning", "evening", "c28"), listOf("morning", "evening"), listOf("morning", "c28", "c25"),
+            listOf("morning", "evening", "c28", "c25"), listOf("morning", "evening"), listOf("morning", "evening", "c28"),
+            listOf("morning", "c25"), listOf("morning", "evening"), listOf("evening", "c28"), listOf("morning", "evening", "c28"),
+            listOf("morning"), listOf("morning", "evening", "c25"), listOf("morning", "evening"), listOf("morning", "evening", "c28"))
+        val o = org.json.JSONObject()
+        plan.forEachIndexed { i, keys ->
+            val c = java.util.Calendar.getInstance().apply { add(java.util.Calendar.DAY_OF_MONTH, -i) }
+            o.put(com.koussa.islamicazkar.data.AzkarHistory.dayKey(c), org.json.JSONArray(keys))
+        }
+        com.koussa.islamicazkar.data.AzkarHistory.merge(ctx, o)
+    }
+
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreHomeEn() = tvStore(1, "home", Lang.EN) { }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreHomeAr() = tvStore(1, "home", Lang.AR) { }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreHomeFr() = tvStore(1, "home", Lang.FR) { }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreReaderEn() = tvStore(2, "reader", Lang.EN) { it.open(Reading.Morning) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreReaderAr() = tvStore(2, "reader", Lang.AR) { it.open(Reading.Morning) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreReaderFr() = tvStore(2, "reader", Lang.FR) { it.open(Reading.Morning) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreRecordEn() = tvStore(3, "record", Lang.EN) { seedRecord(); it.selectTab(3) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreRecordAr() = tvStore(3, "record", Lang.AR) { seedRecord(); it.selectTab(3) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreRecordFr() = tvStore(3, "record", Lang.FR) { seedRecord(); it.selectTab(3) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreTasbihEn() = tvStore(4, "tasbih", Lang.EN) { it.settings.setTasbih(count = 21, target = 33, total = 1250); it.selectTab(2) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreTasbihAr() = tvStore(4, "tasbih", Lang.AR) { it.settings.setTasbih(count = 21, target = 33, total = 1250); it.selectTab(2) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreTasbihFr() = tvStore(4, "tasbih", Lang.FR) { it.settings.setTasbih(count = 21, target = 33, total = 1250); it.selectTab(2) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreCategoryEn() = tvStore(5, "category", Lang.EN) { it.push(com.koussa.islamicazkar.ui.Route.Category("hardship")) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreCategoryAr() = tvStore(5, "category", Lang.AR) { it.push(com.koussa.islamicazkar.ui.Route.Category("hardship")) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreCategoryFr() = tvStore(5, "category", Lang.FR) { it.push(com.koussa.islamicazkar.ui.Route.Category("hardship")) }
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreDedicationEn() = shot("tvstore_en_6_dedication", Lang.EN, ThemeMode.DARK, { DedicationScreen(onContinue = {}) })
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreDedicationAr() = shot("tvstore_ar_6_dedication", Lang.AR, ThemeMode.DARK, { DedicationScreen(onContinue = {}) })
+    @Config(qualifiers = "w960dp-h540dp-land-television-xhdpi") @Test fun tvStoreDedicationFr() = shot("tvstore_fr_6_dedication", Lang.FR, ThemeMode.DARK, { DedicationScreen(onContinue = {}) })
+
     private var fm: androidx.compose.ui.focus.FocusManager? = null
 
     /** A TV screen after pressing these remote keys (the focused control shows its highlight). */

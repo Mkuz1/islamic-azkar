@@ -39,6 +39,7 @@ targets:
         NSLocationUsageDescription: "Your approximate location is used only on this Mac to calculate prayer times. يُستخدم موقعك التقريبي على هذا الجهاز فقط لحساب مواقيت الصلاة."
         NSLocationWhenInUseUsageDescription: "Your approximate location is used only on this Mac to calculate prayer times. يُستخدم موقعك التقريبي على هذا الجهاز فقط لحساب مواقيت الصلاة."
         CFBundleLocalizations: [ar, en, fr]
+        ITSAppUsesNonExemptEncryption: false
         CFBundleURLTypes:
           - CFBundleURLName: com.koussa.IslamicAzkar
             CFBundleURLSchemes: [islamicazkar]
