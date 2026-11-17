@@ -59,6 +59,34 @@ jobs:
             OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/sign/signing.keychain-db" | xcbeautify --renderer github-actions
           APP="build/IslamicAzkar.xcarchive/Products/Applications/Islamic Azkar.app"
           codesign -d --entitlements - "$APP" 2>/dev/null | grep -E "sandbox|network|location|team" || true
+      - name: Add the macOS platform to the app (once)
+        run: |
+          python3 - <<'PY'
+          import json, os, re, time, urllib.request, urllib.error, jwt
+          kid, iss = os.environ["KEY_ID"], os.environ["ISSUER"]
+          key = open(os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{kid}.p8")).read()
+          def call(method, path, body=None):
+              tok = jwt.encode({"iss": iss, "iat": int(time.time()), "exp": int(time.time()) + 600, "aud": "appstoreconnect-v1"},
+                               key, algorithm="ES256", headers={"kid": kid, "typ": "JWT"})
+              req = urllib.request.Request("https://api.appstoreconnect.apple.com/v1/" + path, method=method,
+                                           data=json.dumps(body).encode() if body else None,
+                                           headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"})
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r: return r.status, json.loads(r.read() or b"{}")
+              except urllib.error.HTTPError as e: return e.code, json.loads(e.read() or b"{}")
+          st, b = call("GET", "apps?filter[bundleId]=com.koussa.IslamicAzkar")
+          app = b["data"][0]["id"]
+          st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]=MAC_OS&limit=5")
+          if b.get("data"):
+              print("macOS version already there:", [v["attributes"]["versionString"] for v in b["data"]])
+          else:
+              ver = re.search(r'MARKETING_VERSION: "([^"]+)"', open("project.yml").read()).group(1)
+              st, b = call("POST", "appStoreVersions", {"data": {"type": "appStoreVersions",
+                           "attributes": {"platform": "MAC_OS", "versionString": ver},
+                           "relationships": {"app": {"data": {"type": "apps", "id": app}}}}})
+              print("add macOS", ver, "->", st)
+              for e in b.get("errors", []): print("  ", e.get("title"), e.get("detail"))
+          PY
       - name: Export the installer package and upload it
         run: |
           set -o pipefail
