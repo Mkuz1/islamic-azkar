@@ -11,15 +11,19 @@ import hashlib, json, os, sys, time, urllib.error, urllib.request
 import jwt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STORE = os.path.join(ROOT, "store", "appstore")
+# PLATFORM=mac submits the Mac version (texts, screenshots and notes from store/macstore).
+MAC = os.environ.get("PLATFORM", "").strip().lower() == "mac"
+APPSTORE_DIR = os.path.join(ROOT, "store", "appstore")
+STORE = os.path.join(ROOT, "store", "macstore") if MAC else APPSTORE_DIR
+PLATFORM = "MAC_OS" if MAC else "IOS"
 API = "https://api.appstoreconnect.apple.com/"
 BUNDLE = "com.koussa.IslamicAzkar"
-VERSION = "1.0.19"
+VERSION = "1.0.21" if MAC else "1.0.19"
 BUILD = os.environ.get("BUILD", "").strip()   # e.g. "19.5"; empty = newest valid build of VERSION
 COPYRIGHT = "2026 Mkoussa"
 SITE = "https://islamicazkar.net"
 PRIVACY = "https://islamicazkar.net/privacy/"
-SHOTS = {"iPhone-6.9": "APP_IPHONE_67", "iPhone-6.3": "APP_IPHONE_61", "iPad-13": "APP_IPAD_PRO_3GEN_129"}
+SHOTS = {"Mac": "APP_DESKTOP"} if MAC else {"iPhone-6.9": "APP_IPHONE_67", "iPhone-6.3": "APP_IPHONE_61", "iPad-13": "APP_IPAD_PRO_3GEN_129"}
 LANG = {"en-US": "en", "ar-SA": "ar", "fr-FR": "fr"}
 NOTES = open(os.path.join(STORE, "review-notes.txt"), encoding="utf-8").read().strip()   # answers to App Review
 
@@ -175,13 +179,13 @@ def main(submit):
         step(f"Available in all {len(terrs)} countries and regions", st < 300)
 
     print(f"\n== Version {VERSION}")
-    st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]=IOS&limit=20")
+    st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]={PLATFORM}&limit=20")
     versions = b.get("data", [])
     open_states = ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED", "INVALID_BINARY")
     ver = next((v for v in versions if (v["attributes"].get("appVersionState") or v["attributes"].get("appStoreState")) in open_states
                 or v["attributes"].get("appStoreState") in open_states), None)
     if not ver:
-        st, b = call("POST", "appStoreVersions", {"data": {"type": "appStoreVersions", "attributes": {"platform": "IOS", "versionString": VERSION},
+        st, b = call("POST", "appStoreVersions", {"data": {"type": "appStoreVersions", "attributes": {"platform": PLATFORM, "versionString": VERSION},
                      "relationships": {"app": {"data": {"type": "apps", "id": app}}}}})
         if not step("Create version", st < 300):
             sys.exit(1)
@@ -243,7 +247,7 @@ def main(submit):
             step(f"{loc} {folder}: {ok}/{len(files[:10])} screenshots", ok == len(files[:10]))
 
     print("\n== Build")
-    q = f"builds?filter[app]={app}&filter[preReleaseVersion.version]={VERSION}&sort=-uploadedDate&limit=20"
+    q = f"builds?filter[app]={app}&filter[preReleaseVersion.version]={VERSION}&filter[preReleaseVersion.platform]={PLATFORM}&sort=-uploadedDate&limit=20"
     if BUILD: q += f"&filter[version]={BUILD}"
     build = None
     for _ in range(30):   # a fresh upload can still be processing
@@ -281,7 +285,7 @@ def main(submit):
         print("\nNot submitting (--no-submit).")
         return report(False)
     print("\n== Submit for review")
-    st, b = call("GET", f"reviewSubmissions?filter[app]={app}&filter[platform]=IOS&filter[state]=READY_FOR_REVIEW,WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES")
+    st, b = call("GET", f"reviewSubmissions?filter[app]={app}&filter[platform]={PLATFORM}&filter[state]=READY_FOR_REVIEW,WAITING_FOR_REVIEW,IN_REVIEW,UNRESOLVED_ISSUES")
     subs = b.get("data", [])
     if any(s["attributes"]["state"] in ("WAITING_FOR_REVIEW", "IN_REVIEW") for s in subs):
         step("Already waiting for review", True)
@@ -297,7 +301,7 @@ def main(submit):
         st, b = call("PATCH", f"reviewSubmissions/{sub}", {"data": {"type": "reviewSubmissions", "id": sub, "attributes": {"submitted": True}}})
         return report(step("Resubmitted for App Review", st < 300))
     if not sub:
-        st, b = call("POST", "reviewSubmissions", {"data": {"type": "reviewSubmissions", "attributes": {"platform": "IOS"},
+        st, b = call("POST", "reviewSubmissions", {"data": {"type": "reviewSubmissions", "attributes": {"platform": PLATFORM},
                      "relationships": {"app": {"data": {"type": "apps", "id": app}}}}})
         if not step("Create the review submission", st < 300):
             return report(False)
@@ -364,7 +368,7 @@ def phone_key():
 
 def sealed_phone():
     """The review contact number, stored encrypted in store/appstore/review-phone.enc."""
-    path = os.path.join(STORE, "review-phone.enc")
+    path = os.path.join(APPSTORE_DIR, "review-phone.enc")
     if not os.path.exists(path):
         return ""
     import base64
