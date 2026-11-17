@@ -54,11 +54,26 @@ enum MacCI {
                 launchTrace("banner on screen: visible=\(w?.isVisible ?? false) occluded=\(!(w?.occlusionState.contains(.visible) ?? false)) alpha=\(w?.alphaValue ?? 0) frame=\(w?.frame.debugDescription ?? "none") screen=\(NSScreen.main?.visibleFrame.debugDescription ?? "?")")
             }
         }
+        // App Store screenshots: `-ciWindowSize 1440x900` sizes the main window, `-ciShotScale 2`
+        // captures it at Retina resolution whatever the runner's display is.
+        if let size = UserDefaults.standard.string(forKey: "ciWindowSize")?.split(separator: "x").compactMap({ Double($0) }), size.count == 2 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                if let w = NSApp.windows.first(where: { $0.isVisible && $0.frame.width > 300 && $0.canBecomeMain }) {
+                    w.setContentSize(NSSize(width: size[0], height: size[1]))
+                    w.center()
+                }
+            }
+        }
         guard let path = UserDefaults.standard.string(forKey: "ciShot") else { return }
         DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
             let w = ReminderBanner.window ?? MenuPanelPreviewWindow.window ?? NSApp.windows.first { $0.isVisible && $0.frame.width > 300 }
             launchTrace("capture: \(NSApp.windows.count) windows, chosen \(w?.frame.size.debugDescription ?? "none")")
-            if let v = w?.contentView, let rep = v.bitmapImageRepForCachingDisplay(in: v.bounds) {
+            let scale = max(1, UserDefaults.standard.double(forKey: "ciShotScale"))
+            if let v = w?.contentView,
+               let rep = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: Int(v.bounds.width * scale), pixelsHigh: Int(v.bounds.height * scale),
+                                          bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false,
+                                          colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0) {
+                rep.size = v.bounds.size   // points; the pixels above are `scale` times as many
                 v.cacheDisplay(in: v.bounds, to: rep)
                 try? rep.representation(using: .png, properties: [:])?.write(to: URL(fileURLWithPath: path))
             }

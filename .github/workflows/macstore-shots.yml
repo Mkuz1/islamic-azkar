@@ -1,0 +1,62 @@
+# Mac App Store screenshots: the app's main screens at Retina resolution (window 1280 x 800 points,
+# captured at 2x) in English, Arabic and French, saved to the "macstore-raw" branch. The store
+# images are composed from them by tools/macstore_screens.py.
+name: Mac App Store screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/macstore/SHOTS"]
+
+permissions:
+  contents: write
+
+jobs:
+  shots:
+    runs-on: xcode-27
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: IslamicAzkar/mac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: Build
+        run: |
+          set -o pipefail
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          xcodebuild -project IslamicAzkarMac.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -destination 'generic/platform=macOS' -derivedDataPath build build | xcbeautify --renderer github-actions
+          codesign --force --deep --sign - "build/Build/Products/Release/Islamic Azkar.app"
+      - name: Screens
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APP="build/Build/Products/Release/Islamic Azkar.app"
+          mkdir -p raw
+          shot() { # name screen lang dark [extra args]
+            n=$1; sc=$2; l=$3; dk=$4; shift 4
+            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciDark "$dk" -ciWindowSize 1280x800 -ciShotScale 2 \
+              -ciShot "$PWD/raw/$l-$n.png" "$@" > "raw/$l-$n.log" 2>&1 &
+            PID=$!
+            for i in $(seq 1 25); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+            kill $PID 2>/dev/null || true
+            [ -s "raw/$l-$n.png" ] && echo "$l $n: $(sips -g pixelWidth -g pixelHeight "raw/$l-$n.png" | tail -2 | awk '{print $2}' | paste -sd x -)" \
+              || { echo "::warning::$l $n: nothing captured"; cat "raw/$l-$n.log"; }
+          }
+          for l in en ar fr; do
+            shot home home $l 1
+            shot reader reader $l 1
+            shot record record $l 1
+            shot tasbih tasbih $l 1
+            shot guide guide $l 1
+            shot menu home $l 1 -ciMenu 1
+            shot banner home $l 1 -ciBanner morning
+          done
+          rm -f raw/*.log
+          cd raw && git init -q && git checkout -q -b macstore-raw && git add . \
+            && git -c user.name=ci -c user.email=ci@localhost commit -qm "Mac App Store raw screenshots ${GITHUB_SHA::7}" \
+            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" macstore-raw && echo "pushed to macstore-raw"
