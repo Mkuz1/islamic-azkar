@@ -5,7 +5,7 @@
 
 Env: KEY_ID, ISSUER, TEAM and ~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8.
 PLATFORM=mac signs the Mac App Store build instead: a Mac app and a Mac installer certificate,
-and a Mac App Store profile.
+and a Mac App Store profile. PLATFORM=tv: the Apple TV app (tvOS App Store profile).
 The certificate and profiles are made for this one upload and removed afterwards; an app already
 uploaded stays valid (the App Store re-signs it).
 """
@@ -13,12 +13,14 @@ import base64, json, os, plistlib, re, subprocess, sys, time, urllib.error, urll
 import jwt
 
 API = "https://api.appstoreconnect.apple.com/v1/"
-MAC = os.environ.get("PLATFORM", "").strip().lower() == "mac"
+PLATFORM = os.environ.get("PLATFORM", "").strip().lower()
+MAC, TV = PLATFORM == "mac", PLATFORM == "tv"
 BUNDLES = ({"com.koussa.IslamicAzkar": "Islamic Azkar Mac App Store"} if MAC else
+           {"com.koussa.IslamicAzkar": "Islamic Azkar tvOS App Store"} if TV else
            {"com.koussa.IslamicAzkar": "Islamic Azkar App Store", "com.koussa.IslamicAzkar.Widgets": "Islamic Azkar Widgets App Store"})
 # (certificate type, file name): the Mac App Store also needs an installer certificate for the .pkg.
 CERTS = [("DISTRIBUTION", "dist"), ("MAC_INSTALLER_DISTRIBUTION", "inst")] if MAC else [("DISTRIBUTION", "dist")]
-PROFILE_TYPE = "MAC_APP_STORE" if MAC else "IOS_APP_STORE"
+PROFILE_TYPE = "MAC_APP_STORE" if MAC else "TVOS_APP_STORE" if TV else "IOS_APP_STORE"
 PROFILE_EXT = ".provisionprofile" if MAC else ".mobileprovision"
 KID, ISS = os.environ["KEY_ID"].strip(), os.environ["ISSUER"].strip()
 KEY = open(os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{os.environ['KEY_ID']}.p8")).read()
@@ -107,7 +109,7 @@ def setup(work):
         ent = plistlib.loads(xml).get("Entitlements", {})
         groups = ent.get("com.apple.security.application-groups")
         print(f"profile {name}: uuid {uuid}, app groups {groups}")
-        if not groups and not MAC:
+        if not groups and not (MAC or TV):
             print(f"::warning::{ident} has no App Groups in its profile: enable App Groups on it at developer.apple.com and add group.com.koussa.IslamicAzkar")
         names[ident] = name
     json.dump(state, open(f"{work}/state.json", "w"))

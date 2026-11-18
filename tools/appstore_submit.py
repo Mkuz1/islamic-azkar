@@ -12,18 +12,20 @@ import jwt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # PLATFORM=mac submits the Mac version (texts, screenshots and notes from store/macstore).
+# PLATFORM=tv: the Apple TV version (store/tvstore).
 MAC = os.environ.get("PLATFORM", "").strip().lower() == "mac"
+TV = os.environ.get("PLATFORM", "").strip().lower() == "tv"
 APPSTORE_DIR = os.path.join(ROOT, "store", "appstore")
-STORE = os.path.join(ROOT, "store", "macstore") if MAC else APPSTORE_DIR
-PLATFORM = "MAC_OS" if MAC else "IOS"
+STORE = os.path.join(ROOT, "store", "macstore" if MAC else "tvstore" if TV else "appstore")
+PLATFORM = "MAC_OS" if MAC else "TV_OS" if TV else "IOS"
 API = "https://api.appstoreconnect.apple.com/"
 BUNDLE = "com.koussa.IslamicAzkar"
-VERSION = "1.0.21" if MAC else "1.0.19"
+VERSION = "1.0.21" if MAC else "1.0.23" if TV else "1.0.19"
 BUILD = os.environ.get("BUILD", "").strip()   # e.g. "19.5"; empty = newest valid build of VERSION
 COPYRIGHT = "2026 Mkoussa"
 SITE = "https://islamicazkar.net"
 PRIVACY = "https://islamicazkar.net/privacy/"
-SHOTS = {"Mac": "APP_DESKTOP"} if MAC else {"iPhone-6.9": "APP_IPHONE_67", "iPhone-6.3": "APP_IPHONE_61", "iPad-13": "APP_IPAD_PRO_3GEN_129"}
+SHOTS = {"Mac": "APP_DESKTOP"} if MAC else {"TV": "APP_APPLE_TV"} if TV else {"iPhone-6.9": "APP_IPHONE_67", "iPhone-6.3": "APP_IPHONE_61", "iPad-13": "APP_IPAD_PRO_3GEN_129"}
 LANG = {"en-US": "en", "ar-SA": "ar", "fr-FR": "fr"}
 NOTES = open(os.path.join(STORE, "review-notes.txt"), encoding="utf-8").read().strip()   # answers to App Review
 
