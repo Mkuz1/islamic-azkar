@@ -64,7 +64,7 @@ jobs:
             done
           done
           sips -g pixelWidth -g pixelHeight shots/en-home.png | tail -2
-          R2=$(ls -t ~/Library/Logs/DiagnosticReports/*Islamic* 2>/dev/null | head -1)
+          R2=$(ls -t ~/Library/Logs/DiagnosticReports/*Islamic* 2>/dev/null | head -1 || true)
           if [ -n "$R2" ]; then echo "::warning::crash report: $R2"; head -c 3000 "$R2"; fi
           cd shots && git init -q && git checkout -q -b tv-shots && git add . \
             && git -c user.name=ci -c user.email=ci@localhost commit -qm "Apple TV screenshots ${GITHUB_SHA::7}" \
