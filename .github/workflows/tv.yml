@@ -1,0 +1,72 @@
+# Apple TV app: builds it for the tvOS Simulator and saves screenshots of each screen (1920 x 1080)
+# in Arabic, English and French to the "tv-shots" branch.
+name: Apple TV
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["IslamicAzkar/tv/**", "IslamicAzkar/ios/Shared/**", ".github/workflows/tv.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tv-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: xcode-27
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: IslamicAzkar/tv
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: Build for the Simulator
+        run: |
+          set -o pipefail
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          xcodebuild -project IslamicAzkarTV.xcodeproj -scheme IslamicAzkar -configuration Debug \
+            -sdk appletvsimulator -destination 'generic/platform=tvOS Simulator' -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO build | xcbeautify --renderer github-actions
+      - name: Screenshots
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -uo pipefail
+          APP=$(ls -d build/sim/Build/Products/Debug-appletvsimulator/*.app)
+          BUNDLE=com.koussa.IslamicAzkar
+          xcrun simctl list devicetypes | grep -i "apple tv" || true
+          T=$(xcrun simctl list devicetypes -j | python3 -c '
+          import json,sys
+          t=[d for d in json.load(sys.stdin)["devicetypes"] if "Apple TV" in d["name"]]
+          pick=[d for d in t if "4K" in d["name"]] or t
+          print(pick[-1]["identifier"])')
+          R=$(xcrun simctl list runtimes -j | python3 -c '
+          import json,sys
+          r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="tvOS" and x["isAvailable"]]
+          print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"])')
+          echo "device $T on $R"
+          D=$(xcrun simctl create "TV" "$T" "$R")
+          xcrun simctl boot "$D"; xcrun simctl bootstatus "$D" -b
+          xcrun simctl install "$D" "$APP"
+          mkdir -p shots
+          for l in en ar fr; do
+            for s in home reader done category tasbih record settings; do
+              xcrun simctl terminate "$D" $BUNDLE >/dev/null 2>&1 || true
+              xcrun simctl launch "$D" $BUNDLE -ciScreen $s -ciLang $l >/dev/null || echo "::warning::launch $l $s failed"
+              sleep 7
+              xcrun simctl io "$D" screenshot "shots/$l-$s.png" >/dev/null && echo "$l $s" || echo "::warning::$l $s not captured"
+            done
+          done
+          sips -g pixelWidth -g pixelHeight shots/en-home.png | tail -2
+          R2=$(ls -t ~/Library/Logs/DiagnosticReports/*Islamic* 2>/dev/null | head -1)
+          [ -n "$R2" ] && { echo "::warning::crash report: $R2"; head -c 3000 "$R2"; }
+          cd shots && git init -q && git checkout -q -b tv-shots && git add . \
+            && git -c user.name=ci -c user.email=ci@localhost commit -qm "Apple TV screenshots ${GITHUB_SHA::7}" \
+            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" tv-shots && echo "pushed to tv-shots"

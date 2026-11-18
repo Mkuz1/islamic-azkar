@@ -233,11 +233,11 @@ func normalizeArabic(_ s: String) -> String {
 
 enum SharedStore {
     static let baseGroupID = "group.com.koussa.IslamicAzkar"
-    #if os(macOS)
+    #if os(macOS) || os(tvOS)
     static let groupID = baseGroupID
-    /// The Mac app has no widget extension and is not signed into the App Group's team: on macOS 15
-    /// reading another team's group container is a protected access that can stall launch, so it
-    /// keeps its settings in its own defaults.
+    /// The Mac and Apple TV apps have no widget extension, so they keep their settings in their own
+    /// defaults (on macOS 15, reading another team's group container is a protected access that can
+    /// stall launch).
     static let defaults: UserDefaults = .standard
     #else
     /// The App Group the app and its widgets really share. App Store builds use the base name, but
