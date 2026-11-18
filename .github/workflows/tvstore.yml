@@ -41,7 +41,7 @@ jobs:
         run: |
           python3 $GITHUB_WORKSPACE/tools/appstore_signing.py setup "$RUNNER_TEMP/sign"
           security find-identity -v "$RUNNER_TEMP/sign/signing.keychain-db" | sed 's/[0-9A-F]\{40\}/<id>/'
-                - name: Archive (App Store build)
+      - name: Archive (App Store build)
         run: |
           set -o pipefail
           brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
