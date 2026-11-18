@@ -42,15 +42,14 @@ jobs:
           APP=$(ls -d build/sim/Build/Products/Debug-appletvsimulator/*.app)
           BUNDLE=com.koussa.IslamicAzkar
           xcrun simctl list devicetypes | grep -i "apple tv" || true
-          T=$(xcrun simctl list devicetypes -j | python3 -c '
-          import json,sys
-          t=[d for d in json.load(sys.stdin)["devicetypes"] if "Apple TV" in d["name"]]
-          pick=[d for d in t if "4K" in d["name"]] or t
-          print(pick[-1]["identifier"])')
-          R=$(xcrun simctl list runtimes -j | python3 -c '
+          # The newest tvOS runtime, and the newest Apple TV it supports at 1080p (App Store size 1920 x 1080).
+          read T R < <(xcrun simctl list runtimes -j | python3 -c '
           import json,sys
           r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="tvOS" and x["isAvailable"]]
-          print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"])')
+          rt=sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]
+          types=[d for d in rt.get("supportedDeviceTypes",[]) if "Apple TV" in d["name"]]
+          pick=[d for d in types if "1080p" in d["name"]] or types
+          print(pick[-1]["identifier"], rt["identifier"])')
           echo "device $T on $R"
           D=$(xcrun simctl create "TV" "$T" "$R")
           xcrun simctl boot "$D"; xcrun simctl bootstatus "$D" -b
