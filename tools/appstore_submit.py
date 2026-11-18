@@ -29,6 +29,26 @@ SHOTS = {"Mac": "APP_DESKTOP"} if MAC else {"TV": "APP_APPLE_TV"} if TV else {"i
 LANG = {"en-US": "en", "ar-SA": "ar", "fr-FR": "fr"}
 NOTES = open(os.path.join(STORE, "review-notes.txt"), encoding="utf-8").read().strip()   # answers to App Review
 
+# The privacy policy as text (https://islamicazkar.net/privacy/ in short), for Apple TV.
+PRIVACY_TEXT = {
+    "en-US": "Islamic Azkar collects no personal data. There is no account, no advertising, no analytics and no tracking. "
+             "Your settings, favourites and azkar record stay on your device. Prayer times are calculated on the device; "
+             "your location, if you allow it, is never sent anywhere. Only if you turn on \"Sync between devices\", the dates and "
+             "names of the azkar you complete are stored on our server (islamicazkar.net, hosted by Cloudflare) under an anonymous "
+             "code, to show them on your other devices. You can stop syncing at any time and delete this data at "
+             "islamicazkar.net/delete. Contact: through the App Store page of the app.",
+    "ar-SA": "لا يجمع تطبيق «أذكار إسلامية» أي بيانات شخصية: لا حساب ولا إعلانات ولا إحصاءات ولا تتبّع. تبقى إعداداتك ومفضلتك "
+             "وسجلّ أذكارك على جهازك. تُحسب مواقيت الصلاة على الجهاز، ولا يُرسل موقعك إلى أي مكان. فقط إن فعّلت «المزامنة بين "
+             "الأجهزة» تُحفظ تواريخ الأذكار التي أتممتها وأسماؤها على خادمنا (islamicazkar.net على Cloudflare) تحت رمز مجهول، "
+             "لعرضها على أجهزتك الأخرى. يمكنك إيقاف المزامنة متى شئت وحذف هذه البيانات من islamicazkar.net/delete.",
+    "fr-FR": "Islamic Azkar ne collecte aucune donnée personnelle : pas de compte, pas de publicité, pas de statistiques, pas de "
+             "suivi. Vos réglages, favoris et votre historique restent sur votre appareil. Les horaires de prière sont calculés sur "
+             "l'appareil ; votre position n'est jamais envoyée. Seulement si vous activez la « Synchronisation entre appareils », "
+             "les dates et les noms des adhkar terminés sont enregistrés sur notre serveur (islamicazkar.net, hébergé par Cloudflare) "
+             "sous un code anonyme, pour les afficher sur vos autres appareils. Vous pouvez arrêter la synchronisation à tout moment "
+             "et supprimer ces données sur islamicazkar.net/delete.",
+}
+
 KID, ISS = os.environ["KEY_ID"].strip(), os.environ["ISSUER"].strip()
 KEY = open(os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{KID}.p8")).read()
 problems = []
@@ -125,6 +145,8 @@ def main(submit):
     have = {l["attributes"]["locale"]: l["id"] for l in b.get("data", [])}
     for loc, t in listing.items():
         attrs = {"name": t["name"], "subtitle": t["subtitle"], "privacyPolicyUrl": PRIVACY}
+        if loc in PRIVACY_TEXT:   # Apple TV can't open links: the policy as text (asked for tvOS)
+            attrs["privacyPolicyText"] = PRIVACY_TEXT[loc]
         if loc in have:
             st, _ = call("PATCH", f"appInfoLocalizations/{have[loc]}", {"data": {"type": "appInfoLocalizations", "id": have[loc], "attributes": attrs}})
         else:
