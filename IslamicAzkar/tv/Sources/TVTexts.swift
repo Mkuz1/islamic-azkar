@@ -4,7 +4,7 @@ import Foundation
 /// iPhone app's Record and Sync pages).
 struct TVTexts {
     let record, recordSubtitle, streak, activeDays, finished, today, nothing: String
-    let pressToCount, swipeHint, readAgain, backHome, round: String
+    let pressToCount, swipeHint, readAgain, backHome, round, now: String
     let city, phrase, syncTitle, syncIntro, turnOn, enterCode, link, yourCode, codeHint, syncNow, stop,
         badCode, offline, linked: String
 
@@ -15,7 +15,7 @@ struct TVTexts {
             activeDays: "أيام الذكر هذا الشهر", finished: "أذكار أتممتها هذا الشهر", today: "اليوم",
             nothing: "لم تُتمّ أذكارًا اليوم بعد.",
             pressToCount: "اضغط للعدّ", swipeHint: "اسحب للذكر التالي أو السابق", readAgain: "اقرأ مرة أخرى",
-            backHome: "الرئيسية", round: "دورة",
+            backHome: "الرئيسية", round: "دورة", now: "الآن",
             city: "المدينة", phrase: "الذكر",
             syncTitle: "المزامنة بين الأجهزة",
             syncIntro: "اعرض سجلّ أذكارك على كل أجهزتك: آيفون وآيباد وماك وأبل TV وأندرويد والموقع. بلا حساب ولا بريد: رمز خاص يربط أجهزتك.",
@@ -29,7 +29,7 @@ struct TVTexts {
             activeDays: "Days with azkar this month", finished: "Azkar completed this month", today: "Today",
             nothing: "No azkar completed today yet.",
             pressToCount: "Press to count", swipeHint: "Swipe for the next or previous dhikr", readAgain: "Read again",
-            backHome: "Home", round: "Round",
+            backHome: "Home", round: "Round", now: "Now",
             city: "City", phrase: "Dhikr",
             syncTitle: "Sync between devices",
             syncIntro: "See your azkar record on all your devices: iPhone, iPad, Mac, Apple TV, Android and the website. No account or email: a private code links your devices.",
@@ -43,7 +43,7 @@ struct TVTexts {
             activeDays: "Jours avec des adhkar ce mois-ci", finished: "Adhkar terminés ce mois-ci", today: "Aujourd'hui",
             nothing: "Aucun dhikr terminé aujourd'hui.",
             pressToCount: "Appuyez pour compter", swipeHint: "Balayez pour le dhikr suivant ou précédent", readAgain: "Relire",
-            backHome: "Accueil", round: "Tour",
+            backHome: "Accueil", round: "Tour", now: "Maintenant",
             city: "Ville", phrase: "Dhikr",
             syncTitle: "Synchronisation entre appareils",
             syncIntro: "Retrouvez votre historique d'adhkar sur tous vos appareils : iPhone, iPad, Mac, Apple TV, Android et le site. Sans compte ni e-mail : un code privé relie vos appareils.",

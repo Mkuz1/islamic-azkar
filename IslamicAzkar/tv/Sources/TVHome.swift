@@ -32,7 +32,7 @@ struct TVHomeView: View {
                         NavigationLink(value: TVRoute.reader(tile.reading)) {
                             TVTile(title: tile.title, subtitle: s.azkar(AzkarData.shared.items(tile.reading).count),
                                    symbol: tile.symbol, color: tile.color,
-                                   badge: tile.reading == Reading.recommended() ? model.m.today : nil)
+                                   badge: tile.reading == Reading.recommended() ? model.t.now : nil)
                         }
                         .buttonStyle(.card)
                     }

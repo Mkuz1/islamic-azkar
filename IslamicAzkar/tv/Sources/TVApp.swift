@@ -67,7 +67,7 @@ final class TVModel {
         if let l = args.string(forKey: "ciLang").flatMap(Lang.init(rawValue:)) { lang = l }
         place = Cities.all[0]
         switch screen {
-        case "reader": homePath = [.reader(.morning)]
+        case "reader", "done": homePath = [.reader(.morning)]
         case "category": homePath = [.category("hardship")]
         case "tasbih": tab = .tasbih; tasbihCount = 21; tasbihTarget = 33; tasbihTotal = 1250
         case "record":

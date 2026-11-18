@@ -48,7 +48,8 @@ struct TVTasbihView: View {
                     model.tasbihPhrase = (phrase + 1) % TasbihPhrases.ar.count
                     model.tasbihCount = 0
                 } label: {
-                    Text(TasbihPhrases.ar[(phrase + 1) % TasbihPhrases.ar.count]).font(.amiri(30))
+                    Label { Text(TasbihPhrases.ar[(phrase + 1) % TasbihPhrases.ar.count]).font(.amiri(30)) }
+                        icon: { Image(systemName: "arrow.triangle.2.circlepath") }
                 }
                 Text(s.target).font(.headline).foregroundStyle(Brand.mushafGold)
                 HStack(spacing: 20) {
@@ -125,12 +126,15 @@ struct TVRecordView: View {
                     Button { shift(1) } label: { Image(systemName: lang.isRTL ? "chevron.left" : "chevron.right") }
                 }
                 LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 14), count: 7), spacing: 14) {
-                    ForEach(0..<7, id: \.self) { i in
-                        Text(Hijri.weekday(lang, (i + cal.firstWeekday - 1) % 7).prefix(lang == .ar ? 3 : 2))
-                            .font(.caption).foregroundStyle(.secondary)
+                    // One grid, so every cell needs its own id: "w0…w6" (weekdays), "l0…" (lead-in), day keys.
+                    ForEach((0..<7).map { "w\($0)" }, id: \.self) { w in
+                        let i = Int(w.dropFirst()) ?? 0
+                        let name = Hijri.weekday(lang, (i + cal.firstWeekday - 1) % 7)
+                        Text(lang == .ar ? name : String(name.prefix(3)))
+                            .font(.caption).foregroundStyle(.secondary).lineLimit(1).minimumScaleFactor(0.7)
                     }
-                    ForEach(0..<lead, id: \.self) { _ in Color.clear.frame(height: 76) }
-                    ForEach(Array(keys.enumerated()), id: \.offset) { i, key in
+                    ForEach((0..<lead).map { "l\($0)" }, id: \.self) { _ in Color.clear.frame(height: 76) }
+                    ForEach(Array(keys.enumerated()), id: \.element) { i, key in
                         let n = days[key]?.count ?? 0
                         VStack(spacing: 4) {
                             Text(lang.num(i + 1)).font(.headline.monospacedDigit())
