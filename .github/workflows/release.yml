@@ -4,7 +4,7 @@
 # and pushing (to main or a main-* branch), by pushing that tag, or from the Actions tab.
 #  - Android "github" APK, signed with the upload key  → public release in Mkuz1/islamic-azkar-releases (IslamicAzkar.apk)
 #  - unsigned iPhone IPA (install with Sideloadly/AltStore) → same public release (IslamicAzkar.ipa)
-#  - Mac app, ad-hoc signed                                → same public release (IslamicAzkar.dmg)
+#  - Mac app, Developer ID signed and notarized by Apple   → same public release (IslamicAzkar.dmg)
 #  - Android "play" App Bundle for Google Play          → private release in this repository (IslamicAzkar-play.aab)
 #
 # Each build job uploads its file straight to a draft release (no workflow artifacts, so the
@@ -61,7 +61,7 @@ jobs:
             cat RELEASE_NOTES.md; echo
             echo '**Android:** install `IslamicAzkar.apk` (Android 8 or later).'
             echo '**iPhone:** `IslamicAzkar.ipa` is unsigned; install it with Sideloadly or AltStore.'
-            echo '**Mac:** open `IslamicAzkar.dmg` and drag the app to Applications (macOS 15 or later). The first time, right-click the app and choose Open.'
+            echo '**Mac:** open `IslamicAzkar.dmg` and drag the app to Applications (macOS 15 or later). It is signed and notarized by Apple.'
           } > notes.md
       - name: Draft releases
         env:
@@ -182,6 +182,19 @@ jobs:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.1
         run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: API key (for Developer ID signing and notarization)
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+        run: |
+          for v in KEY_ID ISSUER; do
+            clean=$(printf '%s' "${!v}" | tr -d '[:space:]'); echo "::add-mask::$clean"; echo "$v=$clean" >> "$GITHUB_ENV"
+          done
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          python3 -m pip install -q --break-system-packages pyjwt cryptography 2>/dev/null || python3 -m pip install -q pyjwt cryptography
       - name: Build the DMG
         run: |
           set -o pipefail
@@ -190,9 +203,17 @@ jobs:
           xcodebuild -project IslamicAzkarMac.xcodeproj -scheme IslamicAzkar -configuration Release \
             -destination 'generic/platform=macOS' -derivedDataPath build build | xcbeautify --renderer github-actions
           APP="build/Build/Products/Release/Islamic Azkar.app"
-          codesign --force --deep --sign - "$APP"
           /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist"
-          mkdir -p ../../out && ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
+          mkdir -p ../../out
+          if [ -f $GITHUB_WORKSPACE/store/devid/devid.enc ]; then
+            # Signed with Developer ID and notarized: opens without a warning.
+            python3 $GITHUB_WORKSPACE/tools/developer_id.py setup "$RUNNER_TEMP/devid"
+            $GITHUB_WORKSPACE/tools/sign_mac.sh "$APP" ../../out/IslamicAzkar.dmg "$RUNNER_TEMP/devid/devid.keychain-db"
+          else
+            echo "::warning::No Developer ID certificate yet (run the Mac Developer ID workflow): ad-hoc signed DMG"
+            codesign --force --deep --sign - "$APP"
+            ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
+          fi
       - name: Upload to the draft releases
         working-directory: .
         env:

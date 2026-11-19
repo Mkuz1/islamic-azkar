@@ -1,0 +1,64 @@
+# Signs the Mac app for GitHub with Developer ID, has Apple notarize it, and replaces the DMG in the
+# current release (both the public downloads repository and this one). The first run also creates
+# the Developer ID certificate and commits it, encrypted, to store/devid/devid.enc.
+# Triggered by changing store/devid/SIGN (or by hand). New releases are signed by release.yml.
+name: Mac Developer ID
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/devid/SIGN", ".github/workflows/mac-devid.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  sign:
+    runs-on: xcode-27
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: API key
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+        run: |
+          for v in KEY_ID ISSUER P8; do [ -n "${!v}" ] || { echo "::error::App Store secrets missing"; exit 1; }; done
+          for v in KEY_ID ISSUER; do
+            clean=$(printf '%s' "${!v}" | tr -d '[:space:]'); echo "::add-mask::$clean"; echo "$v=$clean" >> "$GITHUB_ENV"
+          done
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          python3 -m pip install -q --break-system-packages pyjwt cryptography 2>/dev/null || python3 -m pip install -q pyjwt cryptography
+      - name: Developer ID certificate
+        run: python3 tools/developer_id.py setup "$RUNNER_TEMP/devid"
+      - name: Keep the new certificate (encrypted)
+        run: |
+          if [ -n "$(git status --porcelain store/devid)" ]; then
+            git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add store/devid/devid.enc && git commit -m "Developer ID certificate for the Mac app on GitHub (encrypted)" && git pull --rebase -q && git push
+          else echo "certificate already kept"; fi
+      - name: Build, sign and notarize
+        working-directory: IslamicAzkar/mac
+        run: |
+          set -o pipefail
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          xcodebuild -project IslamicAzkarMac.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -destination 'generic/platform=macOS' -derivedDataPath build build | xcbeautify --renderer github-actions
+          mkdir -p ../../out
+          $GITHUB_WORKSPACE/tools/sign_mac.sh "build/Build/Products/Release/Islamic Azkar.app" ../../out/IslamicAzkar.dmg "$RUNNER_TEMP/devid/devid.keychain-db"
+      - name: Replace the DMG in the current release
+        env:
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          V=$(grep -m1 'MARKETING_VERSION:' IslamicAzkar/mac/project.yml | grep -o '[0-9][0-9.]*')
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.dmg -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.dmg -R "$GITHUB_REPOSITORY" --clobber
+          echo "v$V: signed and notarized DMG uploaded"
