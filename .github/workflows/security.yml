@@ -38,7 +38,7 @@ jobs:
           echo | openssl s_client -connect islamicazkar.net:443 -servername islamicazkar.net 2>/dev/null | openssl x509 -noout -issuer -enddate | sed 's/^/      /'
           echo "== Files that must not be served"
           for p in wrangler.toml "functions/sync/%5B%5Bpath%5D%5D.js" _headers .git/config .git/HEAD .env .DS_Store package.json; do
-            c=$(curl -s -o /tmp/b -w '%{http_code}' "$S/$p")
+            c=$(curl -s -o /tmp/b -w '%{http_code}' "$S/$p?nocache=$GITHUB_RUN_ID")
             # Pages answers unknown paths with the home page (200 text/html): only a real file is a leak.
             if [ "$c" = 200 ] && ! grep -qi "<html" /tmp/b; then fail "/$p is served ($(head -c 60 /tmp/b | tr '\n' ' '))"; else pass "/$p not served ($c)"; fi
           done
@@ -70,7 +70,8 @@ jobs:
             case "$R" in *429) got429=1; break;; esac
             CODES="$CODES $(echo "${R% *}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["code"])')"
           done
-          [ $got429 = 1 ] && pass "rate limit answers 429" || fail "no rate limit after 11 new codes"
+          # (KV is eventually consistent, so a fast burst can pass the per-IP counter.)
+          [ $got429 = 1 ] && pass "rate limit answers 429" || fail "no rate limit after 11 new codes in a burst"
           for c in $CODES; do curl -s -o /dev/null -X POST "$S/sync/delete" -H 'content-type: application/json' -d "{\"code\":\"$c\"}"; done
           info "test records deleted"
           echo "== Code randomness: 200 codes would need 20 hours; the server uses crypto.getRandomValues (see functions/sync)."
