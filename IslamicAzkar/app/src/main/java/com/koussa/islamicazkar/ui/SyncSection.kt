@@ -61,6 +61,7 @@ class SyncTexts(
     val title: String, val intro: String, val turnOn: String, val haveCode: String, val enterCode: String, val link: String,
     val linking: String, val yourCode: String, val scanHint: String, val syncNow: String, val lastSync: String, val never: String,
     val stop: String, val stopConfirm: String, val badCode: String, val offline: String, val linked: String,
+    val linkAsk: String, val linkWarn: String,
 ) {
     companion object {
         fun of(lang: Lang) = when (lang) {
@@ -70,21 +71,24 @@ class SyncTexts(
                 "تفعيل المزامنة", "لديّ رمز من جهاز آخر", "أدخل رمز المزامنة", "ربط", "جارٍ الربط…", "رمز المزامنة",
                 "على جهازك الآخر: امسح الرمز بالكاميرا، أو أدخله في الإعدادات ← المزامنة (وفي الموقع: سجلّي ← المزامنة). احتفظ به لنفسك.",
                 "زامن الآن", "آخر مزامنة", "لم تتم بعد", "إيقاف المزامنة على هذا الجهاز", "يبقى سجلّك على هذا الجهاز وعلى أجهزتك الأخرى.",
-                "الرمز غير صحيح. تأكد منه وحاول مرة أخرى.", "تعذّر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.", "تم ربط هذا الجهاز")
+                "الرمز غير صحيح. تأكد منه وحاول مرة أخرى.", "تعذّر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.", "تم ربط هذا الجهاز",
+                "ربط هذا الجهاز برمز المزامنة؟", "اربط فقط برمز من أجهزتك أنت: كل جهاز يستخدم هذا الرمز يرى سجلّ أذكارك.")
             Lang.EN -> SyncTexts(
                 "Sync between devices",
                 "See your azkar record on all your devices: iPhone, iPad, Mac, Android and the website. No account or email: a private code links your devices, then they sync automatically.",
                 "Turn on sync", "I have a code from another device", "Enter the sync code", "Link", "Linking…", "Sync code",
                 "On your other device, scan this with the camera, or enter the code in Settings → Sync (on the website: Record → Sync). Keep it to yourself.",
                 "Sync now", "Last synced", "not yet", "Stop syncing on this device", "Your record stays on this device and on your other devices.",
-                "That code isn't right. Check it and try again.", "Couldn't connect. Check your internet and try again.", "This device is linked")
+                "That code isn't right. Check it and try again.", "Couldn't connect. Check your internet and try again.", "This device is linked",
+                "Link this device to the sync code?", "Only link with a code from your own devices: every device using this code sees your azkar record.")
             Lang.FR -> SyncTexts(
                 "Synchronisation entre appareils",
                 "Retrouvez votre historique d'adhkar sur tous vos appareils : iPhone, iPad, Mac, Android et le site. Sans compte ni e-mail : un code privé relie vos appareils, puis tout se synchronise automatiquement.",
                 "Activer la synchronisation", "J'ai un code d'un autre appareil", "Saisissez le code de synchronisation", "Relier", "Liaison…", "Code de synchronisation",
                 "Sur votre autre appareil, scannez-le avec l'appareil photo, ou saisissez le code dans Réglages → Synchronisation (sur le site : Historique → Synchronisation). Gardez-le pour vous.",
                 "Synchroniser", "Dernière synchronisation", "pas encore", "Arrêter la synchronisation sur cet appareil", "Votre historique reste sur cet appareil et sur vos autres appareils.",
-                "Ce code n'est pas valide. Vérifiez-le et réessayez.", "Connexion impossible. Vérifiez Internet et réessayez.", "Cet appareil est relié")
+                "Ce code n'est pas valide. Vérifiez-le et réessayez.", "Connexion impossible. Vérifiez Internet et réessayez.", "Cet appareil est relié",
+                "Relier cet appareil au code de synchronisation ?", "Ne reliez qu'avec un code de vos propres appareils : chaque appareil utilisant ce code voit votre historique d'adhkar.")
         }
     }
 }

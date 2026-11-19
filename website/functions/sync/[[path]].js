@@ -8,6 +8,8 @@
 const CODE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";   // no 0/O, 1/I/L
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 const READING_RE = /^(morning|evening|c\d{1,4})$/;
+const MAX_BODY = 256 * 1024;     // a full record is well under this
+const MAX_DAYS = 3700;           // about ten years of days kept per code
 const ORIGINS = /^https:\/\/((www\.)?islamicazkar\.net|([a-z0-9-]+\.)?islamic-azkar\.pages\.dev)$|^http:\/\/localhost(:\d+)?$/;
 
 function cors(request) {
@@ -39,13 +41,26 @@ function cleanDays(days) {
   }
   return out;
 }
+/** Reads a JSON body of at most MAX_BODY bytes (null if larger or not JSON). */
+async function readJson(request) {
+  if (Number(request.headers.get("content-length") || 0) > MAX_BODY) return null;
+  const text = await request.text();
+  if (text.length > MAX_BODY) return null;
+  try { return JSON.parse(text); } catch { return null; }
+}
 function mergeDays(a, b) {
   const out = { ...a };
   let changed = false;
   for (const [day, list] of Object.entries(b)) {
     const have = out[day] || [];
     const add = list.filter(k => !have.includes(k));
-    if (add.length) { out[day] = [...have, ...add]; changed = true; }
+    if (add.length) { out[day] = [...have, ...add].slice(0, 60); changed = true; }
+  }
+  // Keep the newest MAX_DAYS days, so one code's record can't grow without end.
+  const keys = Object.keys(out);
+  if (keys.length > MAX_DAYS) {
+    keys.sort().slice(0, keys.length - MAX_DAYS).forEach(k => delete out[k]);
+    changed = true;
   }
   return { days: out, changed };
 }
@@ -58,8 +73,7 @@ async function create(request, env, headers) {
   if (hits >= 10) return json({ error: "rate_limited" }, 429, headers);
   await env.SYNC.put(rateKey, String(hits + 1), { expirationTtl: 3600 });
 
-  let body = {};
-  try { body = await request.json(); } catch { /* no body */ }
+  const body = (await readJson(request)) || {};
   const code = newCode();
   const days = cleanDays(body.days);
   await env.SYNC.put(await storageKey(code), JSON.stringify({ days, updated: Date.now() }));
@@ -67,8 +81,8 @@ async function create(request, env, headers) {
 }
 
 async function merge(request, env, headers) {
-  let body;
-  try { body = await request.json(); } catch { return json({ error: "bad_request" }, 400, headers); }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object") return json({ error: "bad_request" }, 400, headers);
   const code = normalizeCode(body.code);
   if (code.length !== 12) return json({ error: "unknown_code" }, 404, headers);
   const key = await storageKey(code);
@@ -81,8 +95,8 @@ async function merge(request, env, headers) {
 }
 
 async function erase(request, env, headers) {
-  let body;
-  try { body = await request.json(); } catch { return json({ error: "bad_request" }, 400, headers); }
+  const body = await readJson(request);
+  if (!body || typeof body !== "object") return json({ error: "bad_request" }, 400, headers);
   const code = normalizeCode(body.code);
   if (code.length !== 12) return json({ error: "unknown_code" }, 404, headers);
   const key = await storageKey(code);

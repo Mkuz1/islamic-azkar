@@ -9,6 +9,9 @@ on:
     branches: [main, "main-*"]
     paths: ["store/tvstore/UPLOAD"]
 
+permissions:
+  contents: read
+
 jobs:
   upload:
     runs-on: xcode-27

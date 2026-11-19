@@ -9,6 +9,9 @@ on:
     branches: [main, "main-*"]
     paths: ["store/tvstore/SUBMIT"]
 
+permissions:
+  contents: read
+
 jobs:
   submit:
     runs-on: ubuntu-latest

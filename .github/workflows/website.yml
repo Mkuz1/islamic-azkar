@@ -15,6 +15,9 @@ concurrency:
   group: website-deploy
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -44,9 +47,12 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         # --branch main publishes to production (islamicazkar.net) whichever git branch this runs on.
-        # Run inside website/ so wrangler.toml (the KV binding for the /sync function) is used.
+        # Run inside website/ so wrangler.toml (the KV binding for the /sync function) and functions/
+        # are used; only the public files (dist/) are served, not wrangler.toml or the function code.
         working-directory: website
-        run: npx --yes wrangler@3.114.0 pages deploy . --project-name islamic-azkar --branch main --commit-dirty=true
+        run: |
+          rsync -a --exclude dist --exclude functions --exclude wrangler.toml --exclude node_modules --exclude '.*' ./ dist/
+          npx --yes wrangler@3.114.0 pages deploy dist --project-name islamic-azkar --branch main --commit-dirty=true
       - name: Smoke test
         run: |
           sleep 20
@@ -62,6 +68,10 @@ jobs:
           curl -sS -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{\"2026-01-01\":[\"morning\"]}}" | tee /dev/stderr | grep -q '2026-01-01'
           # Data deletion (the Play Store link): delete that code's record, then it must be gone.
           curl -fsS https://islamicazkar.net/delete/ | grep -q "Delete your data"
+          curl -fsS https://islamicazkar.net/delete/delete.js | grep -q "sync/delete"
+          # Security headers, and no deploy config served.
+          curl -sSI https://islamicazkar.net/ | grep -qi "^content-security-policy:" || { echo "::error::no Content-Security-Policy"; exit 1; }
+          curl -sS https://islamicazkar.net/wrangler.toml | grep -q "kv_namespaces" && { echo "::error::wrangler.toml is served"; exit 1; } || echo "wrangler.toml not served"
           curl -sS -X POST https://islamicazkar.net/sync/delete -H 'content-type: application/json' -d "{\"code\":\"$CODE\"}" | tee /dev/stderr | grep -q '"deleted":true'
           # Cloudflare KV can serve a deleted key for up to a minute, so wait for it to go.
           for i in $(seq 1 12); do

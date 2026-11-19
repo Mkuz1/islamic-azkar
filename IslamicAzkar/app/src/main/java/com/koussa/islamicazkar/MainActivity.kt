@@ -96,6 +96,18 @@ class MainActivity : ComponentActivity() {
         if (uri.scheme != "islamicazkar" || uri.host != "sync") return
         val code = uri.lastPathSegment ?: return
         val texts = com.koussa.islamicazkar.ui.SyncTexts.of(settings.lang)
+        val shown = com.koussa.islamicazkar.data.AzkarSync.normalize(code)
+        if (shown.length != 12) return
+        // Any app or web page can open this link: ask first, so nobody links this device to their code.
+        android.app.AlertDialog.Builder(this)
+            .setTitle(texts.linkAsk)
+            .setMessage(com.koussa.islamicazkar.data.AzkarSync.display(shown) + "\n\n" + texts.linkWarn)
+            .setPositiveButton(texts.link) { _, _ -> linkSync(shown, texts) }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun linkSync(code: String, texts: com.koussa.islamicazkar.ui.SyncTexts) {
         lifecycleScope.launch {
             try {
                 com.koussa.islamicazkar.data.AzkarSync.link(this@MainActivity, code)

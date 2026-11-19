@@ -93,6 +93,8 @@ final class AppModel {
     var showDedication = true
     var shareTarget: ShareTarget?
     var toast: String?
+    /// A sync code from a link, waiting for the person to confirm (any app or page can open such a link).
+    var pendingSync: String?
 
     /// Today's remaining repetitions by dhikr id, shared by every screen that shows a dhikr (a reading,
     /// Favourites, the ʿUmrah guide), so completing a dhikr in one shows it completed in the others.
@@ -233,22 +235,30 @@ final class AppModel {
         if url == DeepLink.tasbih { showDedication = false; tab = .tasbih; return }
         // A sync QR scanned with the camera: link this device, then show the record.
         if url.scheme == DeepLink.scheme, url.host == "sync" {
-            let code = url.lastPathComponent
+            let code = AzkarSync.normalize(url.lastPathComponent)
+            guard code.count == 12 else { toast = SyncTexts.of(lang).badCode; return }
             showDedication = false
-            Task { @MainActor in
-                do {
-                    try await AzkarSync.link(code)
-                    toast = SyncTexts.of(lang).linked
-                    #if os(macOS)
-                    tab = .home; homePath = [.history]
-                    #else
-                    tab = .record
-                    #endif
-                } catch { toast = SyncTexts.of(lang).badCode }
-            }
+            pendingSync = code
             return
         }
         if let (r, focus) = DeepLink.parse(url) { open(r, focus: focus) }
+    }
+
+    /// Links this device to the code from a sync link, once the person has agreed.
+    func confirmSync() {
+        guard let code = pendingSync else { return }
+        pendingSync = nil
+        Task { @MainActor in
+            do {
+                try await AzkarSync.link(code)
+                toast = SyncTexts.of(lang).linked
+                #if os(macOS)
+                tab = .home; homePath = [.history]
+                #else
+                tab = .record
+                #endif
+            } catch { toast = SyncTexts.of(lang).badCode }
+        }
     }
 
     private func reloadTasbihWidget() { WidgetCenter.shared.reloadTimelines(ofKind: "TasbihWidget") }
@@ -334,6 +344,13 @@ struct IslamicAzkarApp: App {
             .preferredColorScheme(model.theme == .light ? .light : model.theme == .dark ? .dark : nil)
             .tint(Theme.accent)
             .onOpenURL { model.handle(url: $0) }
+            .alert(SyncTexts.of(model.lang).linkAsk,
+                   isPresented: Binding(get: { model.pendingSync != nil }, set: { if !$0 { model.pendingSync = nil } })) {
+                Button(SyncTexts.of(model.lang).link) { model.confirmSync() }
+                Button(model.lang == .ar ? "إلغاء" : model.lang == .fr ? "Annuler" : "Cancel", role: .cancel) { model.pendingSync = nil }
+            } message: {
+                Text(AzkarSync.display(model.pendingSync ?? "") + "\n\n" + SyncTexts.of(model.lang).linkWarn)
+            }
             .onAppear {
                 launchTrace("main window appeared")
                 #if os(macOS)

@@ -36,3 +36,4 @@ IslamicAzkar/mac/shots/
 IslamicAzkar/mac/Info.plist
 __pycache__/
 *.pyc
+website/dist/

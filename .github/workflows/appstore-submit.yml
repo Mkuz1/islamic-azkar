@@ -10,6 +10,9 @@ on:
     branches: [main, "main-*"]
     paths: ["store/appstore/SUBMIT"]
 
+permissions:
+  contents: read
+
 jobs:
   submit:
     runs-on: ubuntu-latest

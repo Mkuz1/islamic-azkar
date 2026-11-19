@@ -87,16 +87,16 @@ jobs:
           gh release download --repo "$GITHUB_REPOSITORY" --pattern 'IslamicAzkar.apk' --pattern 'IslamicAzkar-play.aab' -D rel
           BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
           $BT/aapt2 dump xmltree rel/IslamicAzkar.apk --file AndroidManifest.xml > m.txt
-          grep -q 'debuggable.*0xffffffff' m.txt && fail "APK is debuggable" || pass "APK not debuggable"
-          grep -q 'usesCleartextTraffic.*0xffffffff' m.txt && fail "cleartext HTTP allowed" || pass "no cleartext HTTP flag"
+          grep -qE 'debuggable[^=]*=(true|.*0xffffffff)' m.txt && fail "APK is debuggable" || pass "APK not debuggable"
+          grep -qE 'usesCleartextTraffic[^=]*=(true|.*0xffffffff)' m.txt && fail "cleartext HTTP allowed" || pass "no cleartext HTTP flag"
           grep -q 'networkSecurityConfig' m.txt && info "has a network security config" || pass "default network security (HTTPS only on Android 9+)"
-          grep -q 'allowBackup.*0xffffffff' m.txt && info "allowBackup=true (record and sync code go into Google backup)" || pass "allowBackup off"
+          grep -qE 'allowBackup[^=]*=(true|.*0xffffffff)' m.txt && info "allowBackup=true (record and sync code go into Google backup)" || pass "allowBackup off"
           echo "== Exported components"
           python3 - <<'EOF'
           import re
           t=open("m.txt").read()
           for block in re.split(r"\n\s*E: (?=activity|receiver|service|provider)", t)[1:]:
-              kind=block.split()[0]; name=re.search(r'android:name.*?="([^"]+)"', block); exp='exported' in block and re.search(r'exported\(0x[0-9a-f]+\)=\(type 0x12\)0xffffffff', block)
+              kind=block.split()[0]; name=re.search(r'android:name.*?="([^"]+)"', block); exp=re.search(r'exported[^=\n]*=(true|\(type 0x12\)0xffffffff)', block)
               perm=re.search(r'android:permission.*?="([^"]+)"', block)
               if exp: print(f"      exported {kind}: {name.group(1) if name else '?'}" + (f" (needs {perm.group(1)})" if perm else ""))
           EOF
@@ -106,7 +106,7 @@ jobs:
           $BT/apksigner verify rel/IslamicAzkar.apk && pass "APK signature valid"
           echo "== Secrets inside the files"
           mkdir x && cd x && unzip -q ../rel/IslamicAzkar.apk && cd ..
-          grep -raoE "BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{35}|sk_live_[0-9a-zA-Z]{20,}" x | head && fail "secret-looking strings in the APK" || pass "no keys or tokens in the APK"
+          if grep -raoE "BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|AIza[0-9A-Za-z_-]{35}|sk_live_[0-9a-zA-Z]{20,}" x > hits.txt; then fail "secret-looking strings in the APK"; head hits.txt; else pass "no keys or tokens in the APK"; fi
           grep -raoE "https?://[a-zA-Z0-9.-]+\.[a-z]{2,}" x/classes*.dex | cut -d: -f2- | sort -u | grep -vE "schemas.android|www.w3.org|apache.org|google.com/|android.com|example" | sed 's/^/      url /'
           grep -raoE "http://[a-zA-Z0-9.-]+\.[a-z]{2,}" x/classes*.dex | grep -vE "schemas.android|www.w3.org|apache.org|ns.adobe|xmlpull|xml.org|example" | sort -u | sed 's/^/      plain http: /'
 
@@ -127,7 +127,7 @@ jobs:
           plutil -extract CFBundleURLTypes json -o - "$APP/Info.plist" | sed 's/^/      url schemes /'
           codesign -d --entitlements :- "$APP" 2>/dev/null | plutil -convert json -o - - 2>/dev/null | sed 's/^/      entitlements /' || info "IPA not signed for distribution (the App Store build is signed by the upload workflow)"
           for ext in "$APP"/PlugIns/*.appex; do plutil -extract NSAppTransportSecurity json -o - "$ext/Info.plist" >/dev/null 2>&1 && fail "$(basename "$ext") has ATS exceptions" || pass "$(basename "$ext"): no ATS exceptions"; done
-          strings -a "$APP"/IslamicAzkar "$APP"/PlugIns/*.appex/* 2>/dev/null | grep -E "BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_|AIza[0-9A-Za-z_-]{35}" | head && fail "secret-looking strings in the iPhone app" || pass "no keys or tokens in the iPhone app"
+          if strings -a "$APP"/IslamicAzkar "$APP"/PlugIns/*.appex/* 2>/dev/null | grep -E "BEGIN [A-Z ]*PRIVATE KEY|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{36}|github_pat_|AIza[0-9A-Za-z_-]{35}" > hits.txt; then fail "secret-looking strings in the iPhone app"; head hits.txt; else pass "no keys or tokens in the iPhone app"; fi
           strings -a "$APP"/IslamicAzkar | grep -oE "http://[a-zA-Z0-9.-]+\.[a-z]{2,}" | grep -v "apple.com/DTDs\|www.w3.org" | sort -u | sed 's/^/      plain http: /'
           echo "== Mac (DMG)"
           hdiutil attach -nobrowse -readonly -mountpoint /tmp/dmg rel/IslamicAzkar.dmg >/dev/null

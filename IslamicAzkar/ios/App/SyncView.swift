@@ -4,7 +4,7 @@ import SwiftUI
 /// Texts for syncing between devices.
 struct SyncTexts {
     let title, intro, turnOn, haveCode, enterCode, link, linking, yourCode, scanHint, syncNow, lastSync, never,
-        stop, stopConfirm, badCode, offline, linked: String
+        stop, stopConfirm, badCode, offline, linked, linkAsk, linkWarn: String
 
     static func of(_ lang: Lang) -> SyncTexts {
         switch lang {
@@ -15,7 +15,8 @@ struct SyncTexts {
             yourCode: "رمز المزامنة", scanHint: "على جهازك الآخر: امسح الرمز بالكاميرا، أو أدخله في الإعدادات ← المزامنة (وفي الموقع: سجلّي ← المزامنة). احتفظ به لنفسك.",
             syncNow: "زامن الآن", lastSync: "آخر مزامنة", never: "لم تتم بعد",
             stop: "إيقاف المزامنة على هذا الجهاز", stopConfirm: "يبقى سجلّك على هذا الجهاز وعلى أجهزتك الأخرى.",
-            badCode: "الرمز غير صحيح. تأكد منه وحاول مرة أخرى.", offline: "تعذّر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.", linked: "تم ربط هذا الجهاز")
+            badCode: "الرمز غير صحيح. تأكد منه وحاول مرة أخرى.", offline: "تعذّر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.", linked: "تم ربط هذا الجهاز",
+            linkAsk: "ربط هذا الجهاز برمز المزامنة؟", linkWarn: "اربط فقط برمز من أجهزتك أنت: كل جهاز يستخدم هذا الرمز يرى سجلّ أذكارك.")
         case .en: return SyncTexts(
             title: "Sync between devices",
             intro: "See your azkar record on all your devices: iPhone, iPad, Mac, Android and the website. No account or email: a private code links your devices, then they sync automatically.",
@@ -23,7 +24,8 @@ struct SyncTexts {
             yourCode: "Sync code", scanHint: "On your other device, scan this with the camera, or enter the code in Settings → Sync (on the website: Record → Sync). Keep it to yourself.",
             syncNow: "Sync now", lastSync: "Last synced", never: "not yet",
             stop: "Stop syncing on this device", stopConfirm: "Your record stays on this device and on your other devices.",
-            badCode: "That code isn't right. Check it and try again.", offline: "Couldn't connect. Check your internet and try again.", linked: "This device is linked")
+            badCode: "That code isn't right. Check it and try again.", offline: "Couldn't connect. Check your internet and try again.", linked: "This device is linked",
+            linkAsk: "Link this device to the sync code?", linkWarn: "Only link with a code from your own devices: every device using this code sees your azkar record.")
         case .fr: return SyncTexts(
             title: "Synchronisation entre appareils",
             intro: "Retrouvez votre historique d'adhkar sur tous vos appareils : iPhone, iPad, Mac, Android et le site. Sans compte ni e-mail : un code privé relie vos appareils, puis tout se synchronise automatiquement.",
@@ -31,7 +33,8 @@ struct SyncTexts {
             yourCode: "Code de synchronisation", scanHint: "Sur votre autre appareil, scannez-le avec l'appareil photo, ou saisissez le code dans Réglages → Synchronisation (sur le site : Historique → Synchronisation). Gardez-le pour vous.",
             syncNow: "Synchroniser", lastSync: "Dernière synchronisation", never: "pas encore",
             stop: "Arrêter la synchronisation sur cet appareil", stopConfirm: "Votre historique reste sur cet appareil et sur vos autres appareils.",
-            badCode: "Ce code n'est pas valide. Vérifiez-le et réessayez.", offline: "Connexion impossible. Vérifiez Internet et réessayez.", linked: "Cet appareil est relié")
+            badCode: "Ce code n'est pas valide. Vérifiez-le et réessayez.", offline: "Connexion impossible. Vérifiez Internet et réessayez.", linked: "Cet appareil est relié",
+            linkAsk: "Relier cet appareil au code de synchronisation ?", linkWarn: "Ne reliez qu'avec un code de vos propres appareils : chaque appareil utilisant ce code voit votre historique d'adhkar.")
         }
     }
 }
