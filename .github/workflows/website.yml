@@ -63,4 +63,10 @@ jobs:
           # Data deletion (the Play Store link): delete that code's record, then it must be gone.
           curl -fsS https://islamicazkar.net/delete/ | grep -q "Delete your data"
           curl -sS -X POST https://islamicazkar.net/sync/delete -H 'content-type: application/json' -d "{\"code\":\"$CODE\"}" | tee /dev/stderr | grep -q '"deleted":true'
-          test "$(curl -s -o /dev/null -w '%{http_code}' -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{}}")" = 404 && echo "deleted record is gone"
+          # Cloudflare KV can serve a deleted key for up to a minute, so wait for it to go.
+          for i in $(seq 1 12); do
+            S=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{}}")
+            [ "$S" = 404 ] && { echo "deleted record is gone"; break; }
+            [ "$i" = 12 ] && { echo "::error::deleted record still answers $S"; exit 1; }
+            sleep 10
+          done

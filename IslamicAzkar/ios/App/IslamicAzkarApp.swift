@@ -125,9 +125,10 @@ final class AppModel {
         let d = SharedStore.defaults
         func bool(_ k: String, _ def: Bool) -> Bool { d.object(forKey: k) == nil ? def : d.bool(forKey: k) }
         func int(_ k: String, _ def: Int) -> Int { d.object(forKey: k) == nil ? def : d.integer(forKey: k) }
-        lang = SharedStore.lang
+        let startLang = SharedStore.lang
+        lang = startLang
         #if os(iOS)
-        Self.applyUIKitDirection(lang)
+        Self.applyUIKitDirection(startLang)
         #endif
         theme = ThemeMode(rawValue: d.string(forKey: "theme") ?? "") ?? .system
         textScale = d.object(forKey: "text_scale") == nil ? 1 : d.double(forKey: "text_scale")
