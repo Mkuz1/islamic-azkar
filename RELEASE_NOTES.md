@@ -1,8 +1,8 @@
-- Cleaner transliterations: every dhikr now shows only the words to say, without English notes such as "(three times)" (the counter already shows how many times) or narrations, in English and French alike.
-- New: Islamic Azkar on Apple TV, coming to the App Store.
+- The round prayer widget on the Lock Screen now shows the prayer's name with its time.
+- iPad: the tabs at the top follow the app's language (English and French no longer appear right to left on an Arabic iPad).
 
-- النطق أوضح: يظهر لكل ذكر ما يُقال فقط، بلا ملاحظات بالإنجليزية مثل «ثلاث مرات» (العدّاد يبيّن العدد).
-- جديد: أذكار إسلامية على أبل TV، قريبًا في متجر التطبيقات.
+- أداة الصلاة الدائرية في شاشة القفل تُظهر الآن اسم الصلاة مع وقتها.
+- آيباد: التبويبات في الأعلى تتبع لغة التطبيق.
 
-- Translittérations plus claires : chaque dhikr n'affiche que les mots à dire, sans notes en anglais comme « (three times) » (le compteur indique le nombre) ni récits.
-- Nouveau : Islamic Azkar sur Apple TV, bientôt sur l'App Store.
+- Le widget rond de prière sur l'écran verrouillé affiche maintenant le nom de la prière avec son heure.
+- iPad : les onglets en haut suivent la langue de l'application.
