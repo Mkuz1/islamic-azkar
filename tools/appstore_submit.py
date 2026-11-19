@@ -20,7 +20,15 @@ STORE = os.path.join(ROOT, "store", "macstore" if MAC else "tvstore" if TV else 
 PLATFORM = "MAC_OS" if MAC else "TV_OS" if TV else "IOS"
 API = "https://api.appstoreconnect.apple.com/"
 BUNDLE = "com.koussa.IslamicAzkar"
-VERSION = "1.0.21" if MAC else "1.0.23" if TV else "1.0.19"
+def _project_version():
+    """The version the app's project builds (what the uploaded build carries)."""
+    path = os.path.join(ROOT, "IslamicAzkar", *(("mac", "project.yml") if MAC else ("tv", "project.yml") if TV
+                                                 else ("ios", "IslamicAzkar.xcodeproj", "project.pbxproj")))
+    import re
+    return re.search(r'MARKETING_VERSION *[:=] *"?([0-9.]+)', open(path).read()).group(1)
+
+
+VERSION = os.environ.get("VERSION", "").strip() or _project_version()
 BUILD = os.environ.get("BUILD", "").strip()   # e.g. "19.5"; empty = newest valid build of VERSION
 COPYRIGHT = "2026 Mkoussa"
 SITE = "https://islamicazkar.net"
@@ -202,9 +210,15 @@ def main(submit):
                           "relationships": {"territory": {"data": {"type": "territories", "id": t}}}} for t in terrs]})
         step(f"Available in all {len(terrs)} countries and regions", st < 300)
 
+    if submit and REPLACE:
+        replace_pending(app)
+
     print(f"\n== Version {VERSION}")
     st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]={PLATFORM}&limit=20")
     versions = b.get("data", [])
+    # An update (a version is already on the App Store) needs "What's New" text.
+    live = any((v["attributes"].get("appStoreState") or "") in ("READY_FOR_SALE", "READY_FOR_DISTRIBUTION")
+               or (v["attributes"].get("appVersionState") or "") == "READY_FOR_DISTRIBUTION" for v in versions)
     open_states = ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED", "INVALID_BINARY")
     ver = next((v for v in versions if (v["attributes"].get("appVersionState") or v["attributes"].get("appStoreState")) in open_states
                 or v["attributes"].get("appStoreState") in open_states), None)
@@ -224,6 +238,8 @@ def main(submit):
     for loc, t in listing.items():
         attrs = {"description": t["description"], "keywords": t["keywords"], "promotionalText": t["promotional_text"],
                  "supportUrl": SITE, "marketingUrl": SITE}
+        if live and WHATS_NEW.get(LANG.get(loc)):
+            attrs["whatsNew"] = WHATS_NEW[LANG[loc]]
         if loc in vlocs:
             st, _ = call("PATCH", f"appStoreVersionLocalizations/{vlocs[loc]}", {"data": {"type": "appStoreVersionLocalizations", "id": vlocs[loc], "attributes": attrs}})
         else:
@@ -340,6 +356,46 @@ def main(submit):
     st, b = call("PATCH", f"reviewSubmissions/{sub}", {"data": {"type": "reviewSubmissions", "id": sub, "attributes": {"submitted": True}}})
     done = step("Submitted for App Review", st < 300)
     return report(done)
+
+
+def _whats_new():
+    """RELEASE_NOTES.md: an English, an Arabic and a French block, separated by blank lines."""
+    try:
+        blocks = [b.strip() for b in open(os.path.join(ROOT, "RELEASE_NOTES.md"), encoding="utf-8").read().split("\n\n") if b.strip()]
+    except OSError:
+        return {}
+    return dict(zip(("en", "ar", "fr"), blocks)) if len(blocks) == 3 else {}
+
+
+WHATS_NEW = _whats_new()
+REPLACE = "--replace" in sys.argv
+
+
+def replace_pending(app):
+    """Withdraw a submission still waiting for (or in) review, so the newer build can take its place."""
+    print("\n== Withdraw the older submission")
+    st, b = call("GET", f"reviewSubmissions?filter[app]={app}&filter[platform]={PLATFORM}&filter[state]=WAITING_FOR_REVIEW,IN_REVIEW")
+    subs = b.get("data", [])
+    if not subs:
+        step("Nothing waiting for review", True)
+        return
+    for s in subs:
+        st, _ = call("PATCH", f"reviewSubmissions/{s['id']}", {"data": {"type": "reviewSubmissions", "id": s["id"], "attributes": {"canceled": True}}})
+        step(f"Cancel the submission {s['attributes']['state'].lower().replace('_', ' ')}", st < 300)
+        for _ in range(40):   # canceling takes a moment
+            st, b = call("GET", f"reviewSubmissions/{s['id']}")
+            state = b.get("data", {}).get("attributes", {}).get("state")
+            if state not in ("CANCELING", "WAITING_FOR_REVIEW", "IN_REVIEW"):
+                print(f"   now {state}")
+                break
+            time.sleep(15)
+    for _ in range(40):   # and the version goes back to "Developer Rejected"
+        st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]={PLATFORM}&limit=20")
+        if not any((v["attributes"].get("appStoreState") or "") in ("WAITING_FOR_REVIEW", "IN_REVIEW") for v in b.get("data", [])):
+            step("Older version withdrawn from review", True)
+            return
+        time.sleep(15)
+    step("Older version withdrawn from review", False, "still in review after 10 minutes")
 
 
 def upload_shot(set_id, path):

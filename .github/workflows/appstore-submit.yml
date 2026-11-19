@@ -36,4 +36,5 @@ jobs:
         run: |
           ARGS=""; grep -q no-submit store/appstore/SUBMIT && ARGS=--no-submit
           grep -q pubkey store/appstore/SUBMIT && ARGS=--pubkey
+          grep -q replace store/appstore/SUBMIT && ARGS="$ARGS --replace"
           BUILD=$(grep -o 'build=[^ ]*' store/appstore/SUBMIT | cut -d= -f2 || true) python3 -u tools/appstore_submit.py $ARGS
