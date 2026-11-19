@@ -15,6 +15,8 @@ targets:
   IslamicAzkar:
     type: application
     platform: tvOS
+    scheme:
+      testTargets: [IslamicAzkarUITests]
     sources:
       - path: ../ios/Shared
         excludes: ["WidgetViews.swift", "TasbihIntents.swift"]
@@ -43,3 +45,14 @@ targets:
         CODE_SIGN_IDENTITY: ""
         CODE_SIGNING_ALLOWED: NO
         DEVELOPMENT_TEAM: ""
+  IslamicAzkarUITests:
+    type: bundle.ui-testing
+    platform: tvOS
+    sources: [UITests]
+    dependencies:
+      - target: IslamicAzkar
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.koussa.IslamicAzkar.UITests
+        CODE_SIGNING_ALLOWED: NO
+        GENERATE_INFOPLIST_FILE: YES

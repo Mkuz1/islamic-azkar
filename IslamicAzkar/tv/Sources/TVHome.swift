@@ -24,7 +24,9 @@ struct TVHomeView: View {
                     Text(s.appName).font(lang == .ar ? .amiri(76, bold: true) : .system(size: 64, weight: .bold))
                         .foregroundStyle(.white)
                 }
-                TVPrayerCard()
+                // A focus stop at the top (so the remote can move up from the tiles); opens the city setting.
+                Button { model.tab = .settings } label: { TVPrayerCard() }
+                    .buttonStyle(.card)
 
                 section(s.recommendedNow)
                 HStack(spacing: 40) {
@@ -37,10 +39,14 @@ struct TVHomeView: View {
                         .buttonStyle(.card)
                     }
                 }
+                .focusSection()
 
                 section(s.categories)
-                LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 40), count: 3), spacing: 40) {
-                    ForEach(AzkarData.shared.categories) { c in
+                // Built up front (not lazily): the remote can only move to buttons that exist.
+                Grid(horizontalSpacing: 40, verticalSpacing: 40) {
+                    ForEach(Array(stride(from: 0, to: AzkarData.shared.categories.count, by: 3)), id: \.self) { row in
+                        GridRow {
+                            ForEach(AzkarData.shared.categories[row..<min(row + 3, AzkarData.shared.categories.count)]) { c in
                         NavigationLink(value: TVRoute.category(c.key)) {
                             HStack(spacing: 24) {
                                 Image(systemName: categorySymbol(c.key)).font(.title2)
@@ -57,8 +63,11 @@ struct TVHomeView: View {
                             .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.card)
+                            }
+                        }
                     }
                 }
+                .focusSection()
             }
             .padding(.horizontal, 90)
             .padding(.vertical, 50)
@@ -148,18 +157,23 @@ struct TVCategoryView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 Text(s.category(key)).font(.system(size: 54, weight: .bold))
-                LazyVGrid(columns: [GridItem(.flexible(), spacing: 40), GridItem(.flexible(), spacing: 40)], spacing: 30) {
-                    ForEach(ids, id: \.self) { id in
-                        if let c = data.chapterById[id] {
-                            NavigationLink(value: TVRoute.reader(.chapter(id))) {
-                                HStack {
-                                    Text(c.title(lang)).font(.headline).multilineTextAlignment(.leading).lineLimit(2)
-                                    Spacer()
-                                    Text(lang.num(c.items.count)).font(.callout).foregroundStyle(.secondary)
+                // Built up front (not lazily), so the remote can reach every chapter.
+                Grid(horizontalSpacing: 40, verticalSpacing: 30) {
+                    ForEach(Array(stride(from: 0, to: ids.count, by: 2)), id: \.self) { row in
+                        GridRow {
+                            ForEach(ids[row..<min(row + 2, ids.count)], id: \.self) { id in
+                                if let c = data.chapterById[id] {
+                                    NavigationLink(value: TVRoute.reader(.chapter(id))) {
+                                        HStack {
+                                            Text(c.title(lang)).font(.headline).multilineTextAlignment(.leading).lineLimit(2)
+                                            Spacer()
+                                            Text(lang.num(c.items.count)).font(.callout).foregroundStyle(.secondary)
+                                        }
+                                        .padding(28).frame(maxWidth: .infinity, minHeight: 110)
+                                    }
+                                    .buttonStyle(.card)
                                 }
-                                .padding(28).frame(maxWidth: .infinity, minHeight: 110)
                             }
-                            .buttonStyle(.card)
                         }
                     }
                 }

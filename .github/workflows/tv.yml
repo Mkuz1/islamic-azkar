@@ -34,6 +34,19 @@ jobs:
           xcodebuild -project IslamicAzkarTV.xcodeproj -scheme IslamicAzkar -configuration Debug \
             -sdk appletvsimulator -destination 'generic/platform=tvOS Simulator' -derivedDataPath build/sim \
             CODE_SIGNING_ALLOWED=NO build | xcbeautify --renderer github-actions
+      - name: Siri Remote navigation (where the focus goes after each press)
+        run: |
+          set -o pipefail
+          D=$(xcrun simctl list devices available -j | python3 -c '
+          import json,sys
+          d=json.load(sys.stdin)["devices"]
+          tv=[(k,x) for k,v in d.items() if "tvOS" in k for x in v]
+          tv.sort(key=lambda kx: [int(n) for n in kx[0].split("tvOS-")[1].split("-") if n.isdigit()])
+          print(tv[-1][1]["udid"] if tv else "")')
+          echo "simulator $D"
+          xcodebuild test -project IslamicAzkarTV.xcodeproj -scheme IslamicAzkar -destination "id=$D" \
+            -derivedDataPath build/test CODE_SIGNING_ALLOWED=NO 2>&1 | tee test.log | grep -E "FOCUS|error:|Test Case.*(passed|failed)|XCTAssert" || true
+          grep -q "TEST FAILED\|\*\* TEST FAILED" test.log && echo "::warning::Remote navigation test failed (see FOCUS lines)" || true
       - name: Screenshots
         env:
           GH_TOKEN: ${{ github.token }}

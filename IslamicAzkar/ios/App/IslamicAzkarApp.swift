@@ -22,11 +22,25 @@ enum Route: Hashable {
 final class AppModel {
     private let d = SharedStore.defaults
 
+    #if os(iOS)
+    /// UIKit draws the tab bar (at the top on iPad) and follows the device's language unless told
+    /// otherwise: an Arabic iPad showed the English and French tabs in right-to-left order.
+    static func applyUIKitDirection(_ lang: Lang) {
+        let dir: UISemanticContentAttribute = lang.isRTL ? .forceRightToLeft : .forceLeftToRight
+        UIView.appearance().semanticContentAttribute = dir
+        UINavigationBar.appearance().semanticContentAttribute = dir
+        UITabBar.appearance().semanticContentAttribute = dir
+    }
+    #endif
+
     var lang: Lang {
         didSet {
             d.set(lang.rawValue, forKey: SharedStore.Key.lang)
             #if os(macOS)
             if oldValue != lang { homePath = [] }
+            #endif
+            #if os(iOS)
+            Self.applyUIKitDirection(lang)
             #endif
             refreshExtensions()
         }
@@ -112,6 +126,9 @@ final class AppModel {
         func bool(_ k: String, _ def: Bool) -> Bool { d.object(forKey: k) == nil ? def : d.bool(forKey: k) }
         func int(_ k: String, _ def: Int) -> Int { d.object(forKey: k) == nil ? def : d.integer(forKey: k) }
         lang = SharedStore.lang
+        #if os(iOS)
+        Self.applyUIKitDirection(lang)
+        #endif
         theme = ThemeMode(rawValue: d.string(forKey: "theme") ?? "") ?? .system
         textScale = d.object(forKey: "text_scale") == nil ? 1 : d.double(forKey: "text_scale")
         showTranslit = bool("translit", true)
@@ -305,7 +322,8 @@ struct IslamicAzkarApp: App {
                     // (keeping the old one made the next navigation loop and crash).
                     MacRootView().id(model.lang).transition(.opacity)
                     #else
-                    RootView().transition(.opacity)
+                    // Rebuilt on a language change, so UIKit's tab bar takes the new direction.
+                    RootView().id(model.lang).transition(.opacity)
                     #endif
                 }
             }

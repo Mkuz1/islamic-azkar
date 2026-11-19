@@ -63,6 +63,7 @@ struct TVTasbihView: View {
                 Button(s.reset, role: .destructive) { model.tasbihCount = 0 }
             }
             .frame(width: 620)
+            .focusSection()   // the remote moves between the counter and these controls as two groups
         }
         .padding(.horizontal, 90)
         .onAppear { focused = true }
