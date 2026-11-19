@@ -16,7 +16,7 @@ permissions:
 jobs:
   sign:
     runs-on: xcode-27
-    timeout-minutes: 60
+    timeout-minutes: 330
     steps:
       - uses: actions/checkout@v4
       - name: Select Xcode 27.1

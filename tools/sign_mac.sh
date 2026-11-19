@@ -12,13 +12,22 @@ IDENT=$(security find-identity -v -p codesigning "$KC" | grep "Developer ID Appl
 security find-identity -v -p codesigning "$KC" | grep "Developer ID" | sed 's/[0-9A-F]\{40\}/<id>/'
 
 notarize() {
-  local out
-  out=$(xcrun notarytool submit "$1" --key "$P8" --key-id "$KEY_ID" --issuer "$ISSUER" --wait --output-format json)
+  # Submit, then ask Apple every minute (the first submissions from a new Developer ID can take hours).
+  local out id status
+  out=$(xcrun notarytool submit "$1" --key "$P8" --key-id "$KEY_ID" --issuer "$ISSUER" --output-format json)
   echo "$out"
-  if ! echo "$out" | grep -q '"status" *: *"Accepted"'; then
-    id=$(echo "$out" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("id",""))')
-    [ -n "$id" ] && xcrun notarytool log "$id" --key "$P8" --key-id "$KEY_ID" --issuer "$ISSUER" || true
-    echo "::error::Apple did not notarize $1"; exit 1
+  id=$(echo "$out" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')
+  for i in $(seq 1 280); do
+    status=$(xcrun notarytool info "$id" --key "$P8" --key-id "$KEY_ID" --issuer "$ISSUER" --output-format json 2>/dev/null \
+      | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status",""))' 2>/dev/null || true)
+    [ "$status" = "In Progress" ] || [ -z "$status" ] || break
+    [ $((i % 10)) = 0 ] && echo "   still with Apple after $i min"
+    sleep 60
+  done
+  echo "notarization of $(basename "$1"): $status"
+  if [ "$status" != "Accepted" ]; then
+    xcrun notarytool log "$id" --key "$P8" --key-id "$KEY_ID" --issuer "$ISSUER" || true
+    echo "::error::Apple did not notarize $1 ($status)"; exit 1
   fi
 }
 

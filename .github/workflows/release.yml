@@ -176,7 +176,7 @@ jobs:
   mac:
     needs: prepare
     runs-on: xcode-27
-    timeout-minutes: 45
+    timeout-minutes: 240
     defaults:
       run:
         working-directory: IslamicAzkar/mac
