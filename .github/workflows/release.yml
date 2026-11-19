@@ -5,6 +5,7 @@
 #  - Android "github" APK, signed with the upload key  → public release in Mkuz1/islamic-azkar-releases (IslamicAzkar.apk)
 #  - unsigned iPhone IPA (install with Sideloadly/AltStore) → same public release (IslamicAzkar.ipa)
 #  - Mac app, Developer ID signed and notarized by Apple   → same public release (IslamicAzkar.dmg)
+#  - Windows app, per-user installer (no admin rights)  → same public release (IslamicAzkar-Setup.exe)
 #  - Android "play" App Bundle for Google Play          → private release in this repository (IslamicAzkar-play.aab)
 #
 # Each build job uploads its file straight to a draft release (no workflow artifacts, so the
@@ -62,6 +63,7 @@ jobs:
             echo '**Android:** install `IslamicAzkar.apk` (Android 8 or later).'
             echo '**iPhone:** `IslamicAzkar.ipa` is unsigned; install it with Sideloadly or AltStore.'
             echo '**Mac:** open `IslamicAzkar.dmg` and drag the app to Applications (macOS 15 or later). It is signed and notarized by Apple.'
+            echo '**Windows:** run `IslamicAzkar-Setup.exe` (Windows 10 or 11). It installs for your user only and needs no administrator rights. If SmartScreen appears, choose More info → Run anyway.'
           } > notes.md
       - name: Draft releases
         env:
@@ -224,8 +226,35 @@ jobs:
           GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.dmg -R Mkuz1/islamic-azkar-releases --clobber
           GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.dmg -R "$GITHUB_REPOSITORY" --clobber
 
+  windows:
+    needs: prepare
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: IslamicAzkar/windows
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the installer (per user, no administrator rights)
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+        run: |
+          npm pkg set version=$V
+          npm install --no-audit --no-fund
+          npm run dist
+          ls -l dist/IslamicAzkar-Setup.exe
+      - name: Upload to the draft releases
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" dist/IslamicAzkar-Setup.exe -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" dist/IslamicAzkar-Setup.exe -R "$GITHUB_REPOSITORY" --clobber
+
   publish:
-    needs: [prepare, android, ios, mac]
+    needs: [prepare, android, ios, mac, windows]
     runs-on: ubuntu-latest
     env:
       V: ${{ needs.prepare.outputs.version }}
@@ -240,7 +269,7 @@ jobs:
       - name: Check the public downloads
         run: |
           sleep 10
-          for f in IslamicAzkar.apk IslamicAzkar.ipa IslamicAzkar.dmg; do
+          for f in IslamicAzkar.apk IslamicAzkar.ipa IslamicAzkar.dmg IslamicAzkar-Setup.exe; do
             curl -fsSL -o "/tmp/$f" "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/$f"
             ls -l "/tmp/$f"
           done

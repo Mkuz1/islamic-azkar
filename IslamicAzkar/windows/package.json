@@ -1,0 +1,44 @@
+{
+  "name": "islamic-azkar",
+  "productName": "Islamic Azkar",
+  "version": "1.0.25",
+  "description": "Islamic Azkar: Hisn al-Muslim in Arabic, English and French, prayer times and tasbih",
+  "author": "Islamic Azkar",
+  "homepage": "https://islamicazkar.net",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "prepare-web": "node prepare-web.js",
+    "start": "npm run prepare-web && electron .",
+    "dist": "npm run prepare-web && electron-builder --win --x64 --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.2.3",
+    "electron-builder": "26.18.0"
+  },
+  "build": {
+    "appId": "com.koussa.IslamicAzkar",
+    "productName": "Islamic Azkar",
+    "copyright": "Islamic Azkar",
+    "files": ["main.js", "package.json", "web/**/*"],
+    "directories": { "output": "dist", "buildResources": "build" },
+    "win": {
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "icon": "build/icon.png",
+      "artifactName": "IslamicAzkar-Setup.${ext}",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowElevation": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Islamic Azkar",
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false
+    },
+    "publish": null
+  }
+}

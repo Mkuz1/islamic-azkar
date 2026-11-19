@@ -10,7 +10,7 @@ const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
 const READING_RE = /^(morning|evening|c\d{1,4})$/;
 const MAX_BODY = 256 * 1024;     // a full record is well under this
 const MAX_DAYS = 3700;           // about ten years of days kept per code
-const ORIGINS = /^https:\/\/((www\.)?islamicazkar\.net|([a-z0-9-]+\.)?islamic-azkar\.pages\.dev)$|^http:\/\/localhost(:\d+)?$/;
+const ORIGINS = /^https:\/\/((www\.)?islamicazkar\.net|([a-z0-9-]+\.)?islamic-azkar\.pages\.dev)$|^http:\/\/localhost(:\d+)?$|^app:\/\/islamic-azkar$/;   // the last: the Windows app
 
 function cors(request) {
   const origin = request.headers.get("origin") || "";
