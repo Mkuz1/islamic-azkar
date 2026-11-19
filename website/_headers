@@ -16,3 +16,7 @@
   X-Frame-Options: DENY
   Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
   Cross-Origin-Opener-Policy: same-origin
+/apple/*
+  Content-Type: application/octet-stream
+  Content-Disposition: attachment
+  Cache-Control: no-cache

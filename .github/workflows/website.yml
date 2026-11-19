@@ -69,6 +69,12 @@ jobs:
           # Data deletion (the Play Store link): delete that code's record, then it must be gone.
           curl -fsS https://islamicazkar.net/delete/ | grep -q "Delete your data"
           curl -fsS https://islamicazkar.net/delete/delete.js | grep -q "sync/delete"
+          # Downloads: each goes to the newest file on GitHub.
+          for d in windows mac android; do
+            u=$(curl -fsSIL -o /dev/null -w '%{url_effective} %{http_code}' "https://islamicazkar.net/download/$d")
+            echo "download/$d → $u"; case "$u" in *" 200") ;; *) echo "::error::download/$d is broken"; exit 1;; esac
+          done
+          curl -fsSI https://islamicazkar.net/apple/IslamicAzkar.certSigningRequest | grep -qi "content-disposition: attachment" && echo "request file downloads as a file"
           # Security headers, and no deploy config served.
           curl -sSI https://islamicazkar.net/ | grep -qi "^content-security-policy:" || { echo "::error::no Content-Security-Policy"; exit 1; }
           curl -sS https://islamicazkar.net/wrangler.toml | grep -q "kv_namespaces" && { echo "::error::wrangler.toml is served"; exit 1; } || echo "wrangler.toml not served"

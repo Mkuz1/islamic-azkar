@@ -2,7 +2,7 @@
 // prayer times, tasbih and sync as islamicazkar.net. Server-only files are left out.
 const fs = require("fs"), path = require("path");
 const src = path.join(__dirname, "..", "..", "website"), dst = path.join(__dirname, "web");
-const skip = new Set(["functions", "wrangler.toml", "_headers", "dist", "node_modules", "delete"]);
+const skip = new Set(["functions", "wrangler.toml", "_headers", "_redirects", "apple", "dist", "node_modules", "delete"]);
 fs.rmSync(dst, { recursive: true, force: true });
 (function copy(from, to) {
   fs.mkdirSync(to, { recursive: true });

@@ -131,9 +131,11 @@
     mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
   };
   // Always the newest APK: GitHub redirects /releases/latest/download/<asset> to the latest release's file.
-  const APK_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.apk";
-  const DMG_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.dmg";
-  const WIN_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar-Setup.exe";
+  // islamicazkar.net/download/* always redirects to the newest file on GitHub (see _redirects).
+  const DL = /(^|\.)islamicazkar\.net$/.test(location.hostname) ? "" : "https://islamicazkar.net";
+  const APK_URL = DL + "/download/android";
+  const DMG_URL = DL + "/download/mac";
+  const WIN_URL = DL + "/download/windows";
   const SYNC_URL = /(^|\.)islamicazkar\.net$|\.pages\.dev$/.test(location.hostname) ? "/sync" : "https://islamicazkar.net/sync";
   const REGISTER_URL = /(^|\.)islamicazkar\.net$/.test(location.hostname) ? "/api/register" : "https://islamicazkar.net/api/register";
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
