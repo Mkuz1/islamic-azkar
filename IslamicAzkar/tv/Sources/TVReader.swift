@@ -49,7 +49,7 @@ struct TVReaderView: View {
                     Text(z.tr).font(.callout).italic().foregroundStyle(.white.opacity(0.7))
                         .multilineTextAlignment(.center).lineLimit(3).minimumScaleFactor(0.6)
                 }
-                if lang != .ar, !z.meaning(lang).isEmpty {
+                if !z.meaning(lang).isEmpty {
                     Text(z.meaning(lang)).font(.callout).foregroundStyle(.white.opacity(0.9))
                         .multilineTextAlignment(.center).lineLimit(4).minimumScaleFactor(0.6)
                 }

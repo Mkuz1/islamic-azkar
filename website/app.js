@@ -30,7 +30,7 @@
       thanks: "جزاك الله خيرًا! وصلنا بريدك وسنضيفك إلى المختبِرين قريبًا إن شاء الله.", failed: "تعذّر الإرسال، حاول مرة أخرى.",
       mushaf: "تطبيق المصحف", mushafText: "اقرأ القرآن الكريم بخط المصحف الشريف، صدقة جارية من فريقنا.", mushafCta: "حمّله من mushafapp.com",
       privacy: "سياسة الخصوصية", sunnahSrc: "من كتب السنة", quranSrc: "من القرآن الكريم", guide: "الدليل", guideCta: "خطوات العمرة من الإحرام إلى التقصير", readDuas: "أذكار هذه الخطوة", sources: "المصادر", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
-      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", quran: "أدعية من القرآن", sunnah: "أدعية من السنة", praise: "الذكر والاستغفار" },
+      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", quran: "أدعية من القرآن", sunnah: "أدعية من السنة", ruqyah: "الرقية الشرعية", names: "أسماء الله الحسنى", praise: "الذكر والاستغفار" },
     },
     en: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "Hisn al-Muslim in a calm, elegant design: the daily azkar with a counter, transliteration and meaning.",
@@ -58,7 +58,7 @@
       thanks: "Jazak Allah khayran! We got your address and will add you to the testers soon, in sha Allah.", failed: "Couldn’t send it. Please try again.",
       mushaf: "Mushaf app", mushafText: "Read the Holy Quran in the script of the printed Mushaf, a sadaqa jariyah from our team.", mushafCta: "Download from mushafapp.com",
       privacy: "Privacy policy", sunnahSrc: "From the hadith collections", quranSrc: "From the Holy Quran", guide: "Guide", guideCta: "Every step from iḥrām to the haircut", readDuas: "Words to say", sources: "Sources", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
-      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", quran: "Duas from the Quran", sunnah: "Duas from the Sunnah", praise: "Praise & Forgiveness" },
+      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", quran: "Duas from the Quran", sunnah: "Duas from the Sunnah", ruqyah: "Ruqyah", names: "The 99 Names of Allah", praise: "Praise & Forgiveness" },
     },
     fr: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "La Citadelle du musulman dans un design apaisant : les adhkar du quotidien avec compteur, translittération et traduction.",
@@ -86,7 +86,7 @@
       thanks: "Jazak Allah khayran ! Nous avons bien reçu votre adresse et vous ajouterons aux testeurs très bientôt, in shâ Allah.", failed: "Échec de l’envoi. Réessayez.",
       mushaf: "Application Mushaf", mushafText: "Lisez le Saint Coran dans l’écriture du Mushaf imprimé, une sadaqa jariya de notre équipe.", mushafCta: "Télécharger sur mushafapp.com",
       privacy: "Confidentialité", sunnahSrc: "Des recueils de hadiths", quranSrc: "Du Saint Coran", guide: "Guide", guideCta: "Chaque étape, de l’iḥrām à la coupe des cheveux", readDuas: "Paroles à dire", sources: "Sources", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
-      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", quran: "Invocations du Coran", sunnah: "Invocations de la Sunna", praise: "Louange & pardon" },
+      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", quran: "Invocations du Coran", sunnah: "Invocations de la Sunna", ruqyah: "La roqya", names: "Les 99 noms d'Allah", praise: "Louange & pardon" },
     },
   };
 
@@ -138,7 +138,7 @@
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
   const CAT_STYLE = {
     prayer: ["mosque", "#34c759"], sleep: ["bed", "#5856d6"], home: ["home", "#ff9500"], hardship: ["heart", "#ff3b30"], illness: ["spark", "#30b0c7"],
-    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], quran: ["book", "#1e6b52"], sunnah: ["book", "#0a84ff"], praise: ["beads", "#1e6b52"],
+    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], quran: ["book", "#1e6b52"], sunnah: ["book", "#0a84ff"], ruqyah: ["beads", "#34aadc"], names: ["spark", "#c8963e"], praise: ["beads", "#1e6b52"],
   };
 
   // ───────────── State ─────────────
@@ -158,7 +158,7 @@
   function arCount(n, one, two, few, many) { if (n === 1) return one; if (n === 2) return two; return `${num(n)} ${n <= 10 ? few : many}`; }
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
-  const meaning = z => lang === "ar" ? "" : (z[lang] || z.en || "");
+  const meaning = z => lang === "ar" ? (z.arm || "") : (z[lang] || z.en || "");
   const chapterTitle = c => c[lang] || c.en;
   const normalize = t => t.replace(/[ً-ٰٟـ]/g, "").replace(/[إأآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").toLowerCase();
 

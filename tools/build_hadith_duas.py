@@ -12,9 +12,10 @@ sahih or hasan by al-Albani. Re-running replaces the chapters it added earlier.
 import argparse, json, os, re, sys, urllib.request
 
 sys.path.insert(0, os.path.dirname(__file__))
-from hadith_duas import CATEGORY, CHAPTERS, DUAS  # noqa: E402
+from hadith_duas import CATEGORY, CHAPTERS, DUAS, EXTRA_CHAPTERS, EXTRA_DUAS  # noqa: E402
 import quran_duas  # noqa: E402
 import umrah_guide  # noqa: E402
+import names99  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TARGETS = ["IslamicAzkar/app/src/main/assets/azkar.json", "IslamicAzkar/ios/Shared/azkar.json", "website/data/azkar.json"]
@@ -34,7 +35,8 @@ GRADE = {
     "Hasan": ("حسّنه الألباني", "hasan according to al-Albani", "hasan selon al-Albani"),
 }
 # New categories, inserted before "praise" in this order.
-NEW_CATEGORIES = ["quran", "sunnah"]
+NEW_CATEGORIES = ["quran", "sunnah", "ruqyah"]
+NAMES_CHAPTER = (141, "أسماء الله الحسنى", "The 99 Names of Allah", "Les 99 noms d'Allah")
 
 HARAKAT = re.compile("[ً-ٰٟۖ-ۭـ‎‏]")
 
@@ -108,7 +110,53 @@ def quran_items(cache, next_id):
                "en": f"Quran, {name_lat} {surah}:{ayat}", "fr": f"Coran, {name_lat} {surah}:{ayat}"}
         chapters[key]["items"].append({"id": next_id, "ar": ar, "tr": tr, "en": en, "fr": fr, "n": 1, "ref": ref})
         next_id += 1
+    rid, rar, ren, rfr = quran_duas.RUQYAH_CHAPTER
+    chapters["ruqyah"] = {"id": rid, "ar": rar, "en": ren, "fr": rfr, "items": []}
+    for item_id, surah, first, last, start, end, tr, en, fr in quran_duas.RUQYAH:
+        text = " ".join(verses[(surah, a)].replace("۞", "") + f" ﴿{ar_digits(a)}﴾" for a in range(first, last + 1))
+        ar = extract(text, start, end)
+        if ar is None:
+            sys.exit(f"Quran {surah}:{first}-{last}: anchors '{start}' … '{end}' not found")
+        ar = re.sub(r"\s+", " ", ar).strip()
+        if not ar.endswith("﴾"):
+            ar += f" ﴿{ar_digits(last)}﴾"
+        name_ar, name_lat = quran_duas.SURAHS[surah]
+        ayat = f"{first}" if first == last else f"{first}–{last}"
+        ref = {"ar": f"سورة {name_ar} {ar_digits(first) if first == last else ar_digits(first) + '–' + ar_digits(last)}",
+               "en": f"Quran, {name_lat} {surah}:{ayat}", "fr": f"Coran, {name_lat} {surah}:{ayat}"}
+        chapters["ruqyah"]["items"].append({"id": item_id, "ar": ar, "tr": tr, "en": en, "fr": fr, "n": 1, "ref": ref})
     return chapters, next_id
+
+
+def names_chapter(hadith):
+    """The 99 Names, cut from at-Tirmidhi 3507 with their vowel marks, after the authentic hadith."""
+    book, num, start, end, tr, en, fr, arm = names99.INTRO
+    h = hadith(book, num)
+    intro = extract(h["text"], start, end)
+    if intro is None:
+        sys.exit(f"{book} {num}: '{start}' … '{end}' not found")
+    items = [{"id": 600, "ar": clean(intro), "tr": tr, "en": en, "fr": fr, "arm": arm, "n": 1,
+              "ref": labels([(book, h), ("muslim", hadith("muslim", 6810))])}]
+    t = hadith("tirmidhi", 3507)["text"].replace("‏", "").replace("‎", "").replace('"', ' " ')
+    w = t.split()
+    nw = [norm(x) for x in w]
+    i = next(k for k in range(len(nw)) if nw[k:k + 6] == ["هو", "الله", "الذي", "لا", "اله", "الا"])
+    allah = w[i + 1]
+    i += 7
+    j = next(k for k in range(i, len(w)) if w[k] == '"')
+    w, nw = w[i:j], nw[i:j]
+    names, k = [allah], 0
+    while k < len(w):
+        size = 2 if nw[k] == "مالك" else 3 if nw[k] == "ذو" else 1
+        names.append(" ".join(w[k:k + size]))
+        k += size
+    if len(names) != 99 or len(names99.NAMES) != 99:
+        sys.exit(f"99 names: {len(names)} from the hadith, {len(names99.NAMES)} meanings")
+    ref = {"ar": "رواية الترمذي ٣٥٠٧", "en": "Narration of at-Tirmidhi 3507", "fr": "Version d'at-Tirmidhi 3507"}
+    for n, (ar, (tr, en, fr, arm)) in enumerate(zip(names, names99.NAMES), start=1):
+        items.append({"id": 600 + n, "ar": clean(ar), "tr": tr, "en": en, "fr": fr, "arm": arm, "n": 1, "ref": ref})
+    cid, car, cen, cfr = NAMES_CHAPTER
+    return {"id": cid, "ar": car, "en": cen, "fr": cfr, "items": items}
 
 
 def citation_number(book, h):
@@ -194,23 +242,45 @@ def main():
         chapters[key]["items"].append({"id": next_id, "ar": ar, "tr": tr, "en": en, "fr": fr, "n": n, "ref": labels(refs, grade)})
         next_id += 1
 
+    chapters.update({k: {"id": v[0], "ar": v[1], "en": v[2], "fr": v[3], "items": []} for k, v in EXTRA_CHAPTERS.items()})
+    for item_id, key, book, num, start, end, n, tr, en, fr, also in EXTRA_DUAS:
+        h = hadith(book, num)
+        ar = extract(h["text"], start, end)
+        if ar is None:
+            sys.exit(f"{book} {num}: anchors '{start}' … '{end}' not found")
+        refs = [(book, h)]
+        grade = None if book in ("bukhari", "muslim") else albani_grade(book, h)
+        for b2, n2, phrase in also:
+            h2 = hadith(b2, n2)
+            if norm(phrase) not in norm(h2["text"]):
+                sys.exit(f"{b2} {n2}: does not contain '{phrase}'")
+            refs.append((b2, h2))
+        chapters[key]["items"].append({"id": item_id, "ar": clean(ar), "tr": tr, "en": en, "fr": fr, "n": n, "ref": labels(refs, grade)})
+    for b, num, phrase in quran_duas.RUQYAH_EVIDENCE:
+        if norm(phrase) not in norm(hadith(b, num)["text"]):
+            sys.exit(f"ruqyah evidence {b} {num} does not contain '{phrase}'")
+
     qchapters, next_id = quran_items(args.cache, next_id)
+    names = names_chapter(hadith)
     guide = build_guide(hadith, chapters)
     category_of = {chapters[k]["id"]: CATEGORY.get(k, "sunnah") for k in chapters}
-    category_of.update({c["id"]: "quran" for c in qchapters.values()})
+    category_of.update({c["id"]: "ruqyah" if k == "ruqyah" else "quran" for k, c in qchapters.items()})
+    category_of[names["id"]] = "names"
     chapters.update({"q_" + k: v for k, v in qchapters.items()})
+    chapters["names"] = names
     new_ids = {c["id"] for c in chapters.values()}
     for rel in TARGETS:
         path = os.path.join(ROOT, rel)
         with open(path, encoding="utf-8") as f:
             data = json.load(f)
         data["chapters"] = [c for c in data["chapters"] if c["id"] not in new_ids] + sorted(chapters.values(), key=lambda c: c["id"])
-        cats = [c for c in data["categories"] if c["key"] not in NEW_CATEGORIES]
+        cats = [c for c in data["categories"] if c["key"] not in NEW_CATEGORIES + ["names"]]
         for c in cats:
             c["chapters"] = [i for i in c["chapters"] if i not in new_ids]
         at = next(i for i, c in enumerate(cats) if c["key"] == "praise")
         for k in reversed(NEW_CATEGORIES):
             cats.insert(at, {"key": k, "chapters": []})
+        cats.insert(0, {"key": "names", "chapters": []})   # the 99 Names first
         by_key = {c["key"]: c for c in cats}
         for cid, cat in sorted(category_of.items()):
             by_key[cat]["chapters"].append(cid)

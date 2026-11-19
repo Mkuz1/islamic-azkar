@@ -24,11 +24,13 @@ data class Zikr(
     val repeat: Int,
     /** Hadith reference (book and number), present on the duas added from the hadith collections. */
     val ref: Localized? = null,
+    /** Arabic explanation, shown as the meaning in Arabic (e.g. for the 99 Names). */
+    val arm: String = "",
 ) {
     fun meaning(lang: Lang): String = when (lang) {
         Lang.FR -> fr
         Lang.EN -> en
-        Lang.AR -> ""
+        Lang.AR -> arm
     }
 }
 
@@ -129,7 +131,7 @@ object AzkarRepository {
 
     private fun parseItems(arr: JSONArray): List<Zikr> = List(arr.length()) { i ->
         val o = arr.getJSONObject(i)
-        Zikr(o.getInt("id"), o.getString("ar"), o.optString("tr"), o.optString("en"), o.optString("fr"), o.optInt("n", 1), Localized.of(o.optJSONObject("ref")))
+        Zikr(o.getInt("id"), o.getString("ar"), o.optString("tr"), o.optString("en"), o.optString("fr"), o.optInt("n", 1), Localized.of(o.optJSONObject("ref")), o.optString("arm"))
     }
 
     private fun parse(root: JSONObject): Data {

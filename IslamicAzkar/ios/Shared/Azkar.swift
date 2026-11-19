@@ -33,12 +33,14 @@ struct Zikr: Codable, Identifiable, Hashable {
     let n: Int
     /// Hadith reference (book and number) on the duas added from the hadith collections.
     var ref: LocalizedText? = nil
+    /// Arabic explanation, shown as the meaning in Arabic (e.g. for the 99 Names).
+    var arm: String? = nil
 
     var repeatCount: Int { max(1, n) }
 
     func meaning(_ lang: Lang) -> String {
         switch lang {
-        case .ar: return ""
+        case .ar: return arm ?? ""
         case .en: return en
         case .fr: return fr
         }
