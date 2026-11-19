@@ -36,13 +36,23 @@ jobs:
           printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
           python3 -m pip install -q --break-system-packages pyjwt cryptography 2>/dev/null || python3 -m pip install -q pyjwt cryptography
       - name: Developer ID certificate
-        run: python3 tools/developer_id.py setup "$RUNNER_TEMP/devid"
-      - name: Keep the new certificate (encrypted)
+        id: cert
+        run: |
+          set +e
+          python3 tools/developer_id.py setup "$RUNNER_TEMP/devid"; rc=$?
+          echo "rc=$rc" >> "$GITHUB_OUTPUT"
+          [ $rc = 0 ] || [ $rc = 2 ]
+      - name: Keep the key, request and certificate (encrypted)
         run: |
           if [ -n "$(git status --porcelain store/devid)" ]; then
             git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add store/devid/devid.enc && git commit -m "Developer ID certificate for the Mac app on GitHub (encrypted)" && git pull --rebase -q && git push
-          else echo "certificate already kept"; fi
+            git add store/devid && git commit -m "Developer ID for the Mac app on GitHub: key and certificate (encrypted)" && git pull --rebase -q && git push
+          else echo "nothing new to keep"; fi
+      - name: Waiting for the Account Holder
+        if: steps.cert.outputs.rc == '2'
+        run: |
+          echo "::error::Upload store/devid/IslamicAzkar.certSigningRequest at developer.apple.com → Certificates → + → Developer ID Application, then run this workflow again."
+          exit 1
       - name: Build, sign and notarize
         working-directory: IslamicAzkar/mac
         run: |
