@@ -1,0 +1,65 @@
+# Cloudflare rate limiting for islamicazkar.net: new sync codes and tester sign-ups, per IP.
+# Triggered by changing this file (or by hand). Uses the CLOUDFLARE_API_TOKEN secret, which needs
+# the "Zone WAF: Edit" permission on islamicazkar.net.
+name: Cloudflare rate limit
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: [".github/workflows/cloudflare-waf.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  waf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Rate limiting rule
+        env:
+          CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          python3 - <<'EOF'
+          import json, os, urllib.request, urllib.error
+          API = "https://api.cloudflare.com/client/v4/"
+          def cf(method, path, body=None):
+              req = urllib.request.Request(API + path, method=method, data=json.dumps(body).encode() if body is not None else None,
+                                           headers={"Authorization": "Bearer " + os.environ["CF_TOKEN"], "Content-Type": "application/json"})
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r: return r.status, json.load(r)
+              except urllib.error.HTTPError as e:
+                  return e.code, json.loads(e.read() or b"{}")
+          st, b = cf("GET", "user/tokens/verify"); print("token:", st, (b.get("result") or {}).get("status"))
+          st, b = cf("GET", "zones?name=islamicazkar.net")
+          if not b.get("result"):
+              raise SystemExit(f"::error::The token can't see the islamicazkar.net zone ({st}): give it Zone → WAF → Edit and Zone → Zone → Read.")
+          zone = b["result"][0]; zid = zone["id"]; print("zone:", zone["name"], "plan:", zone["plan"]["name"])
+          st, b = cf("GET", f"zones/{zid}/rulesets/phases/http_ratelimit/entrypoint")
+          rules = [r for r in (b.get("result") or {}).get("rules", []) if r.get("description") != "Islamic Azkar: sync codes and sign-ups"] if st == 200 else []
+          print("existing rate limit rules:", len(rules), f"(read {st})")
+          expr = '(http.request.uri.path eq "/sync/new") or (http.request.uri.path eq "/api/register")'
+          def rule(period, n, timeout):
+              return {"description": "Islamic Azkar: sync codes and sign-ups", "expression": expr, "action": "block", "enabled": True,
+                      "ratelimit": {"characteristics": ["cf.colo.id", "ip.src"], "period": period, "requests_per_period": n, "mitigation_timeout": timeout}}
+          # 10 a minute where the plan allows a 1-minute window; the Free plan only counts over 10 seconds.
+          for period, n, timeout in ((60, 10, 60), (10, 3, 10)):
+              st, b = cf("PUT", f"zones/{zid}/rulesets/phases/http_ratelimit/entrypoint", {"rules": rules + [rule(period, n, timeout)]})
+              if st < 300:
+                  print(f"PASS rule created: block an IP after {n} requests in {period} s to /sync/new or /api/register (blocked for {timeout} s)")
+                  break
+              print(f"   {period} s window refused ({st}):", "; ".join(e.get("message", "") for e in b.get("errors", [])))
+          else:
+              raise SystemExit("::error::Could not create the rate limiting rule (see above).")
+          EOF
+      - name: Check it blocks a burst
+        run: |
+          sleep 30
+          for i in $(seq 1 15); do
+            c=$(curl -s -o /tmp/r -w '%{http_code}' -X POST https://islamicazkar.net/sync/new -H 'content-type: application/json' -d '{}')
+            echo "request $i → $c"
+            if [ "$c" = 200 ]; then code=$(python3 -c 'import json; print(json.load(open("/tmp/r"))["code"])'); curl -s -o /dev/null -X POST https://islamicazkar.net/sync/delete -H 'content-type: application/json' -d "{\"code\":\"$code\"}"; fi
+            [ "$c" = 429 ] && { echo "PASS blocked after $((i-1)) requests"; exit 0; }
+          done
+          echo "::warning::15 requests in a row were not blocked"
