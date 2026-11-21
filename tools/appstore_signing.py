@@ -6,8 +6,11 @@
 Env: KEY_ID, ISSUER, TEAM and ~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8.
 PLATFORM=mac signs the Mac App Store build instead: a Mac app and a Mac installer certificate,
 and a Mac App Store profile. PLATFORM=tv: the Apple TV app (tvOS App Store profile).
-The certificate and profiles are made for this one upload and removed afterwards; an app already
-uploaded stays valid (the App Store re-signs it).
+The iPhone and Apple TV certificate and profiles are made for one upload and removed afterwards (the
+App Store re-signs those apps). The Mac App Store ones are kept: App Review checks a Mac build's
+signature again when it is submitted, and a build signed with a revoked certificate is marked
+"Invalid Binary". They are made once and stored encrypted in store/macstore/signing.enc (only the
+App Store Connect API key, i.e. GitHub Actions, can open it), and made again only when expired.
 """
 import base64, json, os, plistlib, re, subprocess, sys, time, urllib.error, urllib.request
 import jwt
@@ -51,9 +54,41 @@ def run(*cmd, **kw):
     subprocess.run(cmd, check=True, **kw)
 
 
+SEALED = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "store", "macstore", "signing.enc")
+
+
+def _box():
+    import hashlib
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    return AESGCM(hashlib.sha256(KEY.encode() + b"islamic-azkar mac store signing").digest())
+
+
+def kept():
+    """The kept Mac App Store certificates and profile, if all still valid; else None."""
+    if not (MAC and os.path.exists(SEALED)):
+        return None
+    box = json.load(open(SEALED))
+    data = json.loads(_box().decrypt(base64.b64decode(box["nonce"]), base64.b64decode(box["ct"]), None))
+    for c in data["certificates"]:
+        st, b = call("GET", f"certificates/{c['id']}")
+        exp = (b.get("data") or {}).get("attributes", {}).get("expirationDate", "")
+        if st >= 300 or exp[:10] <= time.strftime("%Y-%m-%d", time.gmtime(time.time() + 7 * 86400)):
+            print("kept certificate", c["id"], "is gone or expires soon: making new ones")
+            return None
+    for ident, pr in data["profiles"].items():
+        st, b = call("GET", f"profiles/{pr['id']}")
+        if st >= 300 or (b.get("data") or {}).get("attributes", {}).get("profileState") != "ACTIVE":
+            print("kept profile for", ident, "is gone: making new ones")
+            return None
+    return data
+
+
 def setup(work):
     os.makedirs(work, exist_ok=True)
     state = {}
+    reuse = kept()
+    if reuse:
+        return setup_kept(work, reuse)
     # 1. Distribution certificate(s), each from a fresh key, in a keychain of their own.
     kc = f"{work}/signing.keychain-db"
     run("security", "create-keychain", "-p", "ci", kc)
@@ -86,7 +121,7 @@ def setup(work):
     for d in dirs:
         os.makedirs(d, exist_ok=True)
     stamp = time.strftime("%Y%m%d%H%M%S")
-    names = {}
+    names, uuids, raws = {}, {}, {}
     for ident, base in BUNDLES.items():
         st, b = call("GET", f"bundleIds?filter[identifier]={ident}&limit=20")
         need(st, b, f"Looking up {ident}")
@@ -102,6 +137,7 @@ def setup(work):
         state["profiles"].append(p["id"])
         raw = base64.b64decode(p["attributes"]["profileContent"])
         uuid = p["attributes"]["uuid"]
+        uuids[ident], raws[ident] = uuid, raw
         for d in dirs:
             open(os.path.join(d, f"{uuid}{PROFILE_EXT}"), "wb").write(raw)
         # The profile's entitlements (App Groups must be enabled on the identifier).
@@ -114,12 +150,58 @@ def setup(work):
         names[ident] = name
     json.dump(state, open(f"{work}/state.json", "w"))
     json.dump(names, open(f"{work}/profiles.json", "w"))
+    if MAC:   # keep them (see the top of this file)
+        data = {"certificates": [{"id": cid, "file": f, "p12": base64.b64encode(open(f"{work}/{f}.p12", "rb").read()).decode()}
+                                 for cid, (_, f) in zip(state["certificates"], CERTS)],
+                "profiles": {ident: {"id": pid, "name": names[ident], "uuid": uuids[ident],
+                                     "raw": base64.b64encode(raws[ident]).decode()}
+                             for ident, pid in zip(BUNDLES, state["profiles"])}}
+        nonce = os.urandom(12)
+        os.makedirs(os.path.dirname(SEALED), exist_ok=True)
+        json.dump({"nonce": base64.b64encode(nonce).decode(),
+                   "ct": base64.b64encode(_box().encrypt(nonce, json.dumps(data).encode(), None)).decode()}, open(SEALED, "w"))
+        state["keep"] = True
+        json.dump(state, open(f"{work}/state.json", "w"))
+        print("NEW-SIGNING kept in store/macstore/signing.enc")
+
+
+def keychain(work, p12s):
+    kc = f"{work}/signing.keychain-db"
+    run("security", "create-keychain", "-p", "ci", kc)
+    run("security", "set-keychain-settings", "-lut", "21600", kc)
+    run("security", "unlock-keychain", "-p", "ci", kc)
+    for f, raw in p12s:
+        open(f"{work}/{f}.p12", "wb").write(raw)
+        run("security", "import", f"{work}/{f}.p12", "-k", kc, "-P", "ci", "-T", "/usr/bin/codesign", "-T", "/usr/bin/security",
+            "-T", "/usr/bin/productbuild")
+    run("security", "set-key-partition-list", "-S", "apple-tool:,apple:,codesign:", "-s", "-k", "ci", kc, stdout=subprocess.DEVNULL)
+    existing = subprocess.run(["security", "list-keychains", "-d", "user"], capture_output=True, text=True).stdout.split()
+    run("security", "list-keychains", "-d", "user", "-s", kc, *[k.strip('"') for k in existing])
+
+
+def setup_kept(work, data):
+    print("Using the kept Mac App Store certificates:", ", ".join(c["id"] for c in data["certificates"]))
+    keychain(work, [(c["file"], base64.b64decode(c["p12"])) for c in data["certificates"]])
+    dirs = [os.path.expanduser("~/Library/MobileDevice/Provisioning Profiles"),
+            os.path.expanduser("~/Library/Developer/Xcode/UserData/Provisioning Profiles")]
+    names = {}
+    for ident, pr in data["profiles"].items():
+        for d in dirs:
+            os.makedirs(d, exist_ok=True)
+            open(os.path.join(d, f"{pr['uuid']}{PROFILE_EXT}"), "wb").write(base64.b64decode(pr["raw"]))
+        names[ident] = pr["name"]
+        print(f"profile {pr['name']}: uuid {pr['uuid']}")
+    json.dump({"keep": True}, open(f"{work}/state.json", "w"))
+    json.dump(names, open(f"{work}/profiles.json", "w"))
 
 
 def cleanup(work):
     try:
         state = json.load(open(f"{work}/state.json"))
     except Exception:
+        return
+    if state.get("keep"):
+        print("Mac App Store certificates and profile kept (store/macstore/signing.enc)")
         return
     for pid in state.get("profiles", []):
         print("delete profile", pid, call("DELETE", f"profiles/{pid}")[0])

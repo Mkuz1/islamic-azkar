@@ -10,7 +10,7 @@ on:
     paths: ["store/macstore/UPLOAD"]
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   upload:
@@ -45,6 +45,13 @@ jobs:
           python3 $GITHUB_WORKSPACE/tools/appstore_signing.py setup "$RUNNER_TEMP/sign"
           security find-identity -v "$RUNNER_TEMP/sign/signing.keychain-db" | sed 's/[0-9A-F]\{40\}/<id>/'
           security find-certificate -a -c "Installer" "$RUNNER_TEMP/sign/signing.keychain-db" | grep '"labl"' || true
+      - name: Keep the Mac App Store signing (encrypted)
+        working-directory: .
+        run: |
+          if [ -n "$(git status --porcelain store/macstore/signing.enc)" ]; then
+            git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add store/macstore/signing.enc && git commit -m "Mac App Store signing certificates and profile, kept (encrypted)" && git pull --rebase -q && git push
+          else echo "signing already kept"; fi
       - name: Archive (sandboxed Mac App Store build)
         run: |
           set -o pipefail
