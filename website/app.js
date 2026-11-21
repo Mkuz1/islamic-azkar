@@ -212,7 +212,7 @@
       <footer class="site">
         <div class="ded">${T.ar.dedication}</div>
         <div class="ded-l">${T.en.dedication} · ${T.fr.dedication}</div>
-        <a href="privacy/">${t.privacy}</a> · © ${new Date().getFullYear()} Mkoussa
+        <a href="${DL}/support/">${lang === "ar" ? "الدعم" : lang === "fr" ? "Assistance" : "Support"}</a> · <a href="${DL}/privacy/">${t.privacy}</a> · © ${new Date().getFullYear()} Mkoussa
       </footer>`;
   }
 

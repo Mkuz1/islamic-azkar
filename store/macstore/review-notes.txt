@@ -27,3 +27,6 @@ The app works the same in every region. Users choose the interface language (Ara
 
 6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
 The app is not in a regulated industry. Its content is classical religious text: verses of the Quran and supplications from the hadith as gathered in the widely distributed collection Hisn al-Muslim. These are centuries-old texts in the public domain. The app contains no third-party brands, media or licensed content.
+
+
+Changes for this review: the Support URL is now https://islamicazkar.net/support/ (contact email and help in English, Arabic and French), and the app is no longer offered on the App Store in China mainland.

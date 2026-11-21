@@ -33,6 +33,9 @@ BUILD = os.environ.get("BUILD", "").strip()   # e.g. "19.5"; empty = newest vali
 COPYRIGHT = "2026 Mkoussa"
 SITE = "https://islamicazkar.net"
 PRIVACY = "https://islamicazkar.net/privacy/"
+SUPPORT = "https://islamicazkar.net/support/"   # contact and help (App Review guideline 1.5)
+# Not offered in China mainland: apps with book content need a publishing licence there (guideline 2.1).
+EXCLUDED_TERRITORIES = {"CHN"}
 SHOTS = {"Mac": "APP_DESKTOP"} if MAC else {"TV": "APP_APPLE_TV"} if TV else {"iPhone-6.9": "APP_IPHONE_67", "iPhone-6.3": "APP_IPHONE_61", "iPad-13": "APP_IPAD_PRO_3GEN_129"}
 LANG = {"en-US": "en", "ar-SA": "ar", "fr-FR": "fr"}
 NOTES = open(os.path.join(STORE, "review-notes.txt"), encoding="utf-8").read().strip()   # answers to App Review
@@ -197,11 +200,12 @@ def main(submit):
     st, b = call("GET", f"apps/{app}/appAvailabilityV2", quiet=True)
     if st < 300 and b.get("data"):
         step("Availability already set", True)
+        exclude_territories(b["data"]["id"])
     else:
         terrs, url = [], "territories?limit=200"
         while url:
             st, b = call("GET", url)
-            terrs += [t["id"] for t in b.get("data", [])]
+            terrs += [t["id"] for t in b.get("data", []) if t["id"] not in EXCLUDED_TERRITORIES]
             url = b.get("links", {}).get("next")
         st, _ = call("POST", "v2/appAvailabilities", {"data": {"type": "appAvailabilities", "attributes": {"availableInNewTerritories": True},
             "relationships": {"app": {"data": {"type": "apps", "id": app}},
@@ -216,6 +220,8 @@ def main(submit):
     print(f"\n== Version {VERSION}")
     st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]={PLATFORM}&limit=20")
     versions = b.get("data", [])
+    for v in versions:
+        print(f"   {v['attributes']['versionString']}: {v['attributes'].get('appVersionState') or v['attributes'].get('appStoreState')}")
     # An update (a version is already on the App Store) needs "What's New" text.
     live = any((v["attributes"].get("appStoreState") or "") in ("READY_FOR_SALE", "READY_FOR_DISTRIBUTION")
                or (v["attributes"].get("appVersionState") or "") == "READY_FOR_DISTRIBUTION" for v in versions)
@@ -237,7 +243,7 @@ def main(submit):
     vlocs = {l["attributes"]["locale"]: l["id"] for l in b.get("data", [])}
     for loc, t in listing.items():
         attrs = {"description": t["description"], "keywords": t["keywords"], "promotionalText": t["promotional_text"],
-                 "supportUrl": SITE, "marketingUrl": SITE}
+                 "supportUrl": SUPPORT, "marketingUrl": SITE}
         if live and WHATS_NEW.get(LANG.get(loc)):
             attrs["whatsNew"] = WHATS_NEW[LANG[loc]]
         if loc in vlocs:
@@ -369,6 +375,24 @@ def _whats_new():
 
 WHATS_NEW = _whats_new()
 REPLACE = "--replace" in sys.argv
+
+
+def exclude_territories(availability):
+    """Makes the app unavailable in EXCLUDED_TERRITORIES (for every platform: availability is per app)."""
+    url = f"v2/appAvailabilities/{availability}/territoryAvailabilities?include=territory&limit=200"
+    while url:
+        st, b = call("GET", url)
+        if st >= 300:
+            step("Read the countries and regions", False); return
+        for ta in b.get("data", []):
+            terr = ((ta.get("relationships") or {}).get("territory") or {}).get("data") or {}
+            if terr.get("id") in EXCLUDED_TERRITORIES:
+                if ta["attributes"].get("available"):
+                    st, _ = call("PATCH", f"territoryAvailabilities/{ta['id']}", {"data": {"type": "territoryAvailabilities", "id": ta["id"], "attributes": {"available": False}}})
+                    step(f"Removed from the App Store in {terr['id']} (China mainland)", st < 300)
+                else:
+                    step(f"Not offered in {terr['id']} (China mainland)", True)
+        url = b.get("links", {}).get("next")
 
 
 def replace_pending(app):
