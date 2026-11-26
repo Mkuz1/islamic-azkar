@@ -143,6 +143,7 @@ class PrayerTimesWidget : AppWidgetProvider() {
     override fun onUpdate(ctx: Context, mgr: AppWidgetManager, ids: IntArray) {
         ids.forEach { mgr.updateAppWidget(it, views(ctx, it)) }
         PrayerTicker.schedule(ctx)
+        WidgetTicker.schedule(ctx)
     }
     override fun onAppWidgetOptionsChanged(ctx: Context, mgr: AppWidgetManager, id: Int, o: Bundle) = mgr.updateAppWidget(id, views(ctx, id))
 

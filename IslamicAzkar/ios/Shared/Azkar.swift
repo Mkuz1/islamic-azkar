@@ -31,16 +31,53 @@ struct Zikr: Codable, Identifiable, Hashable {
     let en: String
     let fr: String
     let n: Int
+    /// Hadith reference (book and number) on the duas added from the hadith collections.
+    var ref: LocalizedText? = nil
+    /// Arabic explanation, shown as the meaning in Arabic (e.g. for the 99 Names).
+    var arm: String? = nil
 
     var repeatCount: Int { max(1, n) }
 
     func meaning(_ lang: Lang) -> String {
         switch lang {
-        case .ar: return ""
+        case .ar: return arm ?? ""
         case .en: return en
         case .fr: return fr
         }
     }
+}
+
+/// A text in the three languages.
+struct LocalizedText: Codable, Hashable {
+    let ar: String
+    let en: String
+    let fr: String
+
+    func callAsFunction(_ lang: Lang) -> String {
+        switch lang {
+        case .ar: return ar
+        case .en: return en
+        case .fr: return fr
+        }
+    }
+}
+
+/// A step-by-step guide (the ʿUmrah guide): each step links duas and cites its hadiths.
+struct Guide: Codable, Hashable, Identifiable {
+    struct Step: Codable, Hashable {
+        let icon: String
+        let title: LocalizedText
+        let text: LocalizedText
+        let zikr: [Int]
+        let ref: LocalizedText
+    }
+    let key: String
+    let title: LocalizedText
+    let intro: LocalizedText
+    let note: LocalizedText
+    let chapter: Int
+    let steps: [Step]
+    var id: String { key }
 }
 
 struct Chapter: Codable, Identifiable, Hashable {
@@ -114,12 +151,15 @@ final class AzkarData {
     let zikrById: [Int: Zikr]
     /// Chapter id of each dhikr (-1 morning list, -2 evening list).
     let chapterOfZikr: [Int: Int]
+    let guides: [Guide]
+    var umrahGuide: Guide? { guides.first { $0.key == "umrah" } }
 
     private struct File: Codable {
         let categories: [Category]
         let chapters: [Chapter]
         let morning: [Zikr]
         let evening: [Zikr]
+        let guides: [Guide]?
     }
 
     private init() {
@@ -129,6 +169,7 @@ final class AzkarData {
         chapters = file.chapters
         morning = file.morning
         evening = file.evening
+        guides = file.guides ?? []
         chapterById = Dictionary(uniqueKeysWithValues: chapters.map { ($0.id, $0) })
         var byId: [Int: Zikr] = [:]
         var of: [Int: Int] = [:]
@@ -193,8 +234,55 @@ func normalizeArabic(_ s: String) -> String {
 // MARK: - Shared store (App Group, so widgets see the same values)
 
 enum SharedStore {
-    static let groupID = "group.com.koussa.IslamicAzkar"
-    static let defaults: UserDefaults = UserDefaults(suiteName: groupID) ?? .standard
+    static let baseGroupID = "group.com.koussa.IslamicAzkar"
+    #if os(macOS) || os(tvOS)
+    static let groupID = baseGroupID
+    /// The Mac and Apple TV apps have no widget extension, so they keep their settings in their own
+    /// defaults (on macOS 15, reading another team's group container is a protected access that can
+    /// stall launch).
+    static let defaults: UserDefaults = .standard
+    #else
+    /// The App Group the app and its widgets really share. App Store builds use the base name, but
+    /// an app re-signed for one device (Xcode, Sideloadly, AltStore…) gets a renamed group, and a
+    /// group the app isn't entitled to gives each process its own private store: the widgets then
+    /// never see the location or the settings. So the name is taken from the signing profile.
+    static let groupID: String = {
+        var candidates = provisionedGroups()
+        var bid = Bundle.main.bundleIdentifier ?? ""
+        if bid.hasSuffix(".Widgets") { bid = String(bid.dropLast(".Widgets".count)) }
+        candidates += [baseGroupID, "group." + bid]
+        if bid.hasPrefix("com.koussa.IslamicAzkar."), let tail = bid.split(separator: ".").last { candidates.append("\(baseGroupID).\(tail)") }
+        return candidates.first { FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: $0) != nil } ?? baseGroupID
+    }()
+
+    static let defaults: UserDefaults = {
+        let d = UserDefaults(suiteName: groupID) ?? .standard
+        migrate(into: d)
+        return d
+    }()
+
+    /// App groups in this bundle's embedded profile (present when the app was signed for a device).
+    private static func provisionedGroups() -> [String] {
+        guard let url = Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision"),
+              let data = try? Data(contentsOf: url),
+              let start = data.range(of: Data("<?xml".utf8)),
+              let end = data.range(of: Data("</plist>".utf8), in: start.lowerBound..<data.endIndex),
+              let plist = try? PropertyListSerialization.propertyList(from: data[start.lowerBound..<end.upperBound], format: nil) as? [String: Any],
+              let ent = plist["Entitlements"] as? [String: Any],
+              let groups = ent["com.apple.security.application-groups"] as? [String] else { return [] }
+        return groups.filter { $0.contains("IslamicAzkar") } + groups.filter { !$0.contains("IslamicAzkar") }
+    }
+
+    /// Settings saved before the shared group was found (in the app's own copy) move into it once.
+    private static func migrate(into d: UserDefaults) {
+        guard groupID != baseGroupID, Bundle.main.bundlePath.hasSuffix(".app"),
+              d.object(forKey: "migrated_from_base_group") == nil else { return }
+        if let old = UserDefaults.standard.persistentDomain(forName: baseGroupID) {
+            for (k, v) in old where d.object(forKey: k) == nil { d.set(v, forKey: k) }
+        }
+        d.set(true, forKey: "migrated_from_base_group")
+    }
+    #endif
 
     enum Key {
         static let lang = "lang"

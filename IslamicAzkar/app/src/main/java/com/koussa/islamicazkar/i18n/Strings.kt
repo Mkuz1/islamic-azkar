@@ -48,6 +48,16 @@ class Strings(
     val catTravel: String,
     val catNature: String,
     val catHajj: String,
+    val catSunnah: String,
+    val catRuqyah: String,
+    val catNames: String,
+    val catQuran: String,
+    val fromQuran: String,
+    /** Subtitle of chapters taken from the hadith collections. */
+    val fromSunnah: String,
+    val guide: String,
+    val guideCta: String,
+    val wordsToSay: String,
     val catPraise: String,
     val tasbih: String,
     val target: String,
@@ -173,6 +183,15 @@ val AR = Strings(
     catTravel = "السفر",
     catNature = "الطبيعة والأحوال",
     catHajj = "الحج والعمرة",
+    catSunnah = "أدعية من السنة",
+    catRuqyah = "الرقية الشرعية",
+    catNames = "أسماء الله الحسنى",
+    catQuran = "أدعية من القرآن",
+    fromQuran = "من القرآن الكريم",
+    fromSunnah = "من كتب السنة",
+    guide = "الدليل",
+    guideCta = "خطوات العمرة من الإحرام إلى التقصير",
+    wordsToSay = "أذكار هذه الخطوة",
     catPraise = "الذكر والاستغفار",
     tasbih = "المسبحة",
     target = "الهدف",
@@ -291,6 +310,15 @@ val EN = Strings(
     catTravel = "Travel",
     catNature = "Nature & Weather",
     catHajj = "Hajj & Umrah",
+    catSunnah = "Duas from the Sunnah",
+    catRuqyah = "Ruqyah",
+    catNames = "The 99 Names of Allah",
+    catQuran = "Duas from the Quran",
+    fromQuran = "From the Holy Quran",
+    fromSunnah = "From the hadith collections",
+    guide = "Guide",
+    guideCta = "Every step from iḥrām to the haircut",
+    wordsToSay = "Words to say",
     catPraise = "Praise & Forgiveness",
     tasbih = "Tasbih",
     target = "Target",
@@ -409,6 +437,15 @@ val FR = Strings(
     catTravel = "Voyage",
     catNature = "Nature & météo",
     catHajj = "Hajj & Omra",
+    catSunnah = "Invocations de la Sunna",
+    catRuqyah = "La roqya",
+    catNames = "Les 99 noms d'Allah",
+    catQuran = "Invocations du Coran",
+    fromQuran = "Du Saint Coran",
+    fromSunnah = "Des recueils de hadiths",
+    guide = "Guide",
+    guideCta = "Chaque étape, de l'iḥrām à la coupe des cheveux",
+    wordsToSay = "Paroles à dire",
     catPraise = "Louange & pardon",
     tasbih = "Tasbih",
     target = "Objectif",
@@ -499,6 +536,10 @@ fun Strings.category(key: String): String = when (key) {
     "travel" -> catTravel
     "nature" -> catNature
     "hajj" -> catHajj
+    "sunnah" -> catSunnah
+    "ruqyah" -> catRuqyah
+    "names" -> catNames
+    "quran" -> catQuran
     else -> catPraise
 }
 

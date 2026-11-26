@@ -1,0 +1,118 @@
+# App Store screenshots: the app's main screens on the App Store's display sizes, in English, Arabic
+# and French, saved at full resolution to the "appstore-raw" branch. The marketing images (headlines,
+# backgrounds) are composed from them by tools/appstore_screens.py.
+name: App Store screenshots
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/appstore/SHOTS", ".github/workflows/appstore-shots.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  shots:
+    runs-on: xcode-27
+    timeout-minutes: 90
+    defaults:
+      run:
+        working-directory: IslamicAzkar/ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: Build for the Simulator
+        run: |
+          set -o pipefail
+          xcodebuild -project IslamicAzkar.xcodeproj -scheme IslamicAzkar -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO build | xcbeautify --renderer github-actions
+      - name: Screenshots on each display
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e -uo pipefail
+          APP=$(ls -d build/sim/Build/Products/Debug-iphonesimulator/IslamicAzkar.app)
+          BUNDLE=com.koussa.IslamicAzkar
+          echo "--- device types"; xcrun simctl list devicetypes | grep -Ei "iphone|ipad" | tail -40
+          RT=$(xcrun simctl list runtimes -j | python3 -c 'import json,sys; r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]]; print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"])')
+          echo "runtime $RT"; xcrun simctl list runtimes
+          # name of a device type matching a pattern (newest first)
+          dtype() { xcrun simctl list devicetypes -j | python3 -c '
+          import json,sys,re
+          p=re.compile(sys.argv[1]); t=[d for d in json.load(sys.stdin)["devicetypes"] if p.search(d["name"])]
+          print(t[-1]["identifier"] if t else "")' "$1"; }
+          mkdir -p raw
+          # newest iOS runtime that supports a device type (the iPhone Duo can have its own runtime)
+          rtfor() { xcrun simctl list runtimes -j | python3 -c '
+          import json,sys
+          t=sys.argv[1]
+          r=[x for x in json.load(sys.stdin)["runtimes"] if x["platform"]=="iOS" and x["isAvailable"]
+             and any(d["identifier"]==t for d in x.get("supportedDeviceTypes",[]))]
+          print(sorted(r,key=lambda x:[int(v) for v in x["version"].split(".")])[-1]["identifier"] if r else "")' "$1"; }
+          # store/appstore/SHOTS may say "only=<folder>" to redo one device (saved to appstore-raw-<folder>).
+          ONLY=$(grep -o 'only=[^ ]*' ../../store/appstore/SHOTS | cut -d= -f2 || true)
+          SCREENS=$(grep -o 'screens=[^ ]*' ../../store/appstore/SHOTS | cut -d= -f2 | tr ',' ' ' || true)
+          shoot() { # folder devicetype-pattern
+            [ -z "$ONLY" ] || [ "$ONLY" = "$1" ] || return 0
+            local NAME=$1 T R; T=$(dtype "$2")
+            [ -n "$T" ] || { echo "::warning::no simulator for $NAME ($2)"; return; }
+            R=$(rtfor "$T"); [ -n "$R" ] || R=$RT
+            echo "== $NAME: $T on $R"
+            local D; D=$(xcrun simctl create "$NAME" "$T" "$R")
+            xcrun simctl boot "$D"; xcrun simctl bootstatus "$D" -b
+            xcrun simctl status_bar "$D" override --time "9:41" --batteryState charged --batteryLevel 100 --cellularBars 4 --wifiBars 3 || true
+            xcrun simctl install "$D" "$APP"
+            # Foldables have two screens: the inner (unfolded) and the outer (folded) one.
+            local DISPLAYS; DISPLAYS=$(xcrun simctl io "$D" screenshot /tmp/probe.png 2>&1 | grep -o -- '--display=[0-9]*' | cut -d= -f2 | tr '\n' ' ' || true)
+            echo "displays: ${DISPLAYS:-one}"
+            if [[ "$NAME" == *Duo* ]]; then
+              echo "--- simctl ui:"; xcrun simctl help ui 2>&1 | head -60
+              for opt in fold folded posture hinge device_state display state; do echo "ui $opt: $(xcrun simctl ui "$D" $opt 2>&1 | head -3 | tr '\n' ' ')"; done
+              MENU=/dev/null
+              alive() { xcrun simctl spawn "$D" launchctl list 2>/dev/null | grep -c "$BUNDLE" || true; }
+              lit() { python3 -c "from PIL import Image; import sys; e=Image.open(sys.argv[1]).convert('L').getextrema(); print('lit' if e[1]-e[0]>10 else 'dark')" "$1" 2>/dev/null || echo "?"; }
+              python3 -m pip install -q --break-system-packages pillow 2>/dev/null || python3 -m pip install -q pillow
+              # Fold test: the app stays open and redraws on each fold and unfold.
+              mkdir -p raw/fold-test
+              xcrun simctl launch "$D" $BUNDLE -ciScreen reader -ciLang en >/dev/null; sleep 8
+              for step in 1-unfold:Unfold 2-fold:Fold 3-unfold:Unfold; do
+                tag=${step%%:*}; word=${step#*:}
+                st=$([ "$word" = Fold ] && echo folded || echo unfolded)
+                echo "$tag: $(xcrun simctl ui "$D" posture $st 2>&1 | head -2 | tr '\n' ' ') | $(xcrun simctl ui "$D" fold $st 2>&1 | head -2 | tr '\n' ' ')"; sleep 6
+                for n in $DISPLAYS; do xcrun simctl io "$D" screenshot --display=$n "raw/fold-test/$tag-display$n.png" >/dev/null 2>&1; done
+                echo "$tag: app running=$(alive) inner=$(lit raw/fold-test/$tag-display3.png) outer=$(lit raw/fold-test/$tag-display1.png)"
+              done
+            fi
+            mkdir -p "raw/$NAME"
+            for l in en ar fr; do
+              for s in "home 0" "reader 0" "celebration 0" "record 1" "tasbih 1" "guide 0" "dedication 1" "widgets 0"; do
+                set -- $s
+                [ "$1" = widgets ] && [[ "$NAME" == iPad* ]] && continue
+                [ -z "$SCREENS" ] || [[ " $SCREENS " == *" $1 "* ]] || continue
+                xcrun simctl terminate "$D" $BUNDLE >/dev/null 2>&1 || true
+                xcrun simctl launch "$D" $BUNDLE -ciScreen $1 -ciLang $l -ciDark $2 -ciScroll none >/dev/null
+                sleep 8
+                if [ -z "$DISPLAYS" ]; then
+                  xcrun simctl io "$D" screenshot "raw/$NAME/$l-$1.png" >/dev/null && echo "$NAME $l $1" || echo "::warning::$NAME $l $1 failed"
+                else
+                  for n in $DISPLAYS; do
+                    mkdir -p "raw/$NAME-$n"
+                    xcrun simctl io "$D" screenshot --display=$n "raw/$NAME-$n/$l-$1.png" >/dev/null && echo "$NAME display $n $l $1"
+                  done
+                fi
+              done
+            done
+            xcrun simctl shutdown "$D" || true
+            for f in raw/$NAME*/en-home.png; do echo "$f"; sips -g pixelWidth -g pixelHeight "$f" | tail -2; done
+          }
+          shoot "iPhone-6.9" "^iPhone 1[6-9] Pro Max$"
+          shoot "iPhone-6.3" "^iPhone 1[6-9] Pro$"
+          shoot "iPad-13" "^iPad Pro 13-inch"
+          [ -n "$ONLY" ] && shoot "iPhone-Duo" "iPhone Duo"   # only when asked for (its two screens are still flaky)
+          BR=appstore-raw${ONLY:+-$ONLY}${SCREENS:+-$(echo $SCREENS | tr " " -)}
+          cd raw && git init -q && git checkout -q -b "$BR" && git add . \
+            && git -c user.name=ci -c user.email=ci@localhost commit -qm "App Store raw screenshots ${GITHUB_SHA::7}" \
+            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "$BR" && echo "pushed to $BR"

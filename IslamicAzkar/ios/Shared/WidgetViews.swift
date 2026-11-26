@@ -123,10 +123,21 @@ struct PrayerWidgetView: View {
         case .circular:
             let span = next.time.timeIntervalSince(prev.time)
             let p = span > 0 ? min(max(now.timeIntervalSince(prev.time) / span, 0), 1) : 0
-            Gauge(value: p) { Text(name) } currentValueLabel: {
-                Text(Prayers.clock(next.time, place, lang)).font(.system(size: 11, weight: .semibold))
+            // The ring style shows only the current value, so the name and time are drawn inside a
+            // ring of our own (time to the next prayer).
+            ZStack {
+                Circle().stroke(.white.opacity(0.25), lineWidth: 4)
+                Circle().trim(from: 0, to: p).stroke(.white, style: StrokeStyle(lineWidth: 4, lineCap: .round))
+                    .rotationEffect(.degrees(-90))
+                VStack(spacing: 0) {
+                    Text(name).font(.system(size: lang == .ar ? 12 : 10, weight: .semibold))
+                        .lineLimit(1).minimumScaleFactor(0.6)
+                    Text(Prayers.clock(next.time, place, lang)).font(.system(size: 13, weight: .bold).monospacedDigit())
+                        .lineLimit(1).minimumScaleFactor(0.6)
+                }
+                .padding(.horizontal, 6)
             }
-            .gaugeStyle(.accessoryCircularCapacity)
+            .padding(2)
         case .rectangular:
             VStack(alignment: .leading, spacing: 1) {
                 Text(m.nextPrayer).font(.caption2).opacity(0.75)

@@ -31,13 +31,16 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.IosShare
 import androidx.compose.material.icons.rounded.AutoAwesome
+import androidx.compose.material.icons.rounded.AutoStories
 import androidx.compose.material.icons.rounded.Bedtime
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Cottage
+import androidx.compose.material.icons.rounded.Healing
 import androidx.compose.material.icons.rounded.Diversity3
 import androidx.compose.material.icons.rounded.Explore
 import androidx.compose.material.icons.rounded.Favorite
@@ -77,9 +80,17 @@ import com.koussa.islamicazkar.ui.glass.ProgressRing
 import com.koussa.islamicazkar.ui.glass.pane
 import com.koussa.islamicazkar.ui.glass.pressable
 
-/** Content padding that clears the status bar (and the floating back button) and the floating tab bar. */
+/** Google TV / Android TV (Chromecast with Google TV, smart TVs): driven by the remote. */
+@Composable
+fun isTv(): Boolean =
+    (androidx.compose.ui.platform.LocalConfiguration.current.uiMode and android.content.res.Configuration.UI_MODE_TYPE_MASK) ==
+        android.content.res.Configuration.UI_MODE_TYPE_TELEVISION
+
+/** Content padding that clears the status bar (and the floating back button) and the floating tab bar.
+ *  On TV the tab bar sits at the top and content keeps inside the TV-safe margins. */
 @Composable
 fun screenPadding(hasBack: Boolean = false, horizontal: Dp = 16.dp): PaddingValues {
+    if (isTv()) return PaddingValues(start = horizontal + 32.dp, end = horizontal + 32.dp, top = 8.dp, bottom = 40.dp)
     val top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
     val bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
     return PaddingValues(start = horizontal, end = horizontal, top = top + if (hasBack) 60.dp else 12.dp, bottom = bottom + 100.dp)
@@ -106,6 +117,10 @@ fun categoryIcon(key: String): ImageVector = when (key) {
     "travel" -> Icons.Rounded.FlightTakeoff
     "nature" -> Icons.Rounded.Thunderstorm
     "hajj" -> Icons.Rounded.Explore
+    "sunnah" -> Icons.AutoMirrored.Rounded.MenuBook
+    "quran" -> Icons.Rounded.AutoStories
+    "ruqyah" -> Icons.Rounded.Healing
+    "names" -> Icons.Rounded.AutoAwesome
     else -> Icons.Rounded.AutoAwesome
 }
 
@@ -121,6 +136,10 @@ fun categoryHue(key: String): Color = when (key) {
     "travel" -> Color(0xFF30B0C7)
     "nature" -> Color(0xFF00C7BE)
     "hajj" -> Color(0xFFA2845E)
+    "sunnah" -> Color(0xFF0A84FF)
+    "quran" -> Color(0xFF1E6B52)
+    "ruqyah" -> Color(0xFF34AADC)
+    "names" -> Color(0xFFC8963E)
     else -> Color(0xFFFF2D55)
 }
 
@@ -221,6 +240,17 @@ fun ZikrCard(
                     fontSize = (16 * settings.textScale).sp, lineHeight = (22 * settings.textScale).sp,
                     modifier = Modifier.padding(top = 10.dp),
                 )
+            }
+        }
+
+        z.ref?.let { ref ->
+            Row(
+                Modifier.fillMaxWidth().alpha(dim).padding(top = 12.dp, end = 8.dp),
+                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.AutoMirrored.Rounded.MenuBook, null, tint = g.text3, modifier = Modifier.size(14.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(ref[lang], color = g.text3, fontSize = 12.5.sp, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center)
             }
         }
 

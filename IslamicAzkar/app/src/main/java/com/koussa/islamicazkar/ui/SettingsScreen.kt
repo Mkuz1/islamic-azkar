@@ -35,6 +35,7 @@ import androidx.compose.material.icons.rounded.NightsStay
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.Translate
 import androidx.compose.material.icons.rounded.TouchApp
+import androidx.compose.material.icons.rounded.Widgets
 import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.rounded.WbSunny
 import androidx.compose.material.icons.rounded.Widgets
@@ -210,13 +211,30 @@ fun SettingsScreen() {
         item { PrayerSettings() }
 
 
+        item { SyncSection() }
+
+        // Widgets (their own page; the tab bar holds the Record tab).
+        item { Spacer(Modifier.height(22.dp)) }
+        item {
+            InsetGroup {
+                ListRow(
+                    tabTitle(lang), icon = Icons.Rounded.Widgets, iconColor = Color(0xFF007AFF),
+                    subtitle = s.widgetsHint, chevron = true, onClick = { app.push(Route.WidgetsRoute) },
+                )
+            }
+        }
+
         item { OurApps() }
 
         item { SectionHeader(s.about) }
         item {
             InsetGroup {
-                ListRow(s.appName, icon = Icons.Rounded.Info, iconColor = Color(0xFF8E8E93), value = "1.1")
+                ListRow(s.appName, icon = Icons.Rounded.Info, iconColor = Color(0xFF8E8E93), value = com.koussa.islamicazkar.BuildConfig.VERSION_NAME)
                 RowDivider()
+                if (com.koussa.islamicazkar.update.appUpdater().supported) {
+                    UpdateSettingsRow()
+                    RowDivider()
+                }
                 Column(Modifier.padding(16.dp)) {
                     Text(s.aboutText, color = g.text, fontSize = 15.sp, lineHeight = 21.sp)
                     if (lang != Lang.EN) {

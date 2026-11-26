@@ -1,0 +1,94 @@
+# Deploys website/ to Cloudflare Pages (project "islamic-azkar", production branch "main"),
+# so the site can be published from GitHub instead of from the Mac.
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   – API token with "Cloudflare Pages: Edit" on the account
+#   CLOUDFLARE_ACCOUNT_ID  – the Cloudflare account ID
+name: Website
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["website/**", ".github/workflows/website.yml"]
+
+concurrency:
+  group: website-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check secrets
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          ACCOUNT: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          if [ -z "$TOKEN" ] || [ -z "$ACCOUNT" ]; then
+            echo "::error::Add the CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID repository secrets, then re-run this workflow."
+            exit 1
+          fi
+      - name: Check the azkar data
+        run: python3 -c "import json; d=json.load(open('website/data/azkar.json')); print(len(d['chapters']), 'chapters,', len(d.get('guides', [])), 'guide(s)')"
+      - name: Version the script and style links
+        # Cloudflare's browser cache can keep app.js / style.css for hours after a deploy; a
+        # version in the link makes browsers fetch the new files at once.
+        run: |
+          V=${GITHUB_SHA::8}
+          for f in website/app/index.html website/index.html website/ar/index.html website/fr/index.html; do
+            sed -i -E "s#(href|src)=\"(/?)(style\.css|app\.js|prayer\.js|landing\.css|landing\.js)\"#\1=\"\2\3?v=$V\"#g" $f
+            grep -qE "\?v=$V" $f || { echo "::error::$f was not stamped"; exit 1; }
+          done
+      - name: Deploy to Cloudflare Pages
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        # --branch main publishes to production (islamicazkar.net) whichever git branch this runs on.
+        # Run inside website/ so wrangler.toml (the KV binding for the /sync function) and functions/
+        # are used; only the public files (dist/) are served, not wrangler.toml or the function code.
+        working-directory: website
+        run: |
+          rsync -a --exclude dist --exclude functions --exclude wrangler.toml --exclude node_modules --exclude '.*' ./ dist/
+          npx --yes wrangler@3.114.0 pages deploy dist --project-name islamic-azkar --branch main --commit-dirty=true
+      - name: Smoke test
+        run: |
+          sleep 20
+          curl -fsS "https://islamicazkar.net/data/azkar.json?check=$GITHUB_RUN_ID" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('guides'), 'live site has no Umrah guide yet'; print('live:', len(d['chapters']), 'chapters')"
+          # The live page links this deploy's script, and that script has the newest features.
+          V=${GITHUB_SHA::8}
+          curl -fsS "https://islamicazkar.net/app/?check=$GITHUB_RUN_ID" | grep -q "app.js?v=$V" || { echo "::error::islamicazkar.net/app does not serve this deploy's page yet"; exit 1; }
+          # The landing page in its three languages, and its script and styles.
+          for p in "" ar/ fr/; do curl -fsS "https://islamicazkar.net/$p?check=$GITHUB_RUN_ID" | grep -q "landing.js?v=$V" || { echo "::error::/$p is not this deploy's landing page"; exit 1; }; done
+          curl -fsS "https://islamicazkar.net/ar/" | grep -q 'dir="rtl"' && echo "landing pages: en, ar, fr"
+          curl -fsS "https://islamicazkar.net/landing.css?v=$V" | grep -q "Manrope" && curl -fsSI "https://islamicazkar.net/fonts/manrope-latin.woff2" | grep -qi "200" && echo "landing styles and font served"
+          curl -fsS "https://islamicazkar.net/app.js?v=$V" | grep -q "function record()" && echo "live app.js: $V"
+          # Sync between devices: create a code, then sync with it.
+          NEW=$(curl -sS -X POST https://islamicazkar.net/sync/new -H 'content-type: application/json' -d '{"days":{}}')
+          echo "sync/new: $NEW"
+          CODE=$(echo "$NEW" | python3 -c 'import json,sys; print(json.load(sys.stdin)["code"])')
+          curl -sS -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{\"2026-01-01\":[\"morning\"]}}" | tee /dev/stderr | grep -q '2026-01-01'
+          # Data deletion (the Play Store link): delete that code's record, then it must be gone.
+          curl -fsS https://islamicazkar.net/delete/ | grep -q "Delete your data"
+          curl -fsS https://islamicazkar.net/delete/delete.js | grep -q "sync/delete"
+          # Downloads: each goes to the newest file on GitHub.
+          for d in windows mac android; do
+            u=$(curl -fsSIL -o /dev/null -w '%{url_effective} %{http_code}' "https://islamicazkar.net/download/$d")
+            echo "download/$d → $u"; case "$u" in *" 200") ;; *) echo "::error::download/$d is broken"; exit 1;; esac
+          done
+          curl -fsSI https://islamicazkar.net/apple/IslamicAzkar.certSigningRequest | grep -qi "content-disposition: attachment" && echo "request file downloads as a file"
+          # Security headers, and no deploy config served.
+          curl -sSI https://islamicazkar.net/ | grep -qi "^content-security-policy:" || { echo "::error::no Content-Security-Policy"; exit 1; }
+          curl -sS https://islamicazkar.net/wrangler.toml | grep -q "kv_namespaces" && { echo "::error::wrangler.toml is served"; exit 1; } || echo "wrangler.toml not served"
+          curl -sS -X POST https://islamicazkar.net/sync/delete -H 'content-type: application/json' -d "{\"code\":\"$CODE\"}" | tee /dev/stderr | grep -q '"deleted":true'
+          # Cloudflare KV can serve a deleted key for up to a minute, so wait for it to go.
+          for i in $(seq 1 12); do
+            S=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://islamicazkar.net/sync -H 'content-type: application/json' -d "{\"code\":\"$CODE\",\"days\":{}}")
+            [ "$S" = 404 ] && { echo "deleted record is gone"; break; }
+            [ "$i" = 12 ] && { echo "::error::deleted record still answers $S"; exit 1; }
+            sleep 10
+          done

@@ -1,6 +1,8 @@
 import SwiftUI
 #if os(iOS)
 import UIKit
+#else
+import AppKit
 #endif
 
 /// The Android app's palette: Apple's label hierarchy tinted with the Mushaf's green and gold,
@@ -28,7 +30,13 @@ enum Theme {
                            blue: CGFloat(hex & 0xFF) / 255, alpha: a)
         })
         #else
-        Color(hex: light, alpha: alphaLight)
+        // Follows the window's appearance (Light / Dark / Auto), like the iOS version.
+        Color(nsColor: NSColor(name: nil) { appearance in
+            let isDark = appearance.bestMatch(from: [.aqua, .darkAqua]) == .darkAqua
+            let hex = isDark ? dark : light
+            return NSColor(srgbRed: CGFloat((hex >> 16) & 0xFF) / 255, green: CGFloat((hex >> 8) & 0xFF) / 255,
+                           blue: CGFloat(hex & 0xFF) / 255, alpha: isDark ? alphaDark : alphaLight)
+        })
         #endif
     }
 }
@@ -52,7 +60,13 @@ extension View {
     @ViewBuilder
     func glassCard(cornerRadius: CGFloat = 26) -> some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        if #available(iOS 26.0, macOS 26.0, *) {
+        #if os(macOS)
+        // On the Mac a live glass effect behind every card (dozens in a reading) makes scrolling and
+        // navigation lag: a tinted card with a hairline rim looks the same at a fraction of the cost.
+        self.background(Theme.pane, in: shape)
+            .overlay(shape.strokeBorder(Theme.rim, lineWidth: 0.7))
+        #else
+        if #available(iOS 26.0, *) {
             self.background(Theme.pane, in: shape)
                 .glassEffect(.regular, in: shape)
         } else {
@@ -60,6 +74,7 @@ extension View {
                 .overlay(shape.strokeBorder(Theme.rim, lineWidth: 0.7))
                 .shadow(color: .black.opacity(0.06), radius: 12, y: 4)
         }
+        #endif
     }
 
     /// A small glass capsule (chips, the language switch).
@@ -73,8 +88,17 @@ extension View {
     }
 
     /// Page chrome: backdrop behind, hidden system background.
+    @ViewBuilder
     func pageBackdrop() -> some View {
+        #if os(macOS)
+        // macOS draws a Form as label/value columns across the whole window: use the grouped
+        // (iOS Settings-like) style in a centred column instead.
+        self.formStyle(.grouped).scrollContentBackground(.hidden)
+            .frame(maxWidth: 720).frame(maxWidth: .infinity)
+            .background(Backdrop())
+        #else
         self.scrollContentBackground(.hidden).background(Backdrop())
+        #endif
     }
 }
 
@@ -99,9 +123,11 @@ struct LanguagePill: View {
                     withAnimation(.snappy) { model.lang = lang }
                 } label: {
                     Text(label).font(.system(size: 15, weight: .semibold))
-                        .foregroundStyle(on ? Color.primary : Color.secondary)
+                        // Explicit light / dark colours: on the Mac's glass capsule the system secondary
+                        // colour came out almost black in Dark mode.
+                        .foregroundStyle(on ? Theme.dynamic(light: 0x111111, dark: 0xFFFFFF) : Theme.dynamic(light: 0x5F6B66, dark: 0xC9D3CE))
                         .frame(width: 42, height: 32)
-                        .background(on ? AnyShapeStyle(.background.opacity(0.9)) : AnyShapeStyle(.clear), in: Capsule())
+                        .background(on ? AnyShapeStyle(Theme.dynamic(light: 0xFFFFFF, dark: 0x3A3A3C, alphaLight: 0.9, alphaDark: 0.9)) : AnyShapeStyle(.clear), in: Capsule())
                 }
                 .buttonStyle(.plain)
             }

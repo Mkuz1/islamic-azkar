@@ -1,0 +1,118 @@
+# Builds the Mac app (menu bar prayer times and azkar reminder) on a GitHub-hosted Mac:
+#  - IslamicAzkar.dmg (ad-hoc signed, universal: Apple silicon and Intel)
+# (GitHub's Mac runners give apps no usable window session, so there are no screenshots.)
+name: Mac
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["IslamicAzkar/ios/App/**", "IslamicAzkar/ios/Shared/**", "IslamicAzkar/mac/**", ".github/workflows/mac.yml"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mac-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: xcode-27
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: IslamicAzkar/mac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: Generate the Xcode project
+        run: |
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+      - name: Build
+        run: |
+          set -o pipefail
+          xcodebuild -project IslamicAzkarMac.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -destination 'generic/platform=macOS' -derivedDataPath build build | xcbeautify --renderer github-actions
+          APP="build/Build/Products/Release/Islamic Azkar.app"
+          codesign --force --deep --sign - "$APP"
+          codesign --verify --verbose "$APP"
+          lipo -archs "$APP/Contents/MacOS/Islamic Azkar"
+          /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist"
+          mkdir -p ../../out && ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
+          ls -lh ../../out
+      - name: Launch check (the app must start, draw its window and the menu bar panel, then quit)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          APP="build/Build/Products/Release/Islamic Azkar.app"
+          mkdir -p shots
+          check() { # name screen lang [extra args]
+            n=$1; sc=$2; l=$3; shift 3
+            "$APP/Contents/MacOS/Islamic Azkar" -ciScreen "$sc" -ciLang "$l" -ciShot "$PWD/shots/$n.png" -ciTrace 1 "$@" > "shots/$n.log" 2>&1 &
+            PID=$!
+            for i in $(seq 1 25); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+            if kill -0 $PID 2>/dev/null; then
+              echo "::error::$n: the app did not finish launching (main thread stack below)"
+              sample $PID 2 -file "shots/$n.sample.txt" > /dev/null 2>&1 || true
+              grep -A60 "main-thread\|DispatchQueue_1" "shots/$n.sample.txt" | cut -c1-200 | head -60
+              kill $PID; cat "shots/$n.log"; return 1
+            fi
+            if [ ! -s "shots/$n.png" ]; then
+              echo "::error::$n: no window was drawn"; cat "shots/$n.log"
+              R=$(ls -t ~/Library/Logs/DiagnosticReports/*Islamic* 2>/dev/null | head -1)
+              if [ -n "$R" ]; then echo "--- crash report $R"; python3 -c "
+          import json,sys
+          t=open(sys.argv[1]).read(); h,_,b=t.partition(chr(10)); d=json.loads(b)
+          print('exception:', d.get('exception')); print('termination:', d.get('termination',{}).get('indicator'))
+          for k in ('asi','lastExceptionBacktrace'): print(k, json.dumps(d.get(k))[:1500])
+          img=d.get('usedImages',[]); th=d['threads'][d.get('faultingThread',0)]
+          for f in th['frames'][:40]:
+              name=img[f['imageIndex']].get('name','?') if f.get('imageIndex') is not None and f['imageIndex']<len(img) else '?'
+              print(' ', name, f.get('symbol','?'), f.get('sourceFile',''), f.get('sourceLine',''))
+          " "$R" || head -c 4000 "$R"; fi
+              FAILED=1; return 0
+            fi
+            echo "$n: launched and drew $(sips -g pixelWidth -g pixelHeight "shots/$n.png" | tail -2 | awk '{print $2}' | paste -sd x -)"
+          }
+          FAILED=0
+          check menu-en home en -ciMenu 1
+          check home-en home en
+          check reader-en reader en
+          check guide-fr guide fr
+          check tap-dedication-en dedication en -ciTap dedication
+          check tap-home-ar home ar -ciTap home
+          check banner-en home en -ciBanner morning
+          check banner-ar home ar -ciBanner evening
+          check banner-general-en home en -ciBanner general
+          check general-due-en home en -ciGeneralDue 1
+          grep -h "general due" shots/general-due-en.log || true
+          grep -q "general due: banner visible=true occluded=false alpha=1.0" shots/general-due-en.log || { echo "::error::a due dhikr reminder did not show its card"; FAILED=1; }
+          grep -h "banner on screen" shots/banner-*.log || true
+          grep -q "banner on screen: visible=true occluded=false alpha=1.0" shots/banner-en.log || { echo "::error::the reminder card is not visible on screen"; FAILED=1; }
+          # Navigation smoke test: sidebar sections, open / back, category, favourites, tasbih, settings, guide.
+          mkdir -p shots/nav
+          "$APP/Contents/MacOS/Islamic Azkar" -ciScreen home -ciLang en -ciNav 1 -ciShotDir "$PWD/shots/nav" -ciTrace 1 > shots/nav.log 2>&1 &
+          PID=$!
+          for i in $(seq 1 60); do kill -0 $PID 2>/dev/null || break; sleep 1; done
+          if kill -0 $PID 2>/dev/null; then echo "::error::navigation test did not finish"; kill $PID; FAILED=1; NAV=timeout
+          else NAV=0; wait $PID || NAV=$?; fi
+          echo "--- navigation test (exit $NAV)"; grep "nav " shots/nav.log || cat shots/nav.log
+          [ "$NAV" = 0 ] || FAILED=1
+          for f in shots/nav/*.png; do [ -f "$f" ] && cp "$f" "shots/nav-$(basename "$f")"; done
+          # Screenshots go to the "mac-shots" branch (artifact storage is full), to review the Mac layout.
+          mkdir -p /tmp/macshots
+          for f in shots/*.png; do sips -s format jpeg -s formatOptions 60 -Z 1100 "$f" --out "/tmp/macshots/$(basename "${f%.png}").jpg" > /dev/null; done
+          cd /tmp/macshots && git init -q && git checkout -q -b mac-shots && git add . \
+            && git -c user.name=ci -c user.email=ci@localhost commit -qm "Mac screenshots ${GITHUB_SHA::7}" \
+            && git push -qf "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" mac-shots && echo "screenshots pushed to mac-shots" || true
+          cd - > /dev/null
+          [ "$FAILED" = 0 ]
+      - uses: actions/upload-artifact@v4
+        continue-on-error: true
+        with:
+          name: IslamicAzkar-dmg
+          retention-days: 3
+          path: out/IslamicAzkar.dmg

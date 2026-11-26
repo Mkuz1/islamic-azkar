@@ -39,6 +39,7 @@ import com.koussa.islamicazkar.ui.glass.Glass
 import com.koussa.islamicazkar.ui.glass.Hairline
 import com.koussa.islamicazkar.ui.glass.pane
 import com.koussa.islamicazkar.ui.glass.pressable
+import com.koussa.islamicazkar.ui.glass.dpadLeavesField
 
 /** Corner radius of iOS 26 inset-grouped sections and cards. */
 val GroupShape = RoundedCornerShape(22.dp)
@@ -165,7 +166,7 @@ fun SearchBar(value: String, hint: String, modifier: Modifier = Modifier, onChan
                 value, onChange, singleLine = true,
                 textStyle = LocalTextStyle.current.copy(color = g.text, fontSize = 17.sp),
                 cursorBrush = SolidColor(g.accent),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().dpadLeavesField(),
             )
         }
         if (value.isNotEmpty()) {

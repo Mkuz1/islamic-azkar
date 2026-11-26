@@ -10,16 +10,19 @@ struct ReaderView: View {
     let reading: Reading
     let focus: Int?
 
-    @State private var remaining: [Int: Int] = [:]
     @State private var celebration: Int?   // streak shown on the completion card
 
     var body: some View {
         let data = AzkarData.shared
         let items = data.items(reading)
         let title = data.title(reading, model.s, model.lang)
+        let source: String = {
+            if !items.isEmpty, items.allSatisfy({ $0.ref?.en.hasPrefix("Quran") == true }) { return GuideTexts.of(model.lang).fromQuran }
+            return items.contains { $0.ref != nil } ? GuideTexts.of(model.lang).fromSunnah : model.s.book
+        }()
         let subtitle: String = {
-            if case .chapter(let id) = reading, model.lang != .ar { return data.chapterById[id]?.ar ?? model.s.book }
-            return model.s.book
+            if case .chapter(let id) = reading, model.lang != .ar { return data.chapterById[id]?.ar ?? source }
+            return source
         }()
         let total = items.reduce(0) { $0 + $1.repeatCount }
         let done = items.reduce(0) { $0 + ($1.repeatCount - left($1)) }
@@ -36,7 +39,7 @@ struct ReaderView: View {
                     ForEach(Array(items.enumerated()), id: \.element.id) { i, z in
                         ZikrCard(zikr: z, index: i + 1, total: items.count, remaining: left(z), chapterTitle: title) { all in
                             let r = all ? 0 : left(z) - 1
-                            withAnimation(.snappy) { remaining[z.id] = r }
+                            withAnimation(.snappy) { model.setRemaining(z, r) }
                             if r == 0, i + 1 < items.count {
                                 Task {
                                     try? await Task.sleep(for: .milliseconds(300))
@@ -59,7 +62,7 @@ struct ReaderView: View {
                                 .symbolEffect(.bounce, value: done == total)
                             Text(model.s.allDone).font(.headline).multilineTextAlignment(.center)
                             Button {
-                                withAnimation { remaining = [:] }
+                                withAnimation { for z in items { model.setRemaining(z, z.repeatCount) } }
                                 if let first = items.first { withAnimation { proxy.scrollTo(first.id, anchor: .top) } }
                             } label: { Label(model.s.restart, systemImage: "arrow.counterclockwise") }
                                 .prominentGlassButton()
@@ -81,7 +84,7 @@ struct ReaderView: View {
             .onAppear {
                 if let focus { proxy.scrollTo(focus, anchor: .top) }
                 if model.ciScreen == "celebration" {
-                    for z in items { remaining[z.id] = 0 }
+                    for z in items { model.setRemaining(z, 0) }
                     celebration = 3
                 }
             }
@@ -94,7 +97,7 @@ struct ReaderView: View {
         .sensoryFeedback(.success, trigger: done == total && total > 0) { _, new in new && model.haptics }
     }
 
-    private func left(_ z: Zikr) -> Int { remaining[z.id] ?? z.repeatCount }
+    private func left(_ z: Zikr) -> Int { model.remaining(z) }
 }
 
 /// One dhikr: Arabic in Amiri, optional transliteration and translation, and a glass counter.
@@ -161,6 +164,14 @@ struct ZikrCard: View {
                 }
             }
             .opacity(done ? 0.5 : 1)
+
+            if let ref = zikr.ref {
+                Label(ref(lang), systemImage: "book.closed")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+                    .multilineTextAlignment(.center)
+                    .opacity(done ? 0.5 : 1)
+            }
 
             if zikr.repeatCount >= 100 && !done {
                 Button { onCount(true) } label: {
@@ -244,7 +255,6 @@ func copyToPasteboard(_ text: String) {
 
 struct FavoritesView: View {
     @Environment(AppModel.self) private var model
-    @State private var remaining: [Int: Int] = [:]
 
     var body: some View {
         let data = AzkarData.shared
@@ -257,9 +267,9 @@ struct FavoritesView: View {
                 }
                 ForEach(favs) { z in
                     let title = chapterTitle(z)
-                    ZikrCard(zikr: z, index: nil, total: nil, remaining: remaining[z.id] ?? z.repeatCount,
+                    ZikrCard(zikr: z, index: nil, total: nil, remaining: model.remaining(z),
                              chapterTitle: title, label: title) { all in
-                        remaining[z.id] = all ? 0 : (remaining[z.id] ?? z.repeatCount) - 1
+                        model.setRemaining(z, all ? 0 : model.remaining(z) - 1)
                     }
                 }
             }

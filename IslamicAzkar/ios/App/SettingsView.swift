@@ -96,18 +96,41 @@ struct SettingsView: View {
                 if model.morningOn { timeRow(s.time, $am.morningAt) }
                 Toggle(isOn: withPermission($am.eveningOn)) { Label(s.eveningReminder, systemImage: "moon.stars.fill") }
                 if model.eveningOn { timeRow(s.time, $am.eveningAt) }
+                #if os(macOS)
+                MacTestReminderRow()
+                #endif
                 Toggle(isOn: withPermission($am.generalOn)) {
                     Label { VStack(alignment: .leading) { Text(s.generalReminders); Text(s.generalRemindersHint).font(.caption).foregroundStyle(.secondary) } }
                     icon: { Image(systemName: "bell.badge.fill") }
                 }
                 if model.generalOn {
                     Picker(s.every, selection: $am.generalEvery) {
-                        ForEach([1, 2, 3, 4, 6], id: \.self) { h in Text("\(lang.num(h)) h").tag(h) }
+                        ForEach([1, 2, 3, 4, 6], id: \.self) { h in Text(hours(h)).tag(h) }
                     }
                     timeRow(s.between, $am.generalFrom)
                     timeRow(s.and, $am.generalTo)
                 }
             }
+
+            #if os(iOS)
+            Section {
+                Button { model.showWidgets = true } label: {
+                    HStack(spacing: 12) {
+                        SymbolSquare(symbol: "square.grid.2x2.fill", color: .blue, size: 30)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(m.widgetsTitle).foregroundStyle(.primary)
+                            Text(m.widgetsHint).font(.caption).foregroundStyle(.secondary).lineLimit(2)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.forward").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
+                    }
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+            }
+            #endif
+
+            SyncSection()
 
             Section(m.ourApps) {
                 Button { openURL(mushafURL) } label: {
@@ -128,6 +151,7 @@ struct SettingsView: View {
             }
 
             Section(s.about) {
+                UpdateSettingsRow()
                 Text(s.aboutText).font(.callout)
                 if lang != .en { Text(s.translationNote).font(.footnote).foregroundStyle(.secondary) }
                 VStack(spacing: 2) {
@@ -140,6 +164,9 @@ struct SettingsView: View {
         }
         .pageBackdrop()
         .navigationTitle(s.settings)
+        #if os(iOS)
+        .navigationDestination(isPresented: $am.showWidgets) { WidgetsView() }
+        #endif
     }
 
     private func locate() {
@@ -167,6 +194,15 @@ struct SettingsView: View {
         })
     }
 
+    /// "every … hours" in the app's language.
+    private func hours(_ n: Int) -> String {
+        switch model.lang {
+        case .ar: return n == 1 ? "ساعة" : n == 2 ? "ساعتين" : "\(Lang.ar.num(n)) ساعات"
+        case .en: return n == 1 ? "1 hour" : "\(n) hours"
+        case .fr: return n == 1 ? "1 heure" : "\(n) heures"
+        }
+    }
+
     private func timeRow(_ title: String, _ minutes: Binding<Int>) -> some View {
         DatePicker(title, selection: Binding<Date>(
             get: { Calendar.current.date(bySettingHour: minutes.wrappedValue / 60, minute: minutes.wrappedValue % 60, second: 0, of: .now) ?? .now },
@@ -175,5 +211,7 @@ struct SettingsView: View {
                 minutes.wrappedValue = (c.hour ?? 0) * 60 + (c.minute ?? 0)
             }
         ), displayedComponents: .hourAndMinute)
+        // Same digits as the prayer times (Arabic-Indic in Arabic).
+        .environment(\.locale, model.lang == .ar ? Locale(identifier: "ar@numbers=arab") : model.lang.locale)
     }
 }

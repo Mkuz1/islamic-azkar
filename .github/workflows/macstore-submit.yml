@@ -1,0 +1,44 @@
+# Fills in the Mac version of the App Store listing and submits it for review (tools/appstore_submit.py
+# with PLATFORM=mac). Triggered by changing store/macstore/SUBMIT ("no-submit" there only fills it in).
+
+name: Mac App Store submission
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/macstore/SUBMIT"]
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    env:
+      PLATFORM: mac
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Secrets
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+          PHONE: ${{ secrets.APPSTORE_REVIEW_PHONE }}
+        run: |
+          for v in KEY_ID ISSUER P8; do [ -n "${!v}" ] || { echo "::error::App Store secrets missing"; exit 1; }; done
+          for v in KEY_ID ISSUER; do
+            clean=$(printf '%s' "${!v}" | tr -d '[:space:]'); echo "::add-mask::$clean"; echo "$v=$clean" >> "$GITHUB_ENV"
+          done
+          if [ -n "$PHONE" ]; then p=$(printf '%s' "$PHONE" | tr -d '\r\n'); echo "::add-mask::$p"; echo "REVIEW_PHONE=$p" >> "$GITHUB_ENV"; fi
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          pip install -q pyjwt cryptography
+      - name: Listing, screenshots, build, submission
+        run: |
+          ARGS=""; grep -q no-submit store/macstore/SUBMIT && ARGS=--no-submit
+          grep -q pubkey store/macstore/SUBMIT && ARGS=--pubkey
+          grep -q replace store/macstore/SUBMIT && ARGS="$ARGS --replace"
+          BUILD=$(grep -o 'build=[^ ]*' store/macstore/SUBMIT | cut -d= -f2 || true) python3 -u tools/appstore_submit.py $ARGS

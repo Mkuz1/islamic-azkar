@@ -4,6 +4,25 @@
   Cache-Control: public, max-age=604800
 /data/*
   Cache-Control: public, max-age=86400
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/app/*
+  Cache-Control: no-cache
+/ar/*
+  Cache-Control: no-cache
+/fr/*
+  Cache-Control: no-cache
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://islamicazkar.net; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Frame-Options: DENY
+  Permissions-Policy: geolocation=(self), camera=(), microphone=(), payment=(), usb=(), interest-cohort=()
+  Cross-Origin-Opener-Policy: same-origin
+/apple/*
+  Content-Type: application/octet-stream
+  Content-Disposition: attachment
+  Cache-Control: no-cache

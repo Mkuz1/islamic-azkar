@@ -75,14 +75,19 @@ object Cities {
 }
 
 /** Calculation authorities: twilight angles for Fajr and Isha (or a fixed delay after Maghrib). */
-enum class CalcMethod(val fajr: Double, val isha: Double, val ishaMinutes: Int = 0) {
+/**
+ * [offsets]: precaution minutes added to Fajr, sunrise, Dhuhr, Asr, Maghrib and Isha.
+ * DUBAI follows Dubai's Islamic Affairs department (IACAD, the Dulook DXB app): Fajr and Isha
+ * at 18.2°, Dhuhr and Maghrib +3 min, as published by aladhan.com (method 16).
+ */
+enum class CalcMethod(val fajr: Double, val isha: Double, val ishaMinutes: Int = 0, val offsets: IntArray = IntArray(6)) {
     MWL(18.0, 17.0),
     UMM_AL_QURA(18.5, 0.0, 90),
     EGYPT(19.5, 17.5),
     ISNA(15.0, 15.0),
     KARACHI(18.0, 18.0),
     GULF(19.5, 0.0, 90),
-    DUBAI(18.2, 18.2),
+    DUBAI(18.2, 18.2, offsets = intArrayOf(0, 0, 3, 0, 3, 0)),
     FRANCE(12.0, 12.0),
     TURKEY(18.0, 17.0),
 }
@@ -157,7 +162,7 @@ object PrayerCalc {
         }
 
         val shift = tz - lng / 15
-        return doubleArrayOf(fajr, sunrise, dhuhr, asr, sunset, isha).map { it + shift }.toDoubleArray()
+        return doubleArrayOf(fajr, sunrise, dhuhr, asr, sunset, isha).mapIndexed { i, h -> h + shift + method.offsets[i] / 60.0 }.toDoubleArray()
     }
 }
 
@@ -169,7 +174,7 @@ object Prayers {
 
     fun place(ctx: Context): Place? = Place.read(Settings.prefs(ctx))
 
-    fun method(ctx: Context): CalcMethod = CalcMethod.entries.getOrElse(Settings.prefs(ctx).getInt(Settings.K_METHOD, 0)) { CalcMethod.MWL }
+    fun method(ctx: Context): CalcMethod = CalcMethod.entries.getOrElse(Settings.prefs(ctx).getInt(Settings.K_METHOD, CalcMethod.DUBAI.ordinal)) { CalcMethod.DUBAI }
 
     /** The six times (Fajr…Isha) of the day containing [day], in the place's time zone. */
     fun times(ctx: Context, place: Place, day: Long = System.currentTimeMillis()): LongArray {

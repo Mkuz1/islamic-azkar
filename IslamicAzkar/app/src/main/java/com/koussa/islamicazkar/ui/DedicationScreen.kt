@@ -25,6 +25,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -55,6 +60,7 @@ import com.koussa.islamicazkar.data.Lang
 import com.koussa.islamicazkar.data.Reading
 import com.koussa.islamicazkar.data.Settings
 import com.koussa.islamicazkar.ui.glass.ArabicFont
+import com.koussa.islamicazkar.ui.glass.tvClickable
 import com.koussa.islamicazkar.ui.glass.ArabicUiFont
 import com.koussa.islamicazkar.ui.glass.CalligraphyFont
 import com.koussa.islamicazkar.ui.glass.Glass
@@ -146,12 +152,28 @@ fun DedicationScreen(onContinue: () -> Unit, onOpen: (Reading) -> Unit = {}) {
         ) {
             // The card follows the window: full width on phones, a centred column on
             // unfolded foldables and tablets (narrower in Arabic, as in the Mushaf).
-            val cardWidth = min(maxWidth, if (lang == Lang.AR) 520.dp else 760.dp)
-            val k = (cardWidth / 560.dp).coerceIn(0.78f, 1.12f)
+            // Phones: the card follows the width. Tablets and unfolded foldables: it grows with the
+            // screen, then `fit` shrinks it if it would overflow.
+            val large = maxWidth >= 600.dp && maxHeight >= 600.dp
+            val grow = if (large) minOf(maxWidth / 640.dp, maxHeight / 760.dp, 1.7f).coerceAtLeast(1f) else 1f
+            val cardWidth = min(maxWidth, (if (lang == Lang.AR) 520.dp else 760.dp) * grow)
+            val kw = if (large) grow * 1.05f else (cardWidth / 560.dp).coerceIn(0.78f, 1.12f)
+            // If the card is taller than the screen (short phones, landscape), shrink everything until
+            // it fits instead of scrolling.
+            val scroll = rememberScrollState()
+            var fit by remember(maxWidth, maxHeight, lang) { mutableFloatStateOf(1f) }
+            var viewH by remember { mutableIntStateOf(0) }
+            LaunchedEffect(scroll.maxValue, viewH) {
+                if (scroll.maxValue > 2 && viewH > 300 && kw * fit > 0.5f) {
+                    fit = maxOf(fit * viewH / (viewH + scroll.maxValue) * 0.98f, 0.5f / kw)
+                }
+            }
+            val k = (kw * fit).coerceAtLeast(0.5f)
             Column(
                 Modifier
                     .width(cardWidth)
                     .heightIn(max = maxHeight)
+                    .onSizeChanged { viewH = it.height }
                     .alpha(appear.value)
                     .glass(RoundedCornerShape(30.dp), blurRadius = 14.dp, elevation = 24.dp, tint = CardTop.copy(alpha = 0.80f), fallback = CardTop)
                     .clip(RoundedCornerShape(30.dp))
@@ -159,8 +181,8 @@ fun DedicationScreen(onContinue: () -> Unit, onOpen: (Reading) -> Unit = {}) {
                     .border(1.dp, Gold.copy(alpha = 0.55f), RoundedCornerShape(30.dp))
                     .padding(6.dp)
                     .border(0.6.dp, Gold.copy(alpha = 0.22f), RoundedCornerShape(25.dp))
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 24.dp, vertical = (30 * k).dp),
+                    .verticalScroll(scroll)
+                    .padding(horizontal = (24 * minOf(k, 1f)).dp, vertical = (30 * k).dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
@@ -179,8 +201,8 @@ fun DedicationScreen(onContinue: () -> Unit, onOpen: (Reading) -> Unit = {}) {
                 )
                 text.transliteration?.let {
                     Text(
-                        it, fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold, fontSize = 13.sp,
-                        letterSpacing = 6.sp, color = Gold.copy(alpha = 0.85f), modifier = Modifier.padding(top = 4.dp),
+                        it, fontFamily = FontFamily.Serif, fontWeight = FontWeight.SemiBold, fontSize = (13 * k).sp,
+                        letterSpacing = (6 * k).sp, color = Gold.copy(alpha = 0.85f), modifier = Modifier.padding(top = (4 * k).dp),
                     )
                 }
                 // The Arabic dedication appears in every language…
@@ -208,26 +230,26 @@ fun DedicationScreen(onContinue: () -> Unit, onOpen: (Reading) -> Unit = {}) {
                 text.duaMeaning?.let {
                     Text(
                         it, fontFamily = FontFamily.Serif, fontStyle = FontStyle.Italic, fontWeight = FontWeight.SemiBold,
-                        fontSize = 15.sp, color = Color.White.copy(alpha = 0.82f), textAlign = TextAlign.Center,
+                        fontSize = (15 * k).sp, color = Color.White.copy(alpha = 0.82f), textAlign = TextAlign.Center,
                         modifier = Modifier.padding(top = 2.dp),
                     )
                 }
                 Text(
                     "إِذَا مَاتَ الإِنْسَانُ انْقَطَعَ عَمَلُهُ إِلَّا مِنْ ثَلَاثٍ: صَدَقَةٍ جَارِيَةٍ… — رواه مسلم",
-                    fontFamily = ArabicFont, fontSize = 15.sp, lineHeight = 26.sp,
+                    fontFamily = ArabicFont, fontSize = (15 * k).sp, lineHeight = (26 * k).sp,
                     color = Color.White.copy(alpha = 0.62f), textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(top = 16.dp),
+                    modifier = Modifier.padding(top = (16 * k).dp),
                 )
                 text.hadithMeaning?.let {
                     Text(
-                        it, fontFamily = FontFamily.Serif, fontSize = 12.sp, lineHeight = 17.sp,
+                        it, fontFamily = FontFamily.Serif, fontSize = (12 * k).sp, lineHeight = (17 * k).sp,
                         color = Color.White.copy(alpha = 0.5f), textAlign = TextAlign.Center,
                     )
                 }
 
                 Spacer(Modifier.height((24 * k).dp))
                 LanguagePicker(lang) { settings.updateLang(it) }
-                Spacer(Modifier.height(18.dp))
+                Spacer(Modifier.height((18 * k).dp))
 
                 Text(
                     text.begin, color = Ink, fontSize = 17.sp, fontWeight = FontWeight.SemiBold,
@@ -235,11 +257,11 @@ fun DedicationScreen(onContinue: () -> Unit, onOpen: (Reading) -> Unit = {}) {
                         .pressable(onContinue, squish = true)
                         .clip(RoundedCornerShape(50))
                         .background(Brush.verticalGradient(listOf(GoldLight, Gold)))
-                        .padding(horizontal = 40.dp, vertical = 13.dp),
+                        .padding(horizontal = 40.dp, vertical = (13 * minOf(k, 1f)).dp),
                 )
                 Text(
                     "$recTitle · ${s.azkar(recCount)}", color = Color.White.copy(alpha = 0.72f), fontSize = 13.sp,
-                    modifier = Modifier.padding(top = 12.dp).pressable({ onOpen(recommended) }),
+                    modifier = Modifier.padding(top = (12 * k).dp).pressable({ onOpen(recommended) }),
                 )
             }
         }
@@ -282,7 +304,7 @@ private fun LanguagePicker(current: Lang, onSelect: (Lang) -> Unit) {
                     modifier = Modifier
                         .clip(RoundedCornerShape(7.dp))
                         .background(if (sel) Color.White.copy(alpha = 0.16f) else Color.Transparent)
-                        .clickable(remember { MutableInteractionSource() }, null) { onSelect(l) }
+                        .then(Modifier.tvClickable { onSelect(l) })
                         .padding(horizontal = 14.dp, vertical = 5.dp),
                 )
             }

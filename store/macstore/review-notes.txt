@@ -1,0 +1,32 @@
+This is the Mac version of Islamic Azkar (the same app as the iPhone and iPad version, one record with Universal Purchase). It is sandboxed and uses only the network (optional sync) and location (prayer times, on the device).
+
+1. SCREEN RECORDING
+A recording of the app on a physical iPhone running the latest iOS: https://photos.icloud.com/shared/album/0f421NaHqfcWEmzakkAWsSV5Q
+The Mac app has the same screens, plus a menu bar item and an on-screen reminder card (described below).
+The app has no account registration or login (so no account deletion), no user-generated content shared with others, and no paid content or in-app purchases.
+
+2. PURPOSE AND AUDIENCE
+Islamic Azkar is a free app for Muslims who want to keep up their daily remembrance of Allah (azkar) and supplications (duas). The authentic morning, evening and daily azkar are spread across books and hard to follow day to day; the app puts the complete Hisn al-Muslim collection in one calm, ad-free place in Arabic, English and French, with a counter for each dhikr, a calendar of the days the user completed their azkar, prayer times, a Hijri calendar, a tasbih counter and reminders.
+
+3. HOW TO USE THE MAIN FEATURES (no login, no setup needed)
+- Launch the app and click the button on the opening page to reach Home.
+- Home: click "Morning Azkar" (or Evening, Sleep, After prayer). Click a card to count it; when every dhikr is done a short completion message appears and the day is marked in Record.
+- Sidebar: Home, Favorites, Tasbih, Record (calendar of completed azkar and the streak), 'Umrah guide and Settings.
+- Menu bar: the app's menu bar item shows the next prayer with a countdown and opens today's azkar. The app keeps running there when its window is closed (quit from the menu bar item).
+- Reminders (Settings > Reminders, optional): at the chosen time a card appears at the top centre of the screen with "Read now" and "Later". macOS asks for notification permission first.
+- Prayer times: Settings > Prayer times > Location: "Use my current location" (asks for location permission, used only on the Mac) or pick a city.
+- Settings > Sync between devices (optional): "Turn on sync" creates an anonymous 12-character code; entering it on another device shares the record of completed azkar. No account, name or email.
+- Menu bar item > "Open at login" (optional): uses the system's login items.
+
+4. EXTERNAL SERVICES
+- The optional sync uses the developer's own endpoint at https://islamicazkar.net/sync (hosted on Cloudflare). It stores only the dates and names of completed azkar under an anonymous code; users can delete it at https://islamicazkar.net/delete/.
+- Nothing else: no authentication service, no payment processor, no analytics, no advertising, no tracking and no AI services. Prayer times and the Hijri date are calculated on the device; the location never leaves the device.
+
+5. REGIONAL DIFFERENCES
+The app works the same in every region. Users choose the interface language (Arabic, English, French) and the prayer-time calculation method used in their country; the content is otherwise identical everywhere.
+
+6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+The app is not in a regulated industry. Its content is classical religious text: verses of the Quran and supplications from the hadith as gathered in the widely distributed collection Hisn al-Muslim. These are centuries-old texts in the public domain. The app contains no third-party brands, media or licensed content.
+
+
+Changes for this review: the Support URL is now https://islamicazkar.net/support/ (contact email and help in English, Arabic and French), and the app is no longer offered on the App Store in China mainland.

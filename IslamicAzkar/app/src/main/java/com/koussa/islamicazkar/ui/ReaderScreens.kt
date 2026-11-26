@@ -68,6 +68,8 @@ fun CategoryScreen(key: String) {
 
     LazyColumn(Modifier.fillMaxSize(), state = listState, contentPadding = screenPadding(hasBack = true)) {
         item { LargeTitle(s.category(key), s.chapters(chapters.size)) }
+        val guide = data.umrahGuide
+        if (key == "hajj" && guide != null) item { InsetGroup(Modifier.padding(bottom = 14.dp)) { GuideRow(guide) } }
         item {
             InsetGroup {
                 chapters.forEachIndexed { i, c ->
@@ -95,7 +97,12 @@ fun ReaderScreen(reading: Reading, focus: Int?) {
         Reading.Morning -> Triple(s.morningAzkar, s.book, data.morning)
         Reading.Evening -> Triple(s.eveningAzkar, s.book, data.evening)
         is Reading.OfChapter -> data.chapterById.getValue(reading.id).let {
-            Triple(it.title(lang), if (lang == Lang.AR) s.book else it.ar, it.items)
+            val source = when {
+                it.items.isNotEmpty() && it.items.all { z -> z.ref?.en?.startsWith("Quran") == true } -> s.fromQuran
+                it.items.any { z -> z.ref != null } -> s.fromSunnah
+                else -> s.book
+            }
+            Triple(it.title(lang), if (lang == Lang.AR) source else it.ar, it.items)
         }
     }
     val remaining = remember(reading) { mutableStateMapOf<Int, Int>() }
@@ -116,11 +123,9 @@ fun ReaderScreen(reading: Reading, focus: Int?) {
     LaunchedEffect(allDone) {
         if (allDone && totalReps > 0 && remaining.isNotEmpty()) {
             delay(450)
-            val streak = when (reading) {
-                Reading.Morning -> app.settings.recordCompletion("morning")
-                Reading.Evening -> app.settings.recordCompletion("evening")
-                else -> null
-            }
+            com.koussa.islamicazkar.data.AzkarHistory.markReading(ctx, reading.key())   // the Record tab
+            // From the record itself (the Record tab), which also holds the other devices' days.
+            val streak = maxOf(com.koussa.islamicazkar.data.AzkarHistory.streak(ctx, reading.key()), 1)
             app.celebration = Celebration(
                 reading = reading, title = title, azkar = items.size, repetitions = totalReps,
                 streak = streak, encouragement = (System.currentTimeMillis() / 86_400_000L).toInt() + items.size,

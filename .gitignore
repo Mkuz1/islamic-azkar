@@ -29,3 +29,11 @@ IslamicAzkar/ios/build/
 IslamicAzkar/ios/shots/
 IslamicAzkar/ios/Payload/
 *.ipa.zip
+.hadith-cache/
+IslamicAzkar/mac/IslamicAzkarMac.xcodeproj/
+IslamicAzkar/mac/build/
+IslamicAzkar/mac/shots/
+IslamicAzkar/mac/Info.plist
+__pycache__/
+*.pyc
+website/dist/

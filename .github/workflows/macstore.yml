@@ -1,0 +1,120 @@
+# Uploads the Mac app to App Store Connect (the same app record as the iPhone app: one purchase on
+# both). Sandboxed build, signed with certificates made through the App Store Connect API and
+# removed afterwards. Triggered by changing store/macstore/UPLOAD. Same secrets as appstore.yml.
+name: Mac App Store
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/macstore/UPLOAD"]
+
+permissions:
+  contents: write
+
+jobs:
+  upload:
+    runs-on: xcode-27
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: IslamicAzkar/mac
+    env:
+      PLATFORM: mac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: Secrets
+        env:
+          TEAM: ${{ secrets.APPSTORE_TEAM_ID }}
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+        run: |
+          for v in TEAM KEY_ID ISSUER P8; do [ -n "${!v}" ] || { echo "::error::App Store secrets missing"; exit 1; }; done
+          for v in TEAM KEY_ID ISSUER; do
+            clean=$(printf '%s' "${!v}" | tr -d '[:space:]'); echo "::add-mask::$clean"; echo "$v=$clean" >> "$GITHUB_ENV"
+          done
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          python3 -m pip install -q --break-system-packages pyjwt cryptography 2>/dev/null || python3 -m pip install -q pyjwt cryptography
+      - name: Signing (Mac App Store certificates and profile made with the API key)
+        run: |
+          python3 $GITHUB_WORKSPACE/tools/appstore_signing.py setup "$RUNNER_TEMP/sign"
+          security find-identity -v "$RUNNER_TEMP/sign/signing.keychain-db" | sed 's/[0-9A-F]\{40\}/<id>/'
+          security find-certificate -a -c "Installer" "$RUNNER_TEMP/sign/signing.keychain-db" | grep '"labl"' || true
+      - name: Keep the Mac App Store signing (encrypted)
+        working-directory: .
+        run: |
+          if [ -n "$(git status --porcelain store/macstore/signing.enc)" ]; then
+            git config user.name "github-actions[bot]"; git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add store/macstore/signing.enc && git commit -m "Mac App Store signing certificates and profile, kept (encrypted)" && git pull --rebase -q && git push
+          else echo "signing already kept"; fi
+      - name: Archive (sandboxed Mac App Store build)
+        run: |
+          set -o pipefail
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          PROFILE=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["com.koussa.IslamicAzkar"])' "$RUNNER_TEMP/sign/profiles.json")
+          BASE=$(grep -m1 'CURRENT_PROJECT_VERSION:' project.yml | grep -o '[0-9]\+')
+          BUILD="$BASE.$GITHUB_RUN_NUMBER"; echo "build $BUILD"
+          xcodebuild archive -project IslamicAzkarMac.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -destination 'generic/platform=macOS' -archivePath build/IslamicAzkar.xcarchive \
+            CURRENT_PROJECT_VERSION="$BUILD" SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) APPSTORE' \
+            CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE" CODE_SIGN_ENTITLEMENTS=AppStore.entitlements \
+            ENABLE_APP_SANDBOX=YES ENABLE_HARDENED_RUNTIME=YES \
+            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/sign/signing.keychain-db" | xcbeautify --renderer github-actions
+          APP="build/IslamicAzkar.xcarchive/Products/Applications/Islamic Azkar.app"
+          codesign -d --entitlements - "$APP" 2>/dev/null | grep -E "sandbox|network|location|team" || true
+      - name: Add the macOS platform to the app (once)
+        run: |
+          python3 - <<'PY'
+          import json, os, re, time, urllib.request, urllib.error, jwt
+          kid, iss = os.environ["KEY_ID"], os.environ["ISSUER"]
+          key = open(os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{kid}.p8")).read()
+          def call(method, path, body=None):
+              tok = jwt.encode({"iss": iss, "iat": int(time.time()), "exp": int(time.time()) + 600, "aud": "appstoreconnect-v1"},
+                               key, algorithm="ES256", headers={"kid": kid, "typ": "JWT"})
+              req = urllib.request.Request("https://api.appstoreconnect.apple.com/v1/" + path, method=method,
+                                           data=json.dumps(body).encode() if body else None,
+                                           headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"})
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r: return r.status, json.loads(r.read() or b"{}")
+              except urllib.error.HTTPError as e: return e.code, json.loads(e.read() or b"{}")
+          st, b = call("GET", "apps?filter[bundleId]=com.koussa.IslamicAzkar")
+          app = b["data"][0]["id"]
+          st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]=MAC_OS&limit=5")
+          if b.get("data"):
+              print("macOS version already there:", [v["attributes"]["versionString"] for v in b["data"]])
+          else:
+              ver = re.search(r'MARKETING_VERSION: "([^"]+)"', open("project.yml").read()).group(1)
+              st, b = call("POST", "appStoreVersions", {"data": {"type": "appStoreVersions",
+                           "attributes": {"platform": "MAC_OS", "versionString": ver},
+                           "relationships": {"app": {"data": {"type": "apps", "id": app}}}}})
+              print("add macOS", ver, "->", st)
+              for e in b.get("errors", []): print("  ", e.get("title"), e.get("detail"))
+          PY
+      - name: Export the installer package and upload it
+        run: |
+          set -o pipefail
+          INSTALLER=$(security find-certificate -a "$RUNNER_TEMP/sign/signing.keychain-db" | grep -o '"labl"<blob>="[^"]*Installer[^"]*' | head -1 | sed 's/.*="//;s/:.*//')
+          echo "installer certificate: ${INSTALLER:-3rd Party Mac Developer Installer}"
+          python3 - "$RUNNER_TEMP/sign/profiles.json" "${INSTALLER:-3rd Party Mac Developer Installer}" <<'PY'
+          import json, os, plistlib, sys
+          plistlib.dump({"method": "app-store-connect", "destination": "export", "teamID": os.environ["TEAM"].strip(),
+                         "signingStyle": "manual", "signingCertificate": "Apple Distribution",
+                         "installerSigningCertificate": sys.argv[2],
+                         "provisioningProfiles": json.load(open(sys.argv[1])), "uploadSymbols": True,
+                         "manageAppVersionAndBuildNumber": False}, open("ExportOptions-MacStore.plist", "wb"))
+          PY
+          xcodebuild -exportArchive -archivePath build/IslamicAzkar.xcarchive \
+            -exportOptionsPlist ExportOptions-MacStore.plist -exportPath build/export | xcbeautify --renderer github-actions
+          ls -l build/export
+          xcrun altool --upload-app --type macos -f build/export/*.pkg --apiKey "$KEY_ID" --apiIssuer "$ISSUER" --output-format normal
+          echo "Uploaded. It appears in App Store Connect (macOS) after Apple finishes processing."
+      - name: Remove the temporary certificates and profile
+        if: always()
+        run: python3 $GITHUB_WORKSPACE/tools/appstore_signing.py cleanup "$RUNNER_TEMP/sign" || true

@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 SDK=$(xcrun --show-sdk-path)
 TMP=$(mktemp -d)
 trap 'rm -rf "$TMP"' EXIT
-cp -R App Shared Widgets "$TMP"/
+cp -R App Shared Widgets "$TMP"/ && cp ../mac/Sources/*.swift "$TMP"/App/
 find "$TMP" -name "*.swift" -exec sed -i '' 's/@State /@LocalState /g' {} +
 cat > "$TMP/Shared/_LocalState.swift" <<'SWIFT'
 import SwiftUI

@@ -1,0 +1,30 @@
+1. SCREEN RECORDING
+Screen recording made on a physical iPhone running the latest iOS: https://photos.icloud.com/shared/album/0f421NaHqfcWEmzakkAWsSV5Q
+It starts from launching the app and shows the typical use of the app; section 3 below lists every main feature and where to find it.
+The app has no account registration or login (so no account deletion), no user-generated content shared with others, and no paid content or in-app purchases.
+
+2. PURPOSE AND AUDIENCE
+Islamic Azkar is a free app for Muslims who want to keep up their daily remembrance of Allah (azkar) and supplications (duas). It solves a common problem: the authentic morning, evening and daily azkar are spread across books and hard to follow on a phone. The app puts the complete Hisn al-Muslim collection in one calm, ad-free place in Arabic, English and French, with a counter for each dhikr, a calendar that records the days the user completed their azkar, prayer times, a Hijri calendar, a tasbih counter, reminders, and Home Screen / Lock Screen widgets.
+
+3. HOW TO USE THE MAIN FEATURES (no login, no setup needed)
+- Launch the app and tap the button on the opening page to reach Home.
+- Home: tap "Morning Azkar" (or Evening, Sleep, After prayer). Tap anywhere on a card to count it; when every dhikr is done a short completion message appears and the day is marked in the Record tab.
+- Record tab: a calendar of the completed azkar per day and the current streak.
+- Tasbih tab: tap to count, choose the phrase and the target (33, 99, 100 or unlimited).
+- Prayer times: Home shows the next prayer. In Settings > Prayer times > Location choose "Use my current location" (asks for location permission, used only on the device) or pick a city from the list.
+- Widgets: Settings > Widgets shows every widget with instructions to add it to the Home Screen or Lock Screen.
+- Settings > Reminders: optional local notifications for the morning and evening azkar.
+- Settings > Sync between devices (optional): "Turn on sync" creates an anonymous 12-character code. Entering the same code on another device shares the record of completed azkar. No account, name or email is involved.
+
+4. EXTERNAL SERVICES
+- The optional sync uses the developer's own endpoint at https://islamicazkar.net/sync (hosted on Cloudflare). It stores only the dates and names of completed azkar under an anonymous code; users can delete it at https://islamicazkar.net/delete/.
+- Nothing else: no authentication service, no payment processor, no analytics, no advertising, no tracking and no AI services. Prayer times and the Hijri date are calculated on the device; the location never leaves the device.
+
+5. REGIONAL DIFFERENCES
+The app works the same in every region. Users can choose the interface language (Arabic, English, French) and the prayer-time calculation method used in their country; the content is otherwise identical everywhere.
+
+6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+The app is not in a regulated industry. Its content is classical religious text: verses of the Quran and supplications from the hadith (the Prophet's sayings) as gathered in the widely distributed collection Hisn al-Muslim. These are centuries-old texts in the public domain. The app contains no third-party brands, media or licensed content.
+
+
+Changes for this review: the Support URL is now https://islamicazkar.net/support/ (contact email and help in English, Arabic and French), and the app is no longer offered on the App Store in China mainland.

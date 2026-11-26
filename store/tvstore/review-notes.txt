@@ -1,0 +1,30 @@
+This is the Apple TV version of Islamic Azkar (the same app record as the iPhone, iPad and Mac versions). It uses the network only for the optional sync, and no location: the user picks a city for prayer times.
+
+1. SCREEN RECORDING
+A recording of the app on a physical iPhone running the latest iOS: https://photos.icloud.com/shared/album/0f421NaHqfcWEmzakkAWsSV5Q
+The Apple TV app has the same content with screens made for the Siri Remote (described below).
+The app has no account registration or login (so no account deletion), no user-generated content shared with others, and no paid content or in-app purchases.
+
+2. PURPOSE AND AUDIENCE
+Islamic Azkar is a free app for Muslims who want to keep up their daily remembrance of Allah (azkar) and supplications (duas). On Apple TV, families can read the morning, evening and daily azkar together from the complete Hisn al-Muslim collection, in large Arabic with the meaning in English and French, see prayer times, and use a tasbih counter.
+
+3. HOW TO USE THE MAIN FEATURES (no login, no setup needed)
+- Tabs at the top: Home, Tasbih, Record, Settings.
+- Home: the next prayer with today's times; select "Morning Azkar" (or Evening, Before Sleep, Prayer) or any category.
+- Reader: press the remote's touch surface (or Play/Pause) to count a dhikr; when its count is reached the next one appears. Swipe left or right to move between azkar. When all are done, a completion screen appears and the day is marked in Record.
+- Tasbih: press to count; choose the phrase and the target (33, 99, 100 or unlimited).
+- Record: a month calendar of completed azkar and the current streak.
+- Settings: language (Arabic, English, French), city and calculation method for prayer times, and the optional sync code.
+
+4. EXTERNAL SERVICES
+- The optional sync uses the developer's own endpoint at https://islamicazkar.net/sync (hosted on Cloudflare). It stores only the dates and names of completed azkar under an anonymous code; users can delete it at https://islamicazkar.net/delete/.
+- Nothing else: no authentication service, no payment processor, no analytics, no advertising, no tracking and no AI services. Prayer times and the Hijri date are calculated on the device.
+
+5. REGIONAL DIFFERENCES
+The app works the same in every region. Users choose the interface language (Arabic, English, French) and the prayer-time calculation method used in their country; the content is otherwise identical everywhere.
+
+6. REGULATED INDUSTRY / THIRD-PARTY MATERIAL
+The app is not in a regulated industry. Its content is classical religious text: verses of the Quran and supplications from the hadith as gathered in the widely distributed collection Hisn al-Muslim. These are centuries-old texts in the public domain. The app contains no third-party brands, media or licensed content.
+
+
+Changes for this review: the Support URL is now https://islamicazkar.net/support/ (contact email and help in English, Arabic and French), and the app is no longer offered on the App Store in China mainland.

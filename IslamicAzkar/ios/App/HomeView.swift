@@ -16,14 +16,19 @@ struct HomeView: View {
                 SearchField(text: $query, prompt: s.searchHint).padding(.horizontal, 16).padding(.top, 14)
 
                 if query.trimmingCharacters(in: .whitespaces).isEmpty {
+                    UpdateBanner().padding(.horizontal, 16).padding(.top, 16)
                     NextPrayerCard().padding(.horizontal, 16).padding(.top, 16)
 
                     SectionLabel(text: s.recommendedNow).padding(.top, 8)
                     let columns = Array(repeating: GridItem(.flexible(), spacing: 14), count: sizeClass == .regular ? 4 : 2)
-                    LazyVGrid(columns: columns, spacing: 14) {
-                        ForEach(todayTiles, id: \.reading) { t in
-                            Button { model.show(t.reading, split: split) } label: { TodayCard(tile: t) }
-                                .buttonStyle(PressStyle())
+                    // Re-evaluated every minute (and when the app comes back), so "Now" follows the clock
+                    // even when the app was last opened hours ago.
+                    TimelineView(.everyMinute) { ctx in
+                        LazyVGrid(columns: columns, spacing: 14) {
+                            ForEach(todayTiles(at: ctx.date), id: \.reading) { t in
+                                Button { model.show(t.reading, split: split) } label: { TodayCard(tile: t) }
+                                    .buttonStyle(PressStyle())
+                            }
                         }
                     }
                     .padding(.horizontal, 16).padding(.top, 6)
@@ -44,6 +49,11 @@ struct HomeView: View {
                         }
                     }
                     .padding(.horizontal, 16).padding(.top, 6)
+
+                    if let guide = data.umrahGuide {
+                        SectionLabel(text: GuideTexts.of(model.lang).guide).padding(.top, 10)
+                        GlassGroup { GuideLinkRow(guide: guide) }.padding(.horizontal, 16).padding(.top, 6)
+                    }
 
                     VStack(spacing: 4) {
                         Text(dedicationAr).font(.amiri(17)).foregroundStyle(.secondary)
@@ -89,9 +99,9 @@ struct HomeView: View {
         let now: Bool
     }
 
-    private var todayTiles: [Tile] {
+    private func todayTiles(at date: Date) -> [Tile] {
         let s = model.s
-        let rec = Reading.recommended()
+        let rec = Reading.recommended(at: date)
         return [
             Tile(reading: .morning, title: s.morningAzkar, symbol: "sun.max.fill", color: .orange, count: data.morning.count, now: rec == .morning),
             Tile(reading: .evening, title: s.eveningAzkar, symbol: "moon.haze.fill", color: .indigo, count: data.evening.count, now: rec == .evening),
@@ -206,6 +216,7 @@ struct GlassRow<Content: View>: View {
         VStack(spacing: 0) {
             HStack(spacing: 14) { content }
                 .padding(.horizontal, 16).frame(minHeight: 56)
+                .contentShape(Rectangle())
             if divider { Divider().padding(.leading, 62) }
         }
         .contentShape(Rectangle())
@@ -228,6 +239,7 @@ extension View {
 struct PressStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .contentShape(Rectangle())   // the whole card is clickable, not only its text (macOS)
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .animation(.spring(response: 0.25, dampingFraction: 0.6), value: configuration.isPressed)
     }
@@ -250,7 +262,7 @@ private struct SearchResults: View {
 
         VStack(spacing: 0) {
             if chapters.isEmpty && hits.isEmpty {
-                ContentUnavailableView.search(text: query).padding(.top, 40)
+                ContentUnavailableView.search(text: query.count > 40 ? String(query.prefix(40)) + "…" : query).padding(.top, 40)
             }
             if !chapters.isEmpty {
                 SectionLabel(text: model.s.categories)
@@ -305,6 +317,7 @@ struct ChapterRow: View {
                     Image(systemName: "chevron.forward").font(.footnote.weight(.semibold)).foregroundStyle(.tertiary)
                 }
                 .padding(.horizontal, 16).padding(.vertical, 12).frame(minHeight: 56)
+                .contentShape(Rectangle())
                 .background(selected ? Theme.accentSoft : .clear)
                 if divider { Divider().padding(.leading, 16) }
             }
@@ -324,6 +337,9 @@ struct CategoryView: View {
         let chapters = (data.categories.first { $0.key == key }?.chapters ?? []).compactMap { data.chapterById[$0] }
         ScrollView {
             VStack(spacing: 0) {
+                if key == "hajj", let guide = data.umrahGuide {
+                    GlassGroup { GuideLinkRow(guide: guide) }.padding(.horizontal, 16).padding(.top, 8)
+                }
                 SectionLabel(text: model.s.chapters(chapters.count))
                 GlassGroup {
                     ForEach(Array(chapters.enumerated()), id: \.element.id) { i, c in

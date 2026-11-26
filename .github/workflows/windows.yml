@@ -1,0 +1,79 @@
+# Windows app: builds the per-user installer (no administrator rights), installs it, launches it and
+# checks it. When store/windows/UPLOAD changes, the installer also replaces the one in the current
+# GitHub release. New releases get it from release.yml.
+name: Windows
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["IslamicAzkar/windows/**", "website/app/**", "website/app.js", "website/style.css", "website/data/**", "store/windows/UPLOAD", ".github/workflows/windows.yml"]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: IslamicAzkar/windows
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Build the installer
+        shell: bash
+        run: |
+          V=$(grep -m1 'MARKETING_VERSION:' ../mac/project.yml | grep -o '[0-9][0-9.]*')
+          npm pkg set version=$V
+          npm install --no-audit --no-fund
+          npm run dist
+          ls -l dist/*.exe
+      - name: The installer asks for no administrator rights
+        shell: bash
+        run: |
+          python -c "
+          import re,sys
+          b=open('dist/IslamicAzkar-Setup.exe','rb').read()
+          m=re.findall(rb'requestedExecutionLevel\s+level=\"(\w+)\"', b)
+          print('installer execution level:', [x.decode() for x in m])
+          sys.exit(0 if m and all(x==b'asInvoker' for x in m) else 1)"
+      - name: Install for this user only, silently
+        shell: pwsh
+        run: |
+          Start-Process -FilePath dist\IslamicAzkar-Setup.exe -ArgumentList '/S' -Wait
+          $exe = Join-Path $env:LOCALAPPDATA 'Programs\islamic-azkar\Islamic Azkar.exe'
+          if (-not (Test-Path $exe)) { Get-ChildItem "$env:LOCALAPPDATA\Programs" -Recurse -Depth 1 | Select-Object FullName; throw "not installed in the user's folder" }
+          Write-Output "PASS installed for this user: $exe"
+          $hkcu = Get-ChildItem HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall | Where-Object { (Get-ItemProperty $_.PSPath).DisplayName -like 'Islamic Azkar*' }
+          $hklm = Get-ChildItem HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall | Where-Object { (Get-ItemProperty $_.PSPath).DisplayName -like 'Islamic Azkar*' }
+          if (-not $hkcu) { throw "no per-user uninstall entry" }
+          if ($hklm) { throw "installed machine-wide" }
+          Write-Output "PASS uninstall entry is per-user (Settings → Apps), nothing machine-wide"
+          (Get-ItemProperty $hkcu.PSPath) | Select-Object DisplayName, DisplayVersion, InstallLocation | Format-List
+          "EXE=$exe" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+      - name: Launch and check
+        shell: bash
+        run: |
+          npm install --no-save --no-audit --no-fund playwright-core@1.65.0
+          node smoke.js "$EXE"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-screenshots
+          path: IslamicAzkar/windows/shots
+          retention-days: 7
+          if-no-files-found: ignore
+      - name: Replace the installer in the current release
+        if: github.event_name == 'workflow_dispatch' || contains(join(github.event.commits.*.modified, ','), 'store/windows/UPLOAD') || contains(join(github.event.commits.*.added, ','), 'store/windows/UPLOAD')
+        shell: bash
+        env:
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          V=$(node -p "require('./package.json').version")
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" dist/IslamicAzkar-Setup.exe -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" dist/IslamicAzkar-Setup.exe -R "$GITHUB_REPOSITORY" --clobber
+          echo "v$V: Windows installer uploaded"

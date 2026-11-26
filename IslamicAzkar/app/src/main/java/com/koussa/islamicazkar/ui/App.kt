@@ -38,8 +38,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.rounded.Widgets
-import androidx.compose.material.icons.outlined.Widgets
+import androidx.compose.material.icons.rounded.CalendarMonth
+import androidx.compose.material.icons.outlined.CalendarMonth
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material.icons.rounded.Favorite
@@ -101,8 +101,10 @@ sealed interface Route {
     data object Favorites : Route { override val key = "fav" }
     data object Tasbih : Route { override val key = "tasbih" }
     data object WidgetsRoute : Route { override val key = "widgets" }
+    data object RecordRoute : Route { override val key = "record" }
     data object SettingsRoute : Route { override val key = "settings" }
     data class Category(val catKey: String) : Route { override val key = "cat:$catKey" }
+    data class GuideRoute(val guideKey: String) : Route { override val key = "guide:$guideKey" }
     data class Reader(val reading: Reading, val focusZikr: Int? = null) : Route { override val key = "read:${reading.key()}" }
 }
 
@@ -111,7 +113,7 @@ sealed interface Route {
 class AppState(val settings: Settings) {
     var tab by mutableIntStateOf(0)
     private val stacks = List(5) { mutableStateListOf<Route>() }
-    private val roots = listOf(Route.Home, Route.Favorites, Route.Tasbih, Route.WidgetsRoute, Route.SettingsRoute)
+    private val roots = listOf(Route.Home, Route.Favorites, Route.Tasbih, Route.RecordRoute, Route.SettingsRoute)
 
     /** True when the window is wide enough (tablet, unfolded foldable) for a split view. */
     var wide by mutableStateOf(false)
@@ -186,19 +188,30 @@ fun AzkarApp(state: AppState) {
             Box(Modifier.fillMaxSize().backdropSource(backdrop)) {
                 // Content panes refract the wallpaper; floating chrome refracts everything.
                 Box(Modifier.fillMaxSize().backdropSource(wallpaper)) { LiquidWallpaper() }
-                CompositionLocalProvider(LocalBackdrop provides wallpaper) { Pane(state.current) }
+                // On TV the pages start below the tab bar: the remote's Down from the bar must find
+                // the page's content below it (a list under the bar would count as overlapping it).
+                CompositionLocalProvider(LocalBackdrop provides wallpaper) {
+                    Box(if (isTv()) Modifier.fillMaxSize().padding(top = 96.dp) else Modifier.fillMaxSize()) { Pane(state.current) }
+                }
             }
 
             CompositionLocalProvider(LocalBackdrop provides backdrop) {
                 TopBlur(backdrop, Modifier.align(Alignment.TopCenter))
-                InlineTitle(state.inlineTitle, Modifier.align(Alignment.TopCenter))
+                if (!isTv()) InlineTitle(state.inlineTitle, Modifier.align(Alignment.TopCenter))   // on TV the tab bar is there
 
+                val tv = isTv()
                 if (state.showBack) {
-                    BackChrome(Modifier.align(Alignment.TopStart).statusBarsPadding().padding(start = 16.dp, top = 6.dp)) { state.pop() }
+                    BackChrome(
+                        if (tv) Modifier.align(Alignment.TopStart).padding(start = 48.dp, top = 30.dp)
+                        else Modifier.align(Alignment.TopStart).statusBarsPadding().padding(start = 16.dp, top = 6.dp),
+                    ) { state.pop() }
                 }
 
                 // With a separating hinge, keep the bar on one screen instead of straddling the gap.
-                val barModifier = if (bookHinge != null && gap > 0.dp) {
+                // On TV the bar sits at the top, where the remote's Up button reaches it from any page.
+                val barModifier = if (tv) {
+                    Modifier.align(Alignment.TopCenter).padding(top = 24.dp).widthIn(max = 620.dp).fillMaxWidth()
+                } else if (bookHinge != null && gap > 0.dp) {
                     Modifier.align(Alignment.BottomStart).width(leftWidth)
                 } else {
                     Modifier.align(Alignment.BottomCenter).widthIn(max = 520.dp).fillMaxWidth()
@@ -208,15 +221,17 @@ fun AzkarApp(state: AppState) {
                         TabItem(s.tabHome, Icons.Outlined.Home, Icons.Rounded.Home),
                         TabItem(s.tabFavorites, Icons.Outlined.FavoriteBorder, Icons.Rounded.Favorite),
                         TabItem(s.tabTasbih, Icons.Outlined.TouchApp, Icons.Rounded.TouchApp),
-                        TabItem(if (Glass.lang == com.koussa.islamicazkar.data.Lang.AR) "الأدوات" else "Widgets", Icons.Outlined.Widgets, Icons.Rounded.Widgets),
+                        TabItem(HistoryTexts.of(Glass.lang).tab, Icons.Outlined.CalendarMonth, Icons.Rounded.CalendarMonth),
                         TabItem(s.tabSettings, Icons.Outlined.Settings, Icons.Rounded.Settings),
                     ),
                     selected = state.tab,
                     onSelect = state::selectTab,
-                    modifier = barModifier
+                    modifier = if (tv) barModifier.padding(horizontal = 18.dp) else barModifier
                         .navigationBarsPadding()
                         .padding(horizontal = 18.dp, vertical = 10.dp),
                 )
+
+                UpdateHost(Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 92.dp))
 
                 ToastHost(state, Modifier.align(Alignment.BottomCenter).navigationBarsPadding().padding(bottom = 92.dp))
 
@@ -257,8 +272,10 @@ private fun Pane(route: Route) {
                         Route.Favorites -> FavoritesScreen()
                         Route.Tasbih -> TasbihScreen()
                         Route.WidgetsRoute -> WidgetsScreen()
+                        Route.RecordRoute -> HistoryScreen()
                         Route.SettingsRoute -> SettingsScreen()
                         is Route.Category -> CategoryScreen(r.catKey)
+                        is Route.GuideRoute -> GuideScreen(r.guideKey)
                         is Route.Reader -> ReaderScreen(r.reading, r.focusZikr)
                     }
                 }

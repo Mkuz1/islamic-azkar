@@ -1,0 +1,276 @@
+# Builds, signs and publishes a release entirely on GitHub (nothing is built on the Mac).
+#
+# Run it by writing the new tag ("v" + versionName, e.g. v1.0.4) into the RELEASE file at the repository root
+# and pushing (to main or a main-* branch), by pushing that tag, or from the Actions tab.
+#  - Android "github" APK, signed with the upload key  → public release in Mkuz1/islamic-azkar-releases (IslamicAzkar.apk)
+#  - unsigned iPhone IPA (install with Sideloadly/AltStore) → same public release (IslamicAzkar.ipa)
+#  - Mac app, Developer ID signed and notarized by Apple   → same public release (IslamicAzkar.dmg)
+#  - Windows app, per-user installer (no admin rights)  → same public release (IslamicAzkar-Setup.exe)
+#  - Android "play" App Bundle for Google Play          → private release in this repository (IslamicAzkar-play.aab)
+#
+# Each build job uploads its file straight to a draft release (no workflow artifacts, so the
+# Actions storage quota never blocks a release); the last job publishes the drafts.
+#
+# Repository secrets (Settings → Secrets and variables → Actions):
+#   UPLOAD_KEYSTORE_BASE64   the upload keystore file, base64-encoded
+#   UPLOAD_KEYSTORE_PASSWORD UPLOAD_KEY_ALIAS  UPLOAD_KEY_PASSWORD
+#   RELEASES_TOKEN           fine-grained token with Contents: read & write on Mkuz1/islamic-azkar-releases
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+    branches: [main, "main-*"]
+    paths: ["RELEASE"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  # SHA-256 of the upload certificate (CN=Mohamad Koussa) that signed every published APK so far.
+  # An APK signed with any other key could not update installed copies, so the build stops instead.
+  UPLOAD_CERT_SHA256: 25f7c4e6493965e99e62586e699bff3727da15d431ca7119671b33c90bd24eee
+
+jobs:
+  # Version from build.gradle.kts, checked against the tag or the RELEASE file; creates both draft releases.
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Version
+        id: version
+        run: |
+          V=$(sed -n 's/^ *versionName = "\(.*\)"/\1/p' IslamicAzkar/app/build.gradle.kts)
+          echo "version=$V" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = tag ]; then WANT="${GITHUB_REF_NAME}"; else WANT=$(tr -d '[:space:]' < RELEASE); fi
+          if [ "$WANT" != "v$V" ]; then echo "::error::Release $WANT does not match versionName $V (expected v$V)"; exit 1; fi
+          grep -q "MARKETING_VERSION: \"$V\"" IslamicAzkar/mac/project.yml || { echo "::error::mac/project.yml MARKETING_VERSION is not $V"; exit 1; }
+          grep -q "MARKETING_VERSION = $V;" IslamicAzkar/ios/IslamicAzkar.xcodeproj/project.pbxproj || { echo "::error::iOS MARKETING_VERSION is not $V"; exit 1; }
+      - name: Release notes
+        env:
+          V: ${{ steps.version.outputs.version }}
+        run: |
+          {
+            echo "**Islamic Azkar $V**"; echo
+            cat RELEASE_NOTES.md; echo
+            echo '**Android:** install `IslamicAzkar.apk` (Android 8 or later).'
+            echo '**iPhone:** `IslamicAzkar.ipa` is unsigned; install it with Sideloadly or AltStore.'
+            echo '**Mac:** open `IslamicAzkar.dmg` and drag the app to Applications (macOS 15 or later). It is signed and notarized by Apple.'
+            echo '**Windows:** run `IslamicAzkar-Setup.exe` (Windows 10 or 11). It installs for your user only and needs no administrator rights. If SmartScreen appears, choose More info → Run anyway.'
+          } > notes.md
+      - name: Draft releases
+        env:
+          V: ${{ steps.version.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [ -n "$PUBLIC_TOKEN" ] || { echo "::error::Add the RELEASES_TOKEN secret."; exit 1; }
+          if ! GH_TOKEN="$PUBLIC_TOKEN" gh release view "v$V" -R Mkuz1/islamic-azkar-releases >/dev/null 2>&1; then
+            GH_TOKEN="$PUBLIC_TOKEN" gh release create "v$V" -R Mkuz1/islamic-azkar-releases --draft --title "Islamic Azkar $V" --notes-file notes.md
+          fi
+          if ! gh release view "v$V" >/dev/null 2>&1; then
+            gh release create "v$V" --draft --title "Islamic Azkar $V" --notes-file notes.md --target "$GITHUB_SHA"
+          fi
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    needs: prepare
+    defaults:
+      run:
+        working-directory: IslamicAzkar
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+      - name: Upload key
+        env:
+          KS: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          KS_PASS: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.UPLOAD_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.UPLOAD_KEY_PASSWORD }}
+        run: |
+          if [ -z "$KS" ] || [ -z "$KS_PASS" ] || [ -z "$ALIAS" ] || [ -z "$KEY_PASS" ]; then
+            echo "::error::Add the UPLOAD_KEYSTORE_BASE64, UPLOAD_KEYSTORE_PASSWORD, UPLOAD_KEY_ALIAS and UPLOAD_KEY_PASSWORD secrets."; exit 1
+          fi
+          mkdir -p ../upload-key
+          echo "$KS" | base64 -d > ../upload-key/upload.jks
+          {
+            echo "storeFile=$(cd ../upload-key && pwd)/upload.jks"
+            echo "storePassword=$KS_PASS"
+            echo "keyAlias=$ALIAS"
+            echo "keyPassword=$KEY_PASS"
+          } > ../upload-key/keystore.properties
+      - name: SDK packages
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34-ext12" "build-tools;35.0.1" > /dev/null
+      - name: Build
+        run: ./gradlew --no-daemon assembleGithubRelease bundlePlayRelease
+      - name: Check signature, version and permissions
+        run: |
+          BT="$ANDROID_HOME/build-tools/35.0.1"
+          APK=app/build/outputs/apk/github/release/app-github-release.apk
+          "$BT/apksigner" verify --print-certs "$APK" | tee certs.txt
+          grep -qi "SHA-256 digest: $UPLOAD_CERT_SHA256" certs.txt || { echo "::error::APK is not signed with the upload key"; exit 1; }
+          "$BT/aapt2" dump badging "$APK" | head -1
+          "$BT/aapt2" dump badging "$APK" | head -1 | grep -q "versionName='${{ needs.prepare.outputs.version }}'"
+          "$BT/aapt2" dump permissions "$APK" | grep -q REQUEST_INSTALL_PACKAGES
+          keytool -printcert -jarfile app/build/outputs/bundle/playRelease/app-play-release.aab | tr -d ':' | grep -qi "$UPLOAD_CERT_SHA256" \
+            || { echo "::error::App Bundle is not signed with the upload key"; exit 1; }
+          mkdir -p ../out
+          cp "$APK" ../out/IslamicAzkar.apk
+          cp app/build/outputs/bundle/playRelease/app-play-release.aab ../out/IslamicAzkar-play.aab
+      - name: Remove the key
+        if: always()
+        run: rm -rf ../upload-key
+      - name: Upload to the draft releases
+        working-directory: .
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.apk -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.apk out/IslamicAzkar-play.aab -R "$GITHUB_REPOSITORY" --clobber
+
+  ios:
+    needs: prepare
+    runs-on: xcode-27
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: IslamicAzkar/ios
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: Build unsigned IPA
+        run: |
+          set -o pipefail
+          xcodebuild -project IslamicAzkar.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath build/device \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | xcbeautify --renderer github-actions
+          rm -rf Payload && mkdir Payload
+          cp -R build/device/Build/Products/Release-iphoneos/IslamicAzkar.app Payload/
+          /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" Payload/IslamicAzkar.app/Info.plist
+          mkdir -p ../../out && zip -qry ../../out/IslamicAzkar.ipa Payload
+      - name: Upload to the draft releases
+        working-directory: .
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.ipa -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.ipa -R "$GITHUB_REPOSITORY" --clobber
+
+  mac:
+    needs: prepare
+    runs-on: xcode-27
+    timeout-minutes: 240
+    defaults:
+      run:
+        working-directory: IslamicAzkar/mac
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: API key (for Developer ID signing and notarization)
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+        run: |
+          for v in KEY_ID ISSUER; do
+            clean=$(printf '%s' "${!v}" | tr -d '[:space:]'); echo "::add-mask::$clean"; echo "$v=$clean" >> "$GITHUB_ENV"
+          done
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          python3 -m pip install -q --break-system-packages pyjwt cryptography 2>/dev/null || python3 -m pip install -q pyjwt cryptography
+      - name: Build the DMG
+        run: |
+          set -o pipefail
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          xcodebuild -project IslamicAzkarMac.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -destination 'generic/platform=macOS' -derivedDataPath build build | xcbeautify --renderer github-actions
+          APP="build/Build/Products/Release/Islamic Azkar.app"
+          /usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP/Contents/Info.plist"
+          mkdir -p ../../out
+          if [ -f $GITHUB_WORKSPACE/store/devid/devid.enc ]; then
+            # Signed with Developer ID and notarized: opens without a warning.
+            python3 $GITHUB_WORKSPACE/tools/developer_id.py setup "$RUNNER_TEMP/devid"
+            $GITHUB_WORKSPACE/tools/sign_mac.sh "$APP" ../../out/IslamicAzkar.dmg "$RUNNER_TEMP/devid/devid.keychain-db"
+          else
+            echo "::warning::No Developer ID certificate yet (run the Mac Developer ID workflow): ad-hoc signed DMG"
+            codesign --force --deep --sign - "$APP"
+            ./make_dmg.sh "$APP" ../../out/IslamicAzkar.dmg
+          fi
+      - name: Upload to the draft releases
+        working-directory: .
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" out/IslamicAzkar.dmg -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" out/IslamicAzkar.dmg -R "$GITHUB_REPOSITORY" --clobber
+
+  windows:
+    needs: prepare
+    runs-on: windows-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: IslamicAzkar/windows
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the installer (per user, no administrator rights)
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+        run: |
+          npm pkg set version=$V
+          npm install --no-audit --no-fund
+          npm run dist
+          ls -l dist/IslamicAzkar-Setup.exe
+      - name: Upload to the draft releases
+        env:
+          V: ${{ needs.prepare.outputs.version }}
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GITHUB_TOKEN_SELF: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release upload "v$V" dist/IslamicAzkar-Setup.exe -R Mkuz1/islamic-azkar-releases --clobber
+          GH_TOKEN="$GITHUB_TOKEN_SELF" gh release upload "v$V" dist/IslamicAzkar-Setup.exe -R "$GITHUB_REPOSITORY" --clobber
+
+  publish:
+    needs: [prepare, android, ios, mac, windows]
+    runs-on: ubuntu-latest
+    env:
+      V: ${{ needs.prepare.outputs.version }}
+    steps:
+      - name: Publish the releases
+        env:
+          PUBLIC_TOKEN: ${{ secrets.RELEASES_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          GH_TOKEN="$PUBLIC_TOKEN" gh release edit "v$V" -R Mkuz1/islamic-azkar-releases --draft=false --latest
+          gh release edit "v$V" -R "$GITHUB_REPOSITORY" --draft=false
+      - name: Check the public downloads
+        run: |
+          sleep 10
+          for f in IslamicAzkar.apk IslamicAzkar.ipa IslamicAzkar.dmg IslamicAzkar-Setup.exe; do
+            curl -fsSL -o "/tmp/$f" "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/$f"
+            ls -l "/tmp/$f"
+          done
+          unzip -p /tmp/IslamicAzkar.ipa Payload/IslamicAzkar.app/Info.plist | grep -a -A1 CFBundleShortVersionString

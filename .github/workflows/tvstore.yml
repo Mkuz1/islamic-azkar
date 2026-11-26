@@ -1,0 +1,108 @@
+# Uploads the Apple TV app to App Store Connect (the same app record as the iPhone app), signed with
+# a certificate and profile made through the App Store Connect API and removed afterwards.
+# Triggered by changing store/tvstore/UPLOAD. Same secrets as appstore.yml.
+name: Apple TV App Store
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: ["store/tvstore/UPLOAD"]
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: xcode-27
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: IslamicAzkar/tv
+    env:
+      PLATFORM: tv
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode 27.1
+        run: $GITHUB_WORKSPACE/tools/select_xcode.sh
+      - name: Secrets
+        env:
+          TEAM: ${{ secrets.APPSTORE_TEAM_ID }}
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+        run: |
+          for v in TEAM KEY_ID ISSUER P8; do [ -n "${!v}" ] || { echo "::error::App Store secrets missing"; exit 1; }; done
+          for v in TEAM KEY_ID ISSUER; do
+            clean=$(printf '%s' "${!v}" | tr -d '[:space:]'); echo "::add-mask::$clean"; echo "$v=$clean" >> "$GITHUB_ENV"
+          done
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]')
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          python3 -m pip install -q --break-system-packages pyjwt cryptography 2>/dev/null || python3 -m pip install -q pyjwt cryptography
+      - name: Signing (certificate and tvOS App Store profile made with the API key)
+        run: |
+          python3 $GITHUB_WORKSPACE/tools/appstore_signing.py setup "$RUNNER_TEMP/sign"
+          security find-identity -v "$RUNNER_TEMP/sign/signing.keychain-db" | sed 's/[0-9A-F]\{40\}/<id>/'
+      - name: Archive (App Store build)
+        run: |
+          set -o pipefail
+          brew list xcodegen >/dev/null 2>&1 || brew install xcodegen
+          xcodegen generate
+          PROFILE=$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["com.koussa.IslamicAzkar"])' "$RUNNER_TEMP/sign/profiles.json")
+          BASE=$(grep -m1 'CURRENT_PROJECT_VERSION:' project.yml | grep -o '[0-9]\+')
+          BUILD="$BASE.$GITHUB_RUN_NUMBER"; echo "build $BUILD"
+          xcodebuild archive -project IslamicAzkarTV.xcodeproj -scheme IslamicAzkar -configuration Release \
+            -destination 'generic/platform=tvOS' -archivePath build/IslamicAzkar.xcarchive \
+            CURRENT_PROJECT_VERSION="$BUILD" SWIFT_ACTIVE_COMPILATION_CONDITIONS='$(inherited) APPSTORE' \
+            CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM="$TEAM" CODE_SIGN_IDENTITY="Apple Distribution" \
+            PROVISIONING_PROFILE_SPECIFIER="$PROFILE" CODE_SIGNING_ALLOWED=YES \
+            OTHER_CODE_SIGN_FLAGS="--keychain $RUNNER_TEMP/sign/signing.keychain-db" | xcbeautify --renderer github-actions
+          APP="build/IslamicAzkar.xcarchive/Products/Applications/Islamic Azkar.app"
+          codesign -d --entitlements - "$APP" 2>/dev/null | grep -E "team|application-identifier" || true
+      - name: Add the tvOS platform to the app (once)
+        run: |
+          python3 - <<'PY'
+          import json, os, re, time, urllib.request, urllib.error, jwt
+          kid, iss = os.environ["KEY_ID"], os.environ["ISSUER"]
+          key = open(os.path.expanduser(f"~/.appstoreconnect/private_keys/AuthKey_{kid}.p8")).read()
+          def call(method, path, body=None):
+              tok = jwt.encode({"iss": iss, "iat": int(time.time()), "exp": int(time.time()) + 600, "aud": "appstoreconnect-v1"},
+                               key, algorithm="ES256", headers={"kid": kid, "typ": "JWT"})
+              req = urllib.request.Request("https://api.appstoreconnect.apple.com/v1/" + path, method=method,
+                                           data=json.dumps(body).encode() if body else None,
+                                           headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"})
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r: return r.status, json.loads(r.read() or b"{}")
+              except urllib.error.HTTPError as e: return e.code, json.loads(e.read() or b"{}")
+          st, b = call("GET", "apps?filter[bundleId]=com.koussa.IslamicAzkar")
+          app = b["data"][0]["id"]
+          st, b = call("GET", f"apps/{app}/appStoreVersions?filter[platform]=TV_OS&limit=5")
+          if b.get("data"):
+              print("tvOS version already there:", [v["attributes"]["versionString"] for v in b["data"]])
+          else:
+              ver = re.search(r'MARKETING_VERSION: "([^"]+)"', open("project.yml").read()).group(1)
+              st, b = call("POST", "appStoreVersions", {"data": {"type": "appStoreVersions",
+                           "attributes": {"platform": "TV_OS", "versionString": ver},
+                           "relationships": {"app": {"data": {"type": "apps", "id": app}}}}})
+              print("add tvOS", ver, "->", st)
+              for e in b.get("errors", []): print("  ", e.get("title"), e.get("detail"))
+          PY
+      - name: Export the app and upload it
+        run: |
+          set -o pipefail
+          python3 - "$RUNNER_TEMP/sign/profiles.json" <<'PY'
+          import json, os, plistlib, sys
+          plistlib.dump({"method": "app-store-connect", "destination": "export", "teamID": os.environ["TEAM"].strip(),
+                         "signingStyle": "manual", "signingCertificate": "Apple Distribution",
+                         "provisioningProfiles": json.load(open(sys.argv[1])), "uploadSymbols": True,
+                         "manageAppVersionAndBuildNumber": False}, open("ExportOptions-TV.plist", "wb"))
+          PY
+          xcodebuild -exportArchive -archivePath build/IslamicAzkar.xcarchive \
+            -exportOptionsPlist ExportOptions-TV.plist -exportPath build/export | xcbeautify --renderer github-actions
+          ls -l build/export
+          xcrun altool --upload-app --type appletvos -f build/export/*.ipa --apiKey "$KEY_ID" --apiIssuer "$ISSUER" --output-format normal
+          echo "Uploaded. It appears in App Store Connect (tvOS) after Apple finishes processing."
+      - name: Remove the temporary certificate and profile
+        if: always()
+        run: python3 $GITHUB_WORKSPACE/tools/appstore_signing.py cleanup "$RUNNER_TEMP/sign" || true

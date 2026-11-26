@@ -7,12 +7,14 @@ import UIKit
 
 enum ThemeMode: String, CaseIterable { case system, light, dark }
 
-enum AppTab: Hashable { case home, favorites, tasbih, widgets, settings }
+enum AppTab: Hashable { case home, favorites, tasbih, record, settings }
 
 /// Navigation destinations inside the Home tab.
 enum Route: Hashable {
     case category(String)
     case reader(Reading, focus: Int?)
+    case guide(String)
+    case history
 }
 
 /// App-wide state: preferences (persisted in the shared App Group so widgets agree) and navigation.
@@ -20,7 +22,29 @@ enum Route: Hashable {
 final class AppModel {
     private let d = SharedStore.defaults
 
-    var lang: Lang { didSet { d.set(lang.rawValue, forKey: SharedStore.Key.lang); refreshExtensions() } }
+    #if os(iOS)
+    /// UIKit draws the tab bar (at the top on iPad) and follows the device's language unless told
+    /// otherwise: an Arabic iPad showed the English and French tabs in right-to-left order.
+    static func applyUIKitDirection(_ lang: Lang) {
+        let dir: UISemanticContentAttribute = lang.isRTL ? .forceRightToLeft : .forceLeftToRight
+        UIView.appearance().semanticContentAttribute = dir
+        UINavigationBar.appearance().semanticContentAttribute = dir
+        UITabBar.appearance().semanticContentAttribute = dir
+    }
+    #endif
+
+    var lang: Lang {
+        didSet {
+            d.set(lang.rawValue, forKey: SharedStore.Key.lang)
+            #if os(macOS)
+            if oldValue != lang { homePath = [] }
+            #endif
+            #if os(iOS)
+            Self.applyUIKitDirection(lang)
+            #endif
+            refreshExtensions()
+        }
+    }
     var theme: ThemeMode { didSet { d.set(theme.rawValue, forKey: "theme") } }
     var textScale: Double { didSet { d.set(textScale, forKey: "text_scale") } }
     var showTranslit: Bool { didSet { d.set(showTranslit, forKey: "translit") } }
@@ -60,21 +84,54 @@ final class AppModel {
     // Navigation
     var tab: AppTab = .home
     var homePath: [Route] = []
+    /// The Record tab's own stack, and Settings → Widgets (iPhone / iPad).
+    var recordPath: [Route] = []
+    var showWidgets = false
     /// Split view (iPad, landscape Plus/Max): the reading shown in the detail column.
     var detail: Reading?
     var detailFocus: Int?
     var showDedication = true
     var shareTarget: ShareTarget?
     var toast: String?
+    /// A sync code from a link, waiting for the person to confirm (any app or page can open such a link).
+    var pendingSync: String?
+
+    /// Today's remaining repetitions by dhikr id, shared by every screen that shows a dhikr (a reading,
+    /// Favourites, the ʿUmrah guide), so completing a dhikr in one shows it completed in the others.
+    private(set) var progress: [Int: Int] = [:]
+    private var progressDay = Calendar.current.startOfDay(for: .now)
+
+    func remaining(_ z: Zikr) -> Int {
+        progressDay == Calendar.current.startOfDay(for: .now) ? (progress[z.id] ?? z.repeatCount) : z.repeatCount
+    }
+
+    func setRemaining(_ z: Zikr, _ value: Int) {
+        let today = Calendar.current.startOfDay(for: .now)
+        if progressDay != today { progress = [:]; progressDay = today }
+        let new = max(0, min(value, z.repeatCount))
+        let finished = new == 0 && remaining(z) != 0
+        progress[z.id] = new
+        // The Record page: a reading (morning, evening, any chapter of any category) whose every
+        // dhikr is now done, wherever it was finished (reader, favourites, ʿUmrah guide).
+        if finished, let r = AzkarData.shared.reading(ofZikr: z.id),
+           AzkarData.shared.items(r).allSatisfy({ remaining($0) == 0 }) {
+            AzkarHistory.markReading(r.key)
+        }
+    }
 
     var s: L10n { L10n.of(lang) }
     var m: More { More.of(lang) }
 
     init() {
+        launchTrace("AppModel.init start")
         let d = SharedStore.defaults
         func bool(_ k: String, _ def: Bool) -> Bool { d.object(forKey: k) == nil ? def : d.bool(forKey: k) }
         func int(_ k: String, _ def: Int) -> Int { d.object(forKey: k) == nil ? def : d.integer(forKey: k) }
-        lang = SharedStore.lang
+        let startLang = SharedStore.lang
+        lang = startLang
+        #if os(iOS)
+        Self.applyUIKitDirection(startLang)
+        #endif
         theme = ThemeMode(rawValue: d.string(forKey: "theme") ?? "") ?? .system
         textScale = d.object(forKey: "text_scale") == nil ? 1 : d.double(forKey: "text_scale")
         showTranslit = bool("translit", true)
@@ -93,9 +150,11 @@ final class AppModel {
         script = int(SharedStore.Key.script, 0)
         hijriOffset = int(SharedStore.Key.hijriOffset, 0)
         place = Place.read(d)
-        method = int(SharedStore.Key.method, 0)
+        method = int(SharedStore.Key.method, CalcMethod.dubai.rawValue)
         asrHanafi = bool(SharedStore.Key.asrHanafi, false)
+        launchTrace("AppModel settings read")
         applyLaunchArguments()
+        launchTrace("AppModel.init done")
     }
 
     /// CI screenshots: `-ciScreen home|reader|celebration|tasbih|widgets|settings|favorites|dedication -ciLang ar -ciDark 1`.
@@ -110,13 +169,40 @@ final class AppModel {
         if favorites.isEmpty { favorites = [AzkarData.shared.morning[1].id, AzkarData.shared.evening[3].id, AzkarData.shared.morning[6].id] }
         if tasbihTotal == 0 { tasbihCount = 21; tasbihTotal = 722; for _ in 0..<39 { TasbihHistory.add() } }
         showDedication = screen == "dedication"
+        // Store screenshots: two weeks of azkar in the Record calendar.
+        if screen == "record" {   // markReading ignores days already there
+            let plan: [[String]] = [["morning", "evening", "c28"], ["morning", "evening"], ["morning", "c28", "c25"],
+                                    ["morning", "evening", "c28", "c25"], ["morning", "evening"], ["morning", "evening", "c28"],
+                                    ["morning", "c25"], ["morning", "evening"], ["evening", "c28"], ["morning", "evening", "c28"],
+                                    ["morning"], ["morning", "evening", "c25"], ["morning", "evening"], ["morning", "evening", "c28"]]
+            for (i, keys) in plan.enumerated() {
+                let day = Calendar.current.date(byAdding: .day, value: -i, to: .now) ?? .now
+                keys.forEach { AzkarHistory.markReading($0, at: day) }
+            }
+        }
         switch screen {
         case "favorites": tab = .favorites
         case "tasbih": tab = .tasbih
-        case "widgets": tab = .widgets
+        case "widgets": tab = .settings; showWidgets = true
+        case "record": tab = .record
         case "settings": tab = .settings
         case "reader", "celebration": homePath = [.reader(.morning, focus: nil)]
+        case "guide": homePath = [.guide("umrah")]
+        case "sunnah": homePath = [.reader(.chapter(134), focus: nil)]
+        case "quran": homePath = [.reader(.chapter(137), focus: nil)]
         default: tab = .home
+        }
+        // `-ciTap dedication|home`: 2 s after launch, open the morning azkar the way a tap does
+        // (from the dedication screen's button, or from the Home tile).
+        if let tap = args.string(forKey: "ciTap") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) { [self] in
+                launchTrace("ciTap \(tap)")
+                if tap == "dedication" {
+                    withAnimation(.easeInOut(duration: 0.6)) { self.open(.morning) }
+                } else {
+                    self.homePath.append(.reader(.morning, focus: nil))
+                }
+            }
         }
     }
 
@@ -147,7 +233,32 @@ final class AppModel {
 
     func handle(url: URL) {
         if url == DeepLink.tasbih { showDedication = false; tab = .tasbih; return }
+        // A sync QR scanned with the camera: link this device, then show the record.
+        if url.scheme == DeepLink.scheme, url.host == "sync" {
+            let code = AzkarSync.normalize(url.lastPathComponent)
+            guard code.count == 12 else { toast = SyncTexts.of(lang).badCode; return }
+            showDedication = false
+            pendingSync = code
+            return
+        }
         if let (r, focus) = DeepLink.parse(url) { open(r, focus: focus) }
+    }
+
+    /// Links this device to the code from a sync link, once the person has agreed.
+    func confirmSync() {
+        guard let code = pendingSync else { return }
+        pendingSync = nil
+        Task { @MainActor in
+            do {
+                try await AzkarSync.link(code)
+                toast = SyncTexts.of(lang).linked
+                #if os(macOS)
+                tab = .home; homePath = [.history]
+                #else
+                tab = .record
+                #endif
+            } catch { toast = SyncTexts.of(lang).badCode }
+        }
     }
 
     private func reloadTasbihWidget() { WidgetCenter.shared.reloadTimelines(ofKind: "TasbihWidget") }
@@ -185,23 +296,46 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
 }
 #endif
 
+/// `-ciTrace 1`: prints launch stages to stderr (diagnosing a launch that shows nothing).
+func launchTrace(_ stage: String) {
+    guard UserDefaults.standard.bool(forKey: "ciTrace") else { return }
+    FileHandle.standardError.write(Data("trace: \(stage)\n".utf8))
+}
+
 @main
 struct IslamicAzkarApp: App {
     #if os(iOS)
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var delegate
+    #else
+    @NSApplicationDelegateAdaptor(MacAppDelegate.self) private var macDelegate
     #endif
     @State private var model = AppModel()
     @Environment(\.scenePhase) private var scenePhase
 
+    init() {
+        launchTrace("App.init")
+        #if os(macOS)
+        // Show reminders as banners even though the app keeps running in the menu bar.
+        UNUserNotificationCenter.current().delegate = MacNotifications.shared
+        #endif
+    }
+
     var body: some Scene {
-        WindowGroup {
+        WindowGroup(id: "main") {
             Group {
                 if model.showDedication {
                     DedicationView(onContinue: { withAnimation(.easeInOut(duration: 0.6)) { model.showDedication = false } },
                                    onOpen: { r in withAnimation(.easeInOut(duration: 0.6)) { model.open(r) } })
                         .transition(.opacity)
                 } else {
-                    RootView().transition(.opacity)
+                    #if os(macOS)
+                    // Rebuilt on a language change so the split view takes the new layout direction
+                    // (keeping the old one made the next navigation loop and crash).
+                    MacRootView().id(model.lang).transition(.opacity)
+                    #else
+                    // Rebuilt on a language change, so UIKit's tab bar takes the new direction.
+                    RootView().id(model.lang).transition(.opacity)
+                    #endif
                 }
             }
             .environment(model)
@@ -210,15 +344,46 @@ struct IslamicAzkarApp: App {
             .preferredColorScheme(model.theme == .light ? .light : model.theme == .dark ? .dark : nil)
             .tint(Theme.accent)
             .onOpenURL { model.handle(url: $0) }
+            .alert(SyncTexts.of(model.lang).linkAsk,
+                   isPresented: Binding(get: { model.pendingSync != nil }, set: { if !$0 { model.pendingSync = nil } })) {
+                Button(SyncTexts.of(model.lang).link) { model.confirmSync() }
+                Button(model.lang == .ar ? "إلغاء" : model.lang == .fr ? "Annuler" : "Cancel", role: .cancel) { model.pendingSync = nil }
+            } message: {
+                Text(AzkarSync.display(model.pendingSync ?? "") + "\n\n" + SyncTexts.of(model.lang).linkWarn)
+            }
             .onAppear {
+                launchTrace("main window appeared")
+                #if os(macOS)
+                MacCI.start()
+                MacNotifications.shared.open = { [model] url in model.handle(url: url) }
+                #endif
                 #if os(iOS)
                 delegate.model = model
                 #endif
                 Reminders.reschedule(model)
+                Task { await AzkarSync.syncNow() }
             }
             .onChange(of: scenePhase) { _, phase in
-                if phase == .active { model.reloadTasbihFromStore() }
+                if phase == .active { model.reloadTasbihFromStore(); Task { await AzkarSync.syncNow() } }
             }
         }
+        #if os(macOS)
+        .defaultSize(width: 1100, height: 760)
+        #endif
+
+        #if os(macOS)
+        // The menu bar icon stays while the app runs, even with every window closed or minimized:
+        // it reminds of the azkar due now and shows today's prayer times (MenuBar.swift in mac/).
+        MenuBarExtra {
+            MenuBarPanel()
+                .environment(model)
+                .environment(\.layoutDirection, model.lang.isRTL ? .rightToLeft : .leftToRight)
+                .environment(\.locale, model.lang.locale)
+                .tint(Theme.accent)
+        } label: {
+            MenuBarLabel().environment(model)
+        }
+        .menuBarExtraStyle(.window)
+        #endif
     }
 }

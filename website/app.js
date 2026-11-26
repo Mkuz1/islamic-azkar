@@ -19,14 +19,18 @@
       reps: n => arCount(n, "تكرار واحد", "تكراران", "تكرارات", "تكرارًا"),
       textSize: "حجم الخط", showTr: "إظهار النطق", showMean: "إظهار المعنى", theme: "المظهر", system: "تلقائي", light: "فاتح", dark: "داكن", close: "إغلاق",
       tapCount: "اضغط للعدّ", reset: "تصفير", total: n => `المجموع: ${num(n)}`, target: "العدد",
-      getApp: "تطبيق أندرويد", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات ومسبحة.",
-      apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", join: "انضم إلى المختبِرين",
+      getApp: "التطبيقات", appText: "أدوات للشاشة الرئيسية بخطٍّ عربيٍّ أصيل، مواقيت الصلاة، تذكيرات، مسبحة، وسجلّ يومي بالأذكار التي أتممتها.",
+      record: "سجلّي", recTitle: "سجلّ الأذكار", recSub: "الأذكار التي أتممتها كل يوم", activeDays: "أيام الذكر هذا الشهر", monthDone: "أذكار أتممتها هذا الشهر", inRow: "أيام متتالية",
+      nothingDay: "لم تُتمّ أذكارًا في هذا اليوم.", dayDone: "الأذكار المكتملة", today: "اليوم",       prayerTimes: "مواقيت الصلاة", prayerNames: ["الفجر", "الشروق", "الظهر", "العصر", "المغرب", "العشاء"], nextPrayer: "الصلاة القادمة", inTime: x => `بعد ${x}`, setPlace: "اختر مدينتك لعرض مواقيت الصلاة", useLoc: "استخدام موقعي الحالي", locating: "جارٍ تحديد الموقع…", locFail: "تعذّر تحديد الموقع، اختر مدينة من القائمة", orCity: "أو اختر مدينة", myLoc: "موقعي", method: "طريقة الحساب", hanafi: "العصر على المذهب الحنفي", change: "تغيير", methods: ["رابطة العالم الإسلامي", "أم القرى (مكة)", "الهيئة المصرية العامة للمساحة", "أمريكا الشمالية (ISNA)", "جامعة العلوم الإسلامية، كراتشي", "الخليج", "دبي · دلوك (الشؤون الإسلامية بدبي)", "فرنسا (١٢°)", "تركيا (ديانت)"],
+      prevMonth: "الشهر السابق", nextMonth: "الشهر التالي",
+      syncTitle: "المزامنة بين الأجهزة", syncIntro: "اعرض سجلّ أذكارك على كل أجهزتك: آيفون وآيباد وماك وأندرويد والموقع. بلا حساب ولا بريد: رمز خاص يربط أجهزتك، ثم تتم المزامنة تلقائيًا.", syncOn: "تفعيل المزامنة", syncHave: "أو أدخل رمزًا من جهاز آخر", syncLink: "ربط", syncCode: "رمز المزامنة", syncHint: "أدخل هذا الرمز على أجهزتك الأخرى: الإعدادات ← المزامنة في التطبيق، أو سجلّي ← المزامنة هنا. احتفظ به لنفسك.", syncNow: "زامن الآن", syncLast: "آخر مزامنة", syncNever: "لم تتم بعد", syncStop: "إيقاف المزامنة في هذا المتصفح", syncStopQ: "إيقاف المزامنة هنا؟ يبقى سجلّك في هذا المتصفح وعلى أجهزتك الأخرى.", syncBad: "الرمز غير صحيح. تأكد منه وحاول مرة أخرى.", syncOff: "تعذّر الاتصال. تحقق من الإنترنت وحاول مرة أخرى.", syncLinked: "تم ربط هذا المتصفح", week: ["أحد", "اثن", "ثلا", "أرب", "خمي", "جمع", "سبت"],
+      apk: "تنزيل التطبيق", apkNote: "ملف APK · أندرويد ٨ أو أحدث", mac: "نسخة ماك", macNote: "ملف DMG · macOS 15 أو أحدث: مواقيت الصلاة في شريط القوائم، وتذكير يظهر أعلى الشاشة", win: "نسخة ويندوز", winNote: "مثبّت لويندوز 10 و11 · لا يحتاج صلاحيات المسؤول", join: "انضم إلى المختبِرين",
       joinText: "التطبيق في مرحلة الاختبار على Google Play. سجّل بريد Gmail المرتبط بمتجرك لنضيفك إلى المختبِرين ونرسل لك رابط التثبيت.",
       emailPh: "name@gmail.com", send: "سجّلني", sending: "جارٍ الإرسال…", badEmail: "أدخل عنوان بريد صحيحًا",
       thanks: "جزاك الله خيرًا! وصلنا بريدك وسنضيفك إلى المختبِرين قريبًا إن شاء الله.", failed: "تعذّر الإرسال، حاول مرة أخرى.",
       mushaf: "تطبيق المصحف", mushafText: "اقرأ القرآن الكريم بخط المصحف الشريف، صدقة جارية من فريقنا.", mushafCta: "حمّله من mushafapp.com",
-      privacy: "سياسة الخصوصية", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
-      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", praise: "الذكر والاستغفار" },
+      privacy: "سياسة الخصوصية", sunnahSrc: "من كتب السنة", quranSrc: "من القرآن الكريم", guide: "الدليل", guideCta: "خطوات العمرة من الإحرام إلى التقصير", readDuas: "أذكار هذه الخطوة", sources: "المصادر", dedication: "صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
+      cat: { prayer: "الصلاة والمسجد", sleep: "النوم والاستيقاظ", home: "البيت والطهارة", hardship: "الكرب والحماية", illness: "المرض والجنائز", food: "الطعام والصيام", family: "الأسرة والمعاملات", travel: "السفر", nature: "الطبيعة والأحوال", hajj: "الحج والعمرة", quran: "أدعية من القرآن", sunnah: "أدعية من السنة", ruqyah: "الرقية الشرعية", names: "أسماء الله الحسنى", praise: "الذكر والاستغفار" },
     },
     en: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "Hisn al-Muslim in a calm, elegant design: the daily azkar with a counter, transliteration and meaning.",
@@ -43,14 +47,18 @@
       reps: n => n === 1 ? "1 repetition" : `${n} repetitions`,
       textSize: "Text size", showTr: "Show transliteration", showMean: "Show meaning", theme: "Appearance", system: "Auto", light: "Light", dark: "Dark", close: "Close",
       tapCount: "Tap to count", reset: "Reset", total: n => `Total: ${n}`, target: "Target",
-      getApp: "Android app", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders and a tasbih.",
-      apk: "Download the app", apkNote: "APK file · Android 8 or later", join: "Join the testers",
+      getApp: "The apps", appText: "Home-screen widgets in real Arabic calligraphy, prayer times, reminders, a tasbih, and a daily record of the azkar you complete.",
+      record: "Record", recTitle: "Azkar record", recSub: "The azkar you completed each day", activeDays: "Days with azkar this month", monthDone: "Azkar completed this month", inRow: "Days in a row",
+      nothingDay: "No azkar completed on this day.", dayDone: "Azkar completed", today: "Today",       prayerTimes: "Prayer times", prayerNames: ["Fajr", "Sunrise", "Dhuhr", "Asr", "Maghrib", "Isha"], nextPrayer: "Next prayer", inTime: x => `in ${x}`, setPlace: "Choose your city to see the prayer times", useLoc: "Use my current location", locating: "Finding your location…", locFail: "Couldn’t find your location. Choose a city instead.", orCity: "Or choose a city", myLoc: "My location", method: "Calculation method", hanafi: "Hanafi Asr", change: "Change", methods: ["Muslim World League", "Umm al-Qura (Makkah)", "Egyptian General Authority", "North America (ISNA)", "University of Islamic Sciences, Karachi", "Gulf region", "Dubai · Dulook DXB (IACAD)", "France (12°)", "Turkey (Diyanet)"],
+      prevMonth: "Previous month", nextMonth: "Next month",
+      syncTitle: "Sync between devices", syncIntro: "See your azkar record on all your devices: iPhone, iPad, Mac, Android and the website. No account or email: a private code links your devices, then they sync automatically.", syncOn: "Turn on sync", syncHave: "or enter a code from another device", syncLink: "Link", syncCode: "Sync code", syncHint: "Enter this code on your other devices: Settings → Sync in the app, or Record → Sync here. Keep it to yourself.", syncNow: "Sync now", syncLast: "Last synced", syncNever: "not yet", syncStop: "Stop syncing in this browser", syncStopQ: "Stop syncing here? Your record stays in this browser and on your other devices.", syncBad: "That code isn't right. Check it and try again.", syncOff: "Couldn't connect. Check your internet and try again.", syncLinked: "This browser is linked", week: ["S", "M", "T", "W", "T", "F", "S"],
+      apk: "Download the app", apkNote: "APK file · Android 8 or later", mac: "Mac app", macNote: "DMG file · macOS 15 or later: prayer times in the menu bar and reminders at the top of the screen", win: "Windows app", winNote: "Installer for Windows 10 and 11 · no administrator rights needed", join: "Join the testers",
       joinText: "The app is in testing on Google Play. Leave the Gmail address you use on the Play Store and we’ll add you as a tester and send you the install link.",
       emailPh: "name@gmail.com", send: "Sign me up", sending: "Sending…", badEmail: "Enter a valid email address",
       thanks: "Jazak Allah khayran! We got your address and will add you to the testers soon, in sha Allah.", failed: "Couldn’t send it. Please try again.",
       mushaf: "Mushaf app", mushafText: "Read the Holy Quran in the script of the printed Mushaf, a sadaqa jariyah from our team.", mushafCta: "Download from mushafapp.com",
-      privacy: "Privacy policy", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
-      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", praise: "Praise & Forgiveness" },
+      privacy: "Privacy policy", sunnahSrc: "From the hadith collections", quranSrc: "From the Holy Quran", guide: "Guide", guideCta: "Every step from iḥrām to the haircut", readDuas: "Words to say", sources: "Sources", dedication: "On behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
+      cat: { prayer: "Prayer & Mosque", sleep: "Sleep & Waking", home: "Home & Purity", hardship: "Distress & Protection", illness: "Illness & Funerals", food: "Food & Fasting", family: "Family & Social", travel: "Travel", nature: "Nature & Weather", hajj: "Hajj & Umrah", quran: "Duas from the Quran", sunnah: "Duas from the Sunnah", ruqyah: "Ruqyah", names: "The 99 Names of Allah", praise: "Praise & Forgiveness" },
     },
     fr: {
       dir: "ltr", appName: "Islamic Azkar", tagline: "La Citadelle du musulman dans un design apaisant : les adhkar du quotidien avec compteur, translittération et traduction.",
@@ -67,14 +75,18 @@
       reps: n => n === 1 ? "1 répétition" : `${n} répétitions`,
       textSize: "Taille du texte", showTr: "Afficher la translittération", showMean: "Afficher la traduction", theme: "Apparence", system: "Auto", light: "Clair", dark: "Sombre", close: "Fermer",
       tapCount: "Touchez pour compter", reset: "Remettre à zéro", total: n => `Total : ${n}`, target: "Objectif",
-      getApp: "Application Android", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels et un chapelet.",
-      apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", join: "Devenir testeur",
+      getApp: "Les applications", appText: "Des widgets en véritable calligraphie arabe, les horaires de prière, des rappels, un chapelet et un historique quotidien des adhkar terminés.",
+      record: "Historique", recTitle: "Historique des adhkar", recSub: "Les adhkar terminés chaque jour", activeDays: "Jours avec des adhkar ce mois-ci", monthDone: "Adhkar terminés ce mois-ci", inRow: "Jours d'affilée",
+      nothingDay: "Aucun dhikr terminé ce jour-là.", dayDone: "Adhkar terminés", today: "Aujourd'hui",       prayerTimes: "Horaires de prière", prayerNames: ["Fajr", "Lever du soleil", "Dhohr", "Asr", "Maghrib", "Icha"], nextPrayer: "Prochaine prière", inTime: x => `dans ${x}`, setPlace: "Choisissez votre ville pour voir les horaires de prière", useLoc: "Utiliser ma position actuelle", locating: "Recherche de votre position…", locFail: "Position introuvable. Choisissez plutôt une ville.", orCity: "Ou choisissez une ville", myLoc: "Ma position", method: "Méthode de calcul", hanafi: "Asr selon l’école hanafite", change: "Modifier", methods: ["Ligue islamique mondiale", "Umm al-Qura (La Mecque)", "Autorité générale égyptienne", "Amérique du Nord (ISNA)", "Université des sciences islamiques, Karachi", "Région du Golfe", "Dubaï · Dulook DXB (IACAD)", "France (12°)", "Turquie (Diyanet)"],
+      prevMonth: "Mois précédent", nextMonth: "Mois suivant",
+      syncTitle: "Synchronisation entre appareils", syncIntro: "Retrouvez votre historique d'adhkar sur tous vos appareils : iPhone, iPad, Mac, Android et le site. Sans compte ni e-mail : un code privé relie vos appareils, puis tout se synchronise automatiquement.", syncOn: "Activer la synchronisation", syncHave: "ou saisissez le code d'un autre appareil", syncLink: "Relier", syncCode: "Code de synchronisation", syncHint: "Saisissez ce code sur vos autres appareils : Réglages → Synchronisation dans l'application, ou Historique → Synchronisation ici. Gardez-le pour vous.", syncNow: "Synchroniser", syncLast: "Dernière synchronisation", syncNever: "pas encore", syncStop: "Arrêter la synchronisation dans ce navigateur", syncStopQ: "Arrêter la synchronisation ici ? Votre historique reste dans ce navigateur et sur vos autres appareils.", syncBad: "Ce code n'est pas valide. Vérifiez-le et réessayez.", syncOff: "Connexion impossible. Vérifiez Internet et réessayez.", syncLinked: "Ce navigateur est relié", week: ["D", "L", "M", "M", "J", "V", "S"],
+      apk: "Télécharger l’application", apkNote: "Fichier APK · Android 8 ou plus récent", mac: "Version Mac", macNote: "Fichier DMG · macOS 15 ou plus récent : horaires de prière dans la barre des menus et rappels en haut de l'écran", win: "Version Windows", winNote: "Installateur pour Windows 10 et 11 · sans droits d'administrateur", join: "Devenir testeur",
       joinText: "L’application est en test sur Google Play. Laissez l’adresse Gmail de votre Play Store : nous vous ajouterons aux testeurs et vous enverrons le lien d’installation.",
       emailPh: "nom@gmail.com", send: "M’inscrire", sending: "Envoi…", badEmail: "Saisissez une adresse e-mail valide",
       thanks: "Jazak Allah khayran ! Nous avons bien reçu votre adresse et vous ajouterons aux testeurs très bientôt, in shâ Allah.", failed: "Échec de l’envoi. Réessayez.",
       mushaf: "Application Mushaf", mushafText: "Lisez le Saint Coran dans l’écriture du Mushaf imprimé, une sadaqa jariya de notre équipe.", mushafCta: "Télécharger sur mushafapp.com",
-      privacy: "Confidentialité", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
-      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", praise: "Louange & pardon" },
+      privacy: "Confidentialité", sunnahSrc: "Des recueils de hadiths", quranSrc: "Du Saint Coran", guide: "Guide", guideCta: "Chaque étape, de l’iḥrām à la coupe des cheveux", readDuas: "Paroles à dire", sources: "Sources", dedication: "Au nom de Mohamad Al-Koussa, Dima Ghannoum et de leurs familles",
+      cat: { prayer: "Prière & mosquée", sleep: "Sommeil & réveil", home: "Maison & purification", hardship: "Détresse & protection", illness: "Maladie & funérailles", food: "Repas & jeûne", family: "Famille & société", travel: "Voyage", nature: "Nature & météo", hajj: "Hajj & Omra", quran: "Invocations du Coran", sunnah: "Invocations de la Sunna", ruqyah: "La roqya", names: "Les 99 noms d'Allah", praise: "Louange & pardon" },
     },
   };
 
@@ -113,15 +125,23 @@
     reset: '<path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/>',
     spark: '<path d="M12 3l1.8 5.4L19 10l-5.2 1.6L12 17l-1.8-5.4L5 10l5.2-1.6z"/>',
     download: '<path d="M12 3v12M7 10l5 5 5-5M5 19h14"/>',
+    book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5zM4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/>',
+    kaaba: '<path d="M4 7.5 12 4l8 3.5v10L12 21l-8-3.5zM4 7.5l8 3.5 8-3.5M12 11v10M4 11l8 3.5 8-3.5"/>',
+    calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4M8 13.5h.01M12 13.5h.01M16 13.5h.01M8 17h.01M12 17h.01"/>',
     mail: '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
   };
   // Always the newest APK: GitHub redirects /releases/latest/download/<asset> to the latest release's file.
-  const APK_URL = "https://github.com/Mkuz1/islamic-azkar-releases/releases/latest/download/IslamicAzkar.apk";
+  // islamicazkar.net/download/* always redirects to the newest file on GitHub (see _redirects).
+  const DL = /(^|\.)islamicazkar\.net$/.test(location.hostname) ? "" : "https://islamicazkar.net";
+  const APK_URL = DL + "/download/android";
+  const DMG_URL = DL + "/download/mac";
+  const WIN_URL = DL + "/download/windows";
+  const SYNC_URL = /(^|\.)islamicazkar\.net$|\.pages\.dev$/.test(location.hostname) ? "/sync" : "https://islamicazkar.net/sync";
   const REGISTER_URL = /(^|\.)islamicazkar\.net$/.test(location.hostname) ? "/api/register" : "https://islamicazkar.net/api/register";
   const svg = (name, fill) => `<svg viewBox="0 0 24 24" fill="${fill ? "currentColor" : "none"}" stroke="${fill ? "none" : "currentColor"}" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[name]}</svg>`;
   const CAT_STYLE = {
     prayer: ["mosque", "#34c759"], sleep: ["bed", "#5856d6"], home: ["home", "#ff9500"], hardship: ["heart", "#ff3b30"], illness: ["spark", "#30b0c7"],
-    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], praise: ["beads", "#1e6b52"],
+    food: ["sun", "#ffcc00"], family: ["heart", "#af52de"], travel: ["chev", "#007aff"], nature: ["moon", "#32ade6"], hajj: ["mosque", "#a2845e"], quran: ["book", "#1e6b52"], sunnah: ["book", "#0a84ff"], ruqyah: ["beads", "#34aadc"], names: ["spark", "#c8963e"], praise: ["beads", "#1e6b52"],
   };
 
   // ───────────── State ─────────────
@@ -132,7 +152,7 @@
   const guessLang = () => { const l = (navigator.language || "en").slice(0, 2); return l === "ar" ? "ar" : l === "fr" ? "fr" : "en"; };
   let lang = new URLSearchParams(location.search).get("lang") || store.get("lang", guessLang());
   if (!T[lang]) lang = "en";
-  let prefs = Object.assign({ scale: 1, tr: true, mean: true, theme: "system" }, store.get("prefs", {}));
+  let prefs = Object.assign({ scale: 1, tr: true, mean: true, theme: "system", place: null, method: 6, hanafi: false }, store.get("prefs", {}));
   let favs = new Set(store.get("favs", []));
   let data = null, index = null;
 
@@ -141,13 +161,17 @@
   function arCount(n, one, two, few, many) { if (n === 1) return one; if (n === 2) return two; return `${num(n)} ${n <= 10 ? few : many}`; }
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
-  const meaning = z => lang === "ar" ? "" : (z[lang] || z.en || "");
+  const meaning = z => lang === "ar" ? (z.arm || "") : (z[lang] || z.en || "");
   const chapterTitle = c => c[lang] || c.en;
   const normalize = t => t.replace(/[ً-ٰٟـ]/g, "").replace(/[إأآٱ]/g, "ا").replace(/ى/g, "ي").replace(/ة/g, "ه").toLowerCase();
 
   function readingOf(key) {
     if (key === "morning") return { key, title: s().morning, items: data.morning };
     if (key === "evening") return { key, title: s().evening, items: data.evening };
+    if (key === "umrah") {
+      const g = umrah();
+      return g ? { key, title: g.title[lang], items: g.steps.flatMap(st => st.zikr).map(id => index.items.get(id)?.z).filter(Boolean) } : null;
+    }
     const id = +key.replace(/^c/, "");
     const c = index.chapters.get(id);
     return c ? { key, title: chapterTitle(c), items: c.items, chapter: c } : null;
@@ -173,7 +197,7 @@
   const app = document.getElementById("app");
   function shell(active, body) {
     const t = s();
-    const nav = [["#/", "home", t.home, "home"], ["#/fav", "heart", t.favorites, "fav"], ["#/tasbih", "beads", t.tasbih, "tasbih"]]
+    const nav = [["#/", "home", t.home, "home"], ["#/fav", "heart", t.favorites, "fav"], ["#/tasbih", "beads", t.tasbih, "tasbih"], ["#/record", "calendar", t.record, "record"]]
       .map(([h, ic, label, k]) => `<a href="${h}" class="press ${active === k ? "on" : ""}">${svg(ic, ic === "heart" && active === k)}<span>${label}</span></a>`).join("");
     return `
       <header class="topbar"><div class="wrap"><div class="bar glass">
@@ -184,11 +208,11 @@
         <button class="icon-btn press" id="open-settings" aria-label="${t.settings}">${svg("text")}</button>
       </div></div></header>
       <nav class="nav nav-bottom">${nav}</nav>
-      <main><div class="wrap ${active === "read" || active === "tasbih" ? "narrow" : ""}">${body}</div></main>
+      <main><div class="wrap ${active === "read" || active === "tasbih" || active === "record" ? "narrow" : ""}">${body}</div></main>
       <footer class="site">
         <div class="ded">${T.ar.dedication}</div>
         <div class="ded-l">${T.en.dedication} · ${T.fr.dedication}</div>
-        <a href="privacy/">${t.privacy}</a> · © ${new Date().getFullYear()} Mkoussa
+        <a href="${DL}/support/">${lang === "ar" ? "الدعم" : lang === "fr" ? "Assistance" : "Support"}</a> · <a href="${DL}/privacy/">${t.privacy}</a> · © ${new Date().getFullYear()} Mkoussa
       </footer>`;
   }
 
@@ -201,15 +225,44 @@
     } catch { return ""; }
   }
 
-  function home() {
+  // ───────────── Prayer times (same calculation as the apps; Dubai · Dulook by default) ─────────────
+  const P = window.AzkarPrayer;
+  const clock = m => { const h = Math.floor(m / 60) % 24, mi = m % 60; return num(String(h).padStart(2, "0")) + ":" + num(String(mi).padStart(2, "0")); };
+  const placeName = p => p ? (p.mine ? s().myLoc : lang === "ar" ? p.ar : p.name) : "";
+  function prayerCard() {
+    const t = s(), p = prefs.place;
+    if (!P) return "";
+    if (!p) return `<button class="prayer-card glass press empty-p" id="pick-place">${svg("mosque")}<span>${t.setPlace}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</button>`;
+    const n = P.next(p, prefs.method, prefs.hanafi);
+    const left = `${num(Math.floor(n.inMinutes / 60))}:${num(String(n.inMinutes % 60).padStart(2, "0"))}`;
+    const cells = n.times.map((m, i) => `<div class="pt ${i === n.index ? "on" : ""} ${i === 1 ? "sr" : ""}"><small>${t.prayerNames[i]}</small><b>${clock(m)}</b></div>`).join("");
+    return `<section class="prayer-card glass" id="prayer-card">
+      <div class="pc-head"><div><small>${t.nextPrayer}</small><b>${t.prayerNames[n.index]} <span class="pc-time">${clock(n.times[n.index] ?? 0)}</span></b><span>${t.inTime(left)}</span></div>
+        <button class="pill press" id="pick-place">${svg("mosque")}${esc(placeName(p))}</button></div>
+      <div class="pt-row">${cells}</div>
+      <small class="pc-method">${t.methods[prefs.method] || ""}</small></section>`;
+  }
+  // Keep the prayer card and the "Now" badge current while the page stays open.
+  function refreshNow() {
+    const c = document.getElementById("prayer-card"); if (c) c.outerHTML = prayerCard();
+    const tl = document.querySelector("#home-body .tiles"); if (tl) tl.innerHTML = homeTiles();
+  }
+  setInterval(refreshNow, 30000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshNow(); });
+
+  function homeTiles() {
     const t = s(), now = momentKey();
-    const tiles = [
+    return [
       ["morning", "#/read/morning", "sun", "#ff9500", data.morning.length],
       ["evening", "#/read/evening", "moon", "#5856d6", data.evening.length],
       ["sleep", "#/read/c28", "bed", "#007aff", index.chapters.get(28).items.length],
       ["prayer", "#/read/c25", "mosque", "#34c759", index.chapters.get(25).items.length],
     ].map(([k, h, ic, col, n]) => `<a class="tile glass press" href="${h}">${k === now ? `<span class="badge">${t.now}</span>` : ""}
         <span class="sym" style="background:${col}">${svg(ic)}</span><b>${t[k]}</b><small>${t.azkar(n)}</small></a>`).join("");
+  }
+
+  function home() {
+    const t = s(), tiles = homeTiles();
     const cats = data.categories.map(c => {
       const [ic, col] = CAT_STYLE[c.key] || ["spark", "#8e8e93"];
       return `<a class="row press" href="#/cat/${c.key}"><span class="sym" style="background:${col}">${svg(ic)}</span><span class="t"><b>${t.cat[c.key]}</b></span><span class="meta">${num(c.chapters.length)}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>`;
@@ -224,6 +277,7 @@
         <div class="ornament"><i></i>${svg("spark", true).replace("<svg", '<svg width="12" height="12"')}<i></i></div>
         <span class="date">${esc(hijri())}</span>
       </section>
+      ${prayerCard()}
       <label class="search glass">${svg("search")}<input id="q" type="search" placeholder="${t.search}" autocomplete="off"></label>
       <div id="results"></div>
       <div id="home-body">
@@ -231,6 +285,7 @@
         <div class="tiles">${tiles}</div>
         <div class="section">${t.categories}</div>
         <div class="cols"><div class="group glass">${cats.slice(0, half).join("")}</div><div class="group glass">${cats.slice(half).join("")}</div></div>
+        ${umrah() ? `<div class="section">${t.guide}</div><div class="group glass">${guideRow()}</div>` : ""}
         <div class="section">${t.getApp}</div>
         <div class="cols">
           <div class="promo glass app-card">
@@ -240,6 +295,10 @@
               <button class="pill press" id="join-toggle" aria-expanded="false" aria-controls="join">${svg("mail")}${t.join}</button>
             </div>
             <small class="apk-note">${t.apkNote}</small>
+            <div class="app-acts" style="margin-top:10px"><a class="pill press" href="${DMG_URL}" rel="noopener">${svg("download")}${t.mac}</a></div>
+            <small class="apk-note">${t.macNote}</small>
+            <div class="app-acts" style="margin-top:10px"><a class="pill press" href="${WIN_URL}" rel="noopener">${svg("download")}${t.win}</a></div>
+            <small class="apk-note">${t.winNote}</small>
             <form id="join" class="join" hidden novalidate>
               <p>${t.joinText}</p>
               <div class="join-row">
@@ -263,7 +322,40 @@
       const sub = lang === "ar" ? c.en : `<span class="ar-sub">${esc(c.ar)}</span>`;
       return `<a class="row press" href="#/read/c${id}"><span class="num">${num(i + 1)}</span><span class="t"><b>${esc(chapterTitle(c))}</b><small>${sub}</small></span><span class="meta">${num(c.items.length)}</span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>`;
     }).join("");
-    return shell("home", `<a class="back" href="#/">${svg("back")}${t.back}</a><h1 class="large">${t.cat[key]}</h1><p class="sub">${t.chapters(cat.chapters.length)}</p><div class="group glass">${rows}</div>`);
+    const g = key === "hajj" && guideRow();
+    return shell("home", `<a class="back" href="#/">${svg("back")}${t.back}</a><h1 class="large">${t.cat[key]}</h1><p class="sub">${t.chapters(cat.chapters.length)}</p>${g ? `<div class="group glass" style="margin-bottom:14px">${g}</div>` : ""}<div class="group glass">${rows}</div>`);
+  }
+
+  const umrah = () => (data.guides || []).find(g => g.key === "umrah");
+  function guideRow() {
+    const g = umrah();
+    return g ? `<a class="row press" href="#/umrah"><span class="sym" style="background:#a2845e">${svg("kaaba")}</span><span class="t"><b>${esc(g.title[lang])}</b><small>${s().guideCta}</small></span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>` : "";
+  }
+
+  // The ʿUmrah guide uses the reader's cards: a numbered step card, then each of its duas as a full
+  // dhikr card (counter, favourite, copy, share). Counting them fills the progress bar like any reading.
+  function guide() {
+    const t = s(), g = umrah(), r = readingOf("umrah");
+    if (!g || !r) return notFound();
+    const counts = progressOf("umrah");
+    let n = 0;
+    const steps = g.steps.map((st, si) => {
+      const title = st.title[lang].replace(/^[\d٠-٩]+\.\s*/, "");
+      const cards = st.zikr.map(id => index.items.get(id)?.z).filter(Boolean).map(z => zikrCard(z, n++, r.items.length, counts)).join("");
+      return `<section class="step-block" id="step-${si + 1}">
+        <article class="glass card step">
+          <header><span class="step-num">${num(si + 1)}</span><span class="chip">${t.of(si + 1, g.steps.length)}</span></header>
+          <h2>${esc(title)}</h2><p>${esc(st.text[lang])}</p>
+          <p class="ref">${svg("book")}<span>${esc(st.ref[lang])}</span></p>
+        </article>${cards}</section>`;
+    }).join("");
+    const nav = g.steps.map((st, si) => `<a class="press" href="#/umrah" data-step="${si + 1}">${num(si + 1)}</a>`).join("");
+    return shell("read", `
+      <div class="reader-head glass"><a class="back" href="#/cat/hajj">${svg("back")}${t.back}</a><span class="progress"><i id="prog"></i></span><span class="prog-label" id="prog-label"></span></div>
+      <h1 class="large">${esc(g.title[lang])}</h1><p class="sub">${esc(g.intro[lang])}</p>
+      <nav class="step-nav glass">${nav}</nav>
+      <div id="cards" data-key="umrah">${steps}</div>
+      <p class="guide-note">${esc(g.note[lang])}</p>`);
   }
 
   function progressOf(key) { const p = store.get("progress", {}); return (p.day === today() && p[key]) || {}; }
@@ -276,7 +368,7 @@
       <header><span class="chip">${t.of(i + 1, total)}</span>${n > 1 ? `<span class="chip">× ${num(n)}</span>` : ""}
         <span class="acts"><button class="fav ${favs.has(z.id) ? "on" : ""}" data-act="fav" aria-label="${t.favorites}">${svg("heart", favs.has(z.id))}</button>
         <button data-act="copy" aria-label="copy">${svg("copy")}</button><button data-act="share" aria-label="share">${svg("share")}</button></span></header>
-      <p class="ar">${esc(z.ar)}</p>${tr}${m}
+      <p class="ar">${esc(z.ar)}</p>${tr}${m}${z.ref ? `<p class="ref">${svg("book")}<span>${esc(z.ref[lang] || z.ref.en)}</span></p>` : ""}
       <footer>${counterHtml(n, c)}</footer></article>`;
   }
   function counterHtml(n, c) {
@@ -297,7 +389,7 @@
     const backHref = r.chapter ? `#/cat/${(data.categories.find(c => c.chapters.includes(r.chapter.id)) || {}).key}` : "#/";
     return shell("read", `
       <div class="reader-head glass"><a class="back" href="${backHref}">${svg("back")}${t.back}</a><span class="progress"><i id="prog"></i></span><span class="prog-label" id="prog-label"></span></div>
-      <h1 class="large">${esc(r.title)}</h1><p class="sub">${t.hisn} · ${t.azkar(r.items.length)}</p>
+      <h1 class="large">${esc(r.title)}</h1><p class="sub">${r.items.length && r.items.every(z => z.ref && /^Quran/.test(z.ref.en)) ? t.quranSrc : r.items.some(z => z.ref) ? t.sunnahSrc : t.hisn} · ${t.azkar(r.items.length)}</p>
       <div id="cards" data-key="${key}" data-focus="${focus || ""}">${cards}</div>`);
   }
 
@@ -306,6 +398,134 @@
     if (!items.length) return shell("fav", `<h1 class="large">${t.favorites}</h1><div class="empty glass card">${svg("heart").replace("<svg", '<svg style="width:40px;height:40px;color:var(--text3)"')}<p>${t.noFav}</p></div>`);
     const rows = items.map(({ z, key, title }) => `<a class="row press" href="#/read/${key}/${z.id}"><span class="sym" style="background:#ff3b30">${svg("heart", true)}</span><span class="t"><b style="font-family:Amiri,serif;font-size:18px">${esc(z.ar.slice(0, 90))}${z.ar.length > 90 ? "…" : ""}</b><small>${esc(title())}</small></span>${svg("chev").replace("<svg", '<svg class="chev"')}</a>`).join("");
     return shell("fav", `<h1 class="large">${t.favorites}</h1><p class="sub">${t.azkar(items.length)}</p><div class="group glass">${rows}</div>`);
+  }
+
+  // ───────────── Record ─────────────
+  // Day ("2026-11-06") → readings completed in full that day ("morning", "evening", "c28"…), as in the apps.
+  const dayKey = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  function markRecord(key) {
+    if (key === "umrah") return;
+    const h = store.get("history", {}), k = dayKey(new Date()), list = h[k] || [];
+    if (!list.includes(key)) list.push(key);
+    h[k] = list; store.set("history", h);
+    syncNow();   // show it on the other devices
+  }
+
+  // Sync with the person's other devices (same private code and protocol as the apps).
+  const normCode = c => String(c || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const showCode = c => c.match(/.{1,4}/g).join("-");
+  async function syncPost(path, body) {
+    let r;
+    try { r = await fetch(SYNC_URL + path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }); }
+    catch { throw "offline"; }
+    if (r.status === 404) throw "unknown";
+    if (!r.ok) throw "offline";
+    return r.json();
+  }
+  function takeIn(days) {
+    const h = store.get("history", {});
+    let changed = false;
+    for (const [k, list] of Object.entries(days || {})) {
+      const have = h[k] || [];
+      for (const x of list) if (!have.includes(x)) { have.push(x); changed = true; }
+      h[k] = have;
+    }
+    store.set("history", h); store.set("syncLast", Date.now());
+    return changed;
+  }
+  let syncing = false;
+  async function syncNow(force) {
+    const code = store.get("syncCode", null);
+    if (!code || (syncing && !force)) return;
+    syncing = true;
+    try {
+      const r = await syncPost("", { code, days: store.get("history", {}) });
+      if ((takeIn(r.days) || force) && location.hash.startsWith("#/record")) route();
+    } catch (e) {
+      if (e === "unknown") { store.set("syncCode", null); if (location.hash.startsWith("#/record")) route(); }
+    } finally { syncing = false; }
+  }
+  function syncCard() {
+    const t = s(), code = store.get("syncCode", null), last = store.get("syncLast", 0);
+    if (code) {
+      const when = last ? new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit" }).format(new Date(last)) : t.syncNever;
+      return `<div class="sync glass" id="sync"><h3>${svg("reset")}${t.syncTitle}</h3>
+        <small>${t.syncCode}</small><div class="sync-code" dir="ltr">${showCode(code)}</div><p>${t.syncHint}</p>
+        <div class="sync-acts"><button class="pill primary press" id="sync-now">${t.syncNow}</button><small>${t.syncLast}: ${num(when)}</small></div>
+        <button class="link-btn" id="sync-stop">${t.syncStop}</button><small class="sync-msg" role="status"></small></div>`;
+    }
+    return `<div class="sync glass" id="sync"><h3>${svg("reset")}${t.syncTitle}</h3><p>${t.syncIntro}</p>
+      <button class="pill primary press" id="sync-on">${t.syncOn}</button>
+      <form id="sync-form" class="sync-form"><label>${t.syncHave}</label><div class="join-row">
+        <input name="code" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX" aria-label="${t.syncCode}">
+        <button class="pill press" type="submit">${t.syncLink}</button></div></form>
+      <small class="sync-msg" role="status"></small></div>`;
+  }
+  /** Consecutive days on which `key` was completed, ending today (or yesterday). */
+  function readingStreak(key) {
+    const h = store.get("history", {}), d = new Date();
+    if (!(h[dayKey(d)] || []).includes(key)) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while ((h[dayKey(d)] || []).includes(key)) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  function streakDays(h) {
+    const d = new Date();
+    if (!(h[dayKey(d)] || []).length) d.setDate(d.getDate() - 1);
+    let n = 0;
+    while ((h[dayKey(d)] || []).length) { n++; d.setDate(d.getDate() - 1); }
+    return n;
+  }
+  let recMonth = 0, recDay = null;   // months back from this one; selected day key
+  function readingLook(key) {
+    const t = s();
+    if (key === "morning") return { title: t.morning, ic: "sun", col: "#ff9500", cat: "" };
+    if (key === "evening") return { title: t.evening, ic: "moon", col: "#5856d6", cat: "" };
+    const id = +key.replace(/^c/, ""), c = index.chapters.get(id);
+    if (!c) return null;
+    const cat = data.categories.find(x => x.chapters.includes(id));
+    const [ic, col] = (cat && CAT_STYLE[cat.key]) || ["spark", "#8e8e93"];
+    return { title: chapterTitle(c), ic, col, cat: cat ? t.cat[cat.key] : "" };
+  }
+  function record() {
+    const t = s(), h = store.get("history", {}), now = new Date(), todayK = dayKey(now);
+    if (!recDay) recDay = todayK;
+    const first = new Date(now.getFullYear(), now.getMonth() + recMonth, 1);
+    const prefix = dayKey(first).slice(0, 8);
+    const inMonth = Object.entries(h).filter(([k]) => k.startsWith(prefix)).map(([, v]) => v);
+    const loc = lang === "ar" ? "ar-u-nu-arab" : lang;
+    const monthName = new Intl.DateTimeFormat(loc, { month: "long", year: "numeric" }).format(first);
+    let hijriMonth = "";
+    try { hijriMonth = new Intl.DateTimeFormat(lang === "ar" ? "ar-SA-u-ca-islamic-umalqura-nu-arab" : `${lang}-u-ca-islamic-umalqura`, { month: "long", year: "numeric" }).format(first); } catch { /* old browsers */ }
+    const lead = first.getDay(), count = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+    let cells = "";
+    for (let i = 0; i < lead; i++) cells += `<span></span>`;
+    for (let d = 1; d <= count; d++) {
+      const date = new Date(first.getFullYear(), first.getMonth(), d), k = dayKey(date), list = h[k] || [];
+      const n = list.length, shade = n === 0 ? 0 : n < 3 ? 1 : n < 6 ? 2 : 3, future = date > now;
+      cells += `<button class="day s${shade}${k === todayK ? " today" : ""}${k === recDay ? " sel" : ""}" data-day="${k}" ${future ? "disabled" : ""}>
+        <b>${num(d)}</b><i>${list.includes("morning") ? svg("sun").replace("<svg", '<svg class="mi"') : ""}${list.includes("evening") ? svg("moon").replace("<svg", '<svg class="ei"') : ""}</i></button>`;
+    }
+    const sel = h[recDay] || [], selDate = new Date(...recDay.split("-").map((v, i) => i === 1 ? v - 1 : +v));
+    const dayTitle = recDay === todayK ? t.today : new Intl.DateTimeFormat(loc, { weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(selDate);
+    const rows = sel.map(k => {
+      const r = readingLook(k);
+      return r ? `<a class="row press" href="#/read/${k}"><span class="sym" style="background:${r.col}">${svg(r.ic)}</span><span class="t"><b>${esc(r.title)}</b>${r.cat ? `<small>${esc(r.cat)}</small>` : ""}</span><span class="ok">${svg("check")}</span></a>` : "";
+    }).join("");
+    const stat = (v, label, ic) => `<div class="stat glass">${svg(ic)}<b>${num(v)}</b><small>${label}</small></div>`;
+    return shell("record", `<h1 class="large">${t.recTitle}</h1><p class="sub">${t.recSub}</p>
+      <div class="stats">${stat(inMonth.filter(v => v.length).length, t.activeDays, "calendar")}${stat(inMonth.reduce((a, v) => a + v.length, 0), t.monthDone, "check")}${stat(streakDays(h), t.inRow, "spark")}</div>
+      <div class="cal-card glass">
+        <div class="cal-head">
+          <button class="icon-btn press" data-month="-1" aria-label="${t.prevMonth}">${svg("back")}</button>
+          <div><b>${esc(monthName)}</b><small>${esc(hijriMonth)}</small></div>
+          <button class="icon-btn press" data-month="1" aria-label="${t.nextMonth}" ${recMonth >= 0 ? "disabled" : ""}>${svg("chev")}</button>
+        </div>
+        <div class="cal-grid">${t.week.map(w => `<span class="wd">${w}</span>`).join("")}${cells}</div>
+      </div>
+      <div class="section">${esc(dayTitle)}${sel.length ? ` · ${t.dayDone} (${num(sel.length)})` : ""}</div>
+      ${rows ? `<div class="group glass">${rows}</div>` : `<div class="empty glass card" style="padding:24px">${t.nothingDay}</div>`}
+      <div style="height:22px"></div>${syncCard()}`);
   }
 
   function tasbih() {
@@ -357,11 +577,9 @@
     const t = s(), r = readingOf(key), counts = progressOf(key);
     if (counts.__celebrated) return;
     counts.__celebrated = true; saveProgress(key, counts);
-    const st = store.get("streaks", {}), prev = st[key] || {}, d = today();
-    const y = new Date(); y.setDate(y.getDate() - 1);
-    const yd = `${y.getFullYear()}-${y.getMonth() + 1}-${y.getDate()}`;
-    const streak = prev.last === d ? prev.n : prev.last === yd ? prev.n + 1 : 1;
-    st[key] = { last: d, n: streak }; store.set("streaks", st);
+    markRecord(key);
+    // From the record itself (the Record page), which also holds the other devices' days.
+    const streak = key === "umrah" ? 1 : Math.max(readingStreak(key), 1);
     const reps = r.items.reduce((a, z) => a + Math.max(1, z.n || 1), 0);
     const e = ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)];
     const next = key === "morning" ? t.seeEvening : key === "evening" ? t.seeMorning : "";
@@ -395,15 +613,33 @@
           <p class="ar" style="margin:0">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</p></div>
         ${lang === "ar" ? "" : `<button class="row" data-toggle="tr" style="width:100%"><span class="t"><b>${t.showTr}</b></span><span class="switch ${prefs.tr ? "on" : ""}"></span></button>
         <button class="row" data-toggle="mean" style="width:100%"><span class="t"><b>${t.showMean}</b></span><span class="switch ${prefs.mean ? "on" : ""}"></span></button>`}
+        <div class="row" style="display:block"><b>${t.prayerTimes}</b>
+          <button class="pill press" id="use-loc" style="margin-top:8px">${svg("mosque")}${t.useLoc}</button><small class="loc-msg" style="display:block;color:var(--text2);margin-top:6px"></small>
+          <label class="pick"><span>${t.orCity}</span><select id="city"><option value="">—</option>${P ? P.CITIES.map((c, i) => `<option value="${i}" ${prefs.place && !prefs.place.mine && prefs.place.name === c.name ? "selected" : ""}>${esc(lang === "ar" ? c.ar : c.name)}</option>`).join("") : ""}</select></label>
+          <label class="pick"><span>${t.method}</span><select id="method">${t.methods.map((m, i) => `<option value="${i}" ${prefs.method === i ? "selected" : ""}>${esc(m)}</option>`).join("")}</select></label>
+          <button class="row" data-toggle="hanafi" style="width:100%;padding-inline:0"><span class="t"><b style="font-weight:500">${t.hanafi}</b></span><span class="switch ${prefs.hanafi ? "on" : ""}"></span></button></div>
         <div class="row" style="display:block"><b>${t.theme}</b><div class="seg" style="margin-top:8px;display:flex">${["system", "light", "dark"].map(k => `<button style="flex:1" data-theme-set="${k}" class="${prefs.theme === k ? "on" : ""}">${t[k]}</button>`).join("")}</div></div>
         <button class="btn press" style="width:100%;margin-top:12px" id="close-sheet">${t.close}</button></div>`;
     };
     render();
     document.body.appendChild(scrim);
     scrim.addEventListener("input", ev => { if (ev.target.id === "scale") { prefs.scale = +ev.target.value; applyPrefs(); } });
+    scrim.addEventListener("change", ev => {
+      if (ev.target.id === "city" && ev.target.value !== "") { prefs.place = { ...P.CITIES[+ev.target.value] }; applyPrefs(); }
+      if (ev.target.id === "method") { prefs.method = +ev.target.value; applyPrefs(); }
+    });
     scrim.addEventListener("click", ev => {
       const el = ev.target.closest("button");
-      if (ev.target === scrim || (el && el.id === "close-sheet")) return scrim.remove();
+      if (ev.target === scrim || (el && el.id === "close-sheet")) { scrim.remove(); route(); return; }
+      if (el && el.id === "use-loc") {
+        const msg = scrim.querySelector(".loc-msg"); msg.textContent = t.locating;
+        if (!navigator.geolocation) { msg.textContent = t.locFail; return; }
+        navigator.geolocation.getCurrentPosition(pos => {
+          prefs.place = { mine: true, ar: "", name: "", lat: +pos.coords.latitude.toFixed(4), lng: +pos.coords.longitude.toFixed(4), tz: Intl.DateTimeFormat().resolvedOptions().timeZone };
+          applyPrefs(); msg.textContent = `${t.myLoc} ✓`;
+        }, () => { msg.textContent = t.locFail; }, { maximumAge: 3600000, timeout: 15000 });
+        return;
+      }
       if (!el) return;
       if (el.dataset.toggle) { prefs[el.dataset.toggle] = !prefs[el.dataset.toggle]; applyPrefs(); render(); }
       if (el.dataset.themeSet) { prefs.theme = el.dataset.themeSet; applyPrefs(); render(); }
@@ -419,7 +655,7 @@
     const items = [];
     for (const [id, it] of index.items) {
       const z = it.z;
-      if ([z.ar, z.en, z.fr, z.tr].some(x => x && normalize(x).includes(nq))) items.push(it);
+      if ([z.ar, z.en, z.fr, z.tr, z.ref && z.ref[lang]].some(x => x && normalize(x).includes(nq))) items.push(it);
       if (items.length >= 40) break;
     }
     if (!chapters.length && !items.length) { box.innerHTML = `<div class="empty">${t.noResults}</div>`; return; }
@@ -443,6 +679,8 @@
       };
     } else if (parts[0] === "fav") html = favorites();
     else if (parts[0] === "tasbih") html = tasbih();
+    else if (parts[0] === "record") { html = record(); after = () => syncNow(); }
+    else if (parts[0] === "umrah") { html = guide(); after = () => updateProgress("umrah"); }
     else html = notFound();
     app.innerHTML = html;
     if (!parts[2]) window.scrollTo(0, 0);
@@ -453,7 +691,20 @@
     const btn = ev.target.closest("button");
     const langBtn = ev.target.closest("[data-lang]");
     if (langBtn) { lang = langBtn.dataset.lang; applyLang(); route(); return; }
-    if (btn && btn.id === "open-settings") return openSettings();
+    if (btn && (btn.id === "open-settings" || btn.id === "pick-place")) return openSettings();
+    if (btn && btn.dataset.month) { recMonth = Math.min(0, recMonth + +btn.dataset.month); route(); return; }
+    if (btn && btn.dataset.day) { recDay = btn.dataset.day; route(); return; }
+    if (btn && btn.id === "sync-now") { btn.disabled = true; syncNow(true); return; }
+    if (btn && btn.id === "sync-stop") { if (confirm(s().syncStopQ)) { store.set("syncCode", null); store.set("syncLast", 0); route(); } return; }
+    if (btn && btn.id === "sync-on") {
+      btn.disabled = true;
+      syncPost("/new", { days: store.get("history", {}) })
+        .then(r => { store.set("syncCode", r.code); takeIn(r.days); route(); })
+        .catch(() => { btn.disabled = false; document.querySelector(".sync-msg").textContent = s().syncOff; });
+      return;
+    }
+    const stepLink = ev.target.closest("[data-step]");
+    if (stepLink) { ev.preventDefault(); document.getElementById(`step-${stepLink.dataset.step}`)?.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
     if (btn && btn.id === "join-toggle") {
       const form = document.getElementById("join"), open = form.hidden;
       form.hidden = !open; btn.setAttribute("aria-expanded", open); btn.classList.toggle("on", open);
@@ -497,6 +748,16 @@
   });
   app.addEventListener("input", ev => { if (ev.target.id === "q") search(ev.target.value); });
   app.addEventListener("submit", async ev => {
+    if (ev.target.id === "sync-form") {
+      ev.preventDefault();
+      const code = normCode(ev.target.code.value), msg = document.querySelector(".sync-msg");
+      if (code.length !== 12) { msg.textContent = s().syncBad; return; }
+      try {
+        const r = await syncPost("", { code, days: store.get("history", {}) });
+        store.set("syncCode", code); takeIn(r.days); route(); toast(s().syncLinked);
+      } catch (e) { msg.textContent = e === "unknown" ? s().syncBad : s().syncOff; }
+      return;
+    }
     if (ev.target.id !== "join") return;
     ev.preventDefault();
     const form = ev.target, t = s(), msg = form.querySelector(".join-msg"), send = form.querySelector("button[type=submit]");
@@ -512,11 +773,16 @@
     }
   });
   window.addEventListener("hashchange", route);
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) return;
+    syncNow();
+    if (!location.hash || location.hash === "#/") route();   // "Now" follows the clock
+  });
 
   // ───────────── Boot ─────────────
   applyLang(); applyPrefs();
   app.innerHTML = `<div class="loading">…</div>`;
-  fetch("data/azkar.json").then(r => r.json()).then(d => {
+  fetch("data/azkar.json?v=2026-11-01b") /* bump when the data changes: browsers cache data/ for a day */.then(r => r.json()).then(d => {
     data = d;
     index = { chapters: new Map(d.chapters.map(c => [c.id, c])), items: new Map() };
     const add = (z, key, title) => index.items.set(z.id, { z, key, title });
@@ -524,5 +790,6 @@
     d.evening.forEach(z => add(z, "evening", () => s().evening));
     d.chapters.forEach(c => c.items.forEach(z => add(z, `c${c.id}`, () => chapterTitle(c))));
     route();
+    syncNow();
   }).catch(() => { app.innerHTML = `<div class="loading">Could not load azkar.</div>`; });
 })();
