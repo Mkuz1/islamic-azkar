@@ -68,6 +68,11 @@ jobs:
             # Foldables have two screens: the inner (unfolded) and the outer (folded) one.
             local DISPLAYS; DISPLAYS=$(xcrun simctl io "$D" screenshot /tmp/probe.png 2>&1 | grep -o -- '--display=[0-9]*' | cut -d= -f2 | tr '\n' ' ' || true)
             echo "displays: ${DISPLAYS:-one}"
+            if [[ "$NAME" == *Duo* ]]; then
+              echo "--- simctl commands about folding:"; xcrun simctl help 2>&1 | grep -iE "fold|posture|hinge|display|state" || echo "(none)"
+              echo "--- io:"; xcrun simctl io "$D" enumerate 2>&1 | grep -iE "display|size|width|height|name|class" | head -30
+              xcrun simctl help io 2>&1 | head -40
+            fi
             mkdir -p "raw/$NAME"
             for l in en ar fr; do
               for s in "home 0" "reader 0" "celebration 0" "record 1" "tasbih 1" "guide 0" "dedication 1" "widgets 0"; do
