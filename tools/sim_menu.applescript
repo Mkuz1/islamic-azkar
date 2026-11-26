@@ -3,7 +3,7 @@
 -- state can only be changed from the Simulator app.
 on run argv
 	set action to item 1 of argv
-	tell application "Simulator" to activate
+	tell application id "com.apple.iphonesimulator" to activate
 	delay 2
 	tell application "System Events" to tell process "Simulator"
 		set out to ""

@@ -70,7 +70,7 @@ jobs:
             echo "displays: ${DISPLAYS:-one}"
             if [[ "$NAME" == *Duo* ]]; then
               # The fold state is only in the Simulator app's menus: open it on this device.
-              open -a Simulator --args -CurrentDeviceUDID "$D"; sleep 20
+              open -a "$(xcode-select -p)/Applications/Simulator.app" --args -CurrentDeviceUDID "$D"; sleep 25
               MENU=$GITHUB_WORKSPACE/tools/sim_menu.applescript
               echo "--- Simulator menu items about folding:"; osascript "$MENU" list 2>&1 | grep -iE "fold|posture|hinge|open|close" || osascript "$MENU" list 2>&1 | head -60
               alive() { xcrun simctl spawn "$D" launchctl list 2>/dev/null | grep -c "$BUNDLE" || true; }
