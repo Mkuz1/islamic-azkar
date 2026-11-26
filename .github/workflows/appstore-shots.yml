@@ -70,7 +70,15 @@ jobs:
             echo "displays: ${DISPLAYS:-one}"
             if [[ "$NAME" == *Duo* ]]; then
               # The fold state is only in the Simulator app's menus: open it on this device.
-              open -a "$(xcode-select -p)/Applications/Simulator.app" --args -CurrentDeviceUDID "$D"; sleep 25
+              XC=$(dirname "$(dirname "$(xcode-select -p)")")
+              echo "--- apps inside Xcode:"; find "$XC" -maxdepth 6 -name "*.app" 2>/dev/null | grep -viE "/Platforms/.*/Library/Developer/CoreSimulator/Profiles" | head -30
+              echo "--- simctl commands:"; xcrun simctl help 2>&1 | sed -n '/Subcommands/,$p' | head -60
+              SIMAPP=$(find "$XC" -maxdepth 6 -name "Simulator.app" -o -maxdepth 6 -name "Device Hub.app" 2>/dev/null | head -1)
+              echo "simulator app: ${SIMAPP:-none}"
+              [ -n "$SIMAPP" ] && { open -a "$SIMAPP" --args -CurrentDeviceUDID "$D"; sleep 25; }
+              BID=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$SIMAPP/Contents/Info.plist" 2>/dev/null || echo com.apple.iphonesimulator)
+              PNAME=$(basename "$SIMAPP" .app); echo "bundle $BID, process $PNAME"
+              sed -i '' "s/application id \"com.apple.iphonesimulator\"/application id \"$BID\"/; s/process \"Simulator\"/process \"$PNAME\"/" $GITHUB_WORKSPACE/tools/sim_menu.applescript
               MENU=$GITHUB_WORKSPACE/tools/sim_menu.applescript
               echo "--- Simulator menu items about folding:"; osascript "$MENU" list 2>&1 | grep -iE "fold|posture|hinge|open|close" || osascript "$MENU" list 2>&1 | head -60
               alive() { xcrun simctl spawn "$D" launchctl list 2>/dev/null | grep -c "$BUNDLE" || true; }
