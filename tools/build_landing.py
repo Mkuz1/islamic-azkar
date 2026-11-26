@@ -80,6 +80,7 @@ T = {
           ("How do I delete my data?", 'Only synced records are kept on our server, and you can erase them at <a href="/delete/">islamicazkar.net/delete</a> at any time.')],
     final="Start tomorrow morning<br>with your azkar ready",
     foot="Islamic Azkar · a sadaqa jariyah on behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
+    ded_tr="SADAQA JARIYAH", ded_names='<p class="names">On behalf of <span class="nw">Mohamad Al-Koussa</span>, <span class="nw">Dima Ghannoum</span> and their families</p>', ded_dua="O Allah, place it in the scale of their good deeds.", ded_hadith="“When a person dies, their deeds end except for three: an ongoing charity…” Muslim",
     ded_label="Sadaqa jariyah", ded="This app is a sadaqa jariyah on behalf of Mohamad Al-Koussa, Dima Ghannoum and their families. Please remember them in your duas.", support="Support", privacy="Privacy", delete="Delete your data"),
 "ar": dict(
     dir="rtl", path="/ar/", title="أذكار إسلامية: أذكار الصباح والمساء بمصادرها",
@@ -118,6 +119,7 @@ T = {
           ("كيف أحذف بياناتي؟", 'لا يُحفظ على خادمنا إلا سجلّ من فعّل المزامنة، ويمكنك حذفه متى شئت من <a href="/delete/">islamicazkar.net/delete</a>.')],
     final="ابدأ صباح الغد<br>وأذكارك جاهزة",
     foot="أذكار إسلامية · صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
+    ded_tr="", ded_names='<p class="names ar" lang="ar">عن محمد الكوسا وديمة غنوم وعائلاتهم</p>', ded_dua="", ded_hadith="",
     ded_label="صدقة جارية", ded="هذا التطبيق صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم، فلا تنسوهم من صالح دعائكم.", support="الدعم", privacy="الخصوصية", delete="احذف بياناتك"),
 "fr": dict(
     dir="ltr", path="/fr/", title="Islamic Azkar : les adhkar du matin et du soir avec leurs sources",
@@ -156,6 +158,7 @@ T = {
           ("Comment supprimer mes données ?", 'Seul l\'historique synchronisé est conservé sur notre serveur, et vous pouvez l\'effacer à tout moment sur <a href="/delete/">islamicazkar.net/delete</a>.')],
     final="Commencez demain matin<br>avec vos adhkar prêts",
     foot="Islamic Azkar · une sadaqa jariya au nom de Mohamad Al-Koussa, Dima Ghannoum et leurs familles",
+    ded_tr="SADAQA JARIYA", ded_names='<p class="names">Au nom de <span class="nw">Mohamad Al-Koussa</span>, <span class="nw">Dima Ghannoum</span> et leurs familles</p>', ded_dua="Ô Allah, place-la dans la balance de leurs bonnes actions.", ded_hadith="« Quand l\'homme meurt, ses œuvres cessent sauf trois : une aumône continue… » Muslim",
     ded_label="Sadaqa jariya", ded="Cette application est une sadaqa jariya au nom de Mohamad Al-Koussa, Dima Ghannoum et leurs familles. Pensez à eux dans vos douas.", support="Assistance", privacy="Confidentialité", delete="Supprimer vos données"),
 }
 
@@ -189,7 +192,7 @@ def page(lang):
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>{e(t["title"])}</title>
 <meta name="description" content="{e(t["desc"])}">
-<meta name="theme-color" content="#131209">
+<meta name="theme-color" content="#08231a">
 <link rel="canonical" href="{SITE}{t["path"]}">
 {alternates}
 <link rel="icon" href="/img/icon.png">
@@ -304,9 +307,18 @@ def page(lang):
   </section>
 
   <section class="dedication reveal" aria-label="{e(t["ded_label"])}">
-    <span class="caption-3 label">{icon("sparkle")}{e(t["ded_label"])}</span>
-    <p class="ar ded-ar" lang="ar">صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم</p>
-    {"" if lang == "ar" else f'<p class="body-3 muted ded-text">{e(t["ded"])}</p>'}{f'<p class="body-3 muted ded-text">فلا تنسوهم من صالح دعائكم.</p>' if lang == "ar" else ""}
+    <div class="ded-card">
+      <p class="ar bas" lang="ar">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+      <div class="rule"><i></i></div>
+      <p class="ar big" lang="ar">صدقة جارية</p>
+      {"" if lang == "ar" else f'<p class="tr">{e(t["ded_tr"])}</p>'}
+      {t["ded_names"]}
+      <div class="rule"><i></i></div>
+      <p class="ar dua" lang="ar">اللَّهُمَّ اجْعَلْهُ فِي مِيزَانِ حَسَنَاتِهِمْ</p>
+      {"" if lang == "ar" else f'<p class="mean">{e(t["ded_dua"])}</p>'}
+      <p class="ar hadith" lang="ar">إِذَا مَاتَ الإِنْسَانُ انْقَطَعَ عَمَلُهُ إِلَّا مِنْ ثَلَاثٍ: صَدَقَةٍ جَارِيَةٍ… رواه مسلم</p>
+      {"" if lang == "ar" else f'<p class="hmean">{e(t["ded_hadith"])}</p>'}
+    </div>
   </section>
 
   <section class="final reveal" aria-labelledby="final-title">
