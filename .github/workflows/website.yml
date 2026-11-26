@@ -40,8 +40,10 @@ jobs:
         # version in the link makes browsers fetch the new files at once.
         run: |
           V=${GITHUB_SHA::8}
-          sed -i -E "s#(href|src)=\"(style\.css|app\.js|prayer\.js)\"#\1=\"\2?v=$V\"#g" website/index.html
-          grep -E "\?v=$V" website/index.html
+          for f in website/app/index.html website/index.html website/ar/index.html website/fr/index.html; do
+            sed -i -E "s#(href|src)=\"(/?)(style\.css|app\.js|prayer\.js|landing\.css|landing\.js)\"#\1=\"\2\3?v=$V\"#g" $f
+            grep -qE "\?v=$V" $f || { echo "::error::$f was not stamped"; exit 1; }
+          done
       - name: Deploy to Cloudflare Pages
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -59,7 +61,11 @@ jobs:
           curl -fsS "https://islamicazkar.net/data/azkar.json?check=$GITHUB_RUN_ID" | python3 -c "import json,sys; d=json.load(sys.stdin); assert d.get('guides'), 'live site has no Umrah guide yet'; print('live:', len(d['chapters']), 'chapters')"
           # The live page links this deploy's script, and that script has the newest features.
           V=${GITHUB_SHA::8}
-          curl -fsS "https://islamicazkar.net/?check=$GITHUB_RUN_ID" | grep -q "app.js?v=$V" || { echo "::error::islamicazkar.net does not serve this deploy's page yet"; exit 1; }
+          curl -fsS "https://islamicazkar.net/app/?check=$GITHUB_RUN_ID" | grep -q "app.js?v=$V" || { echo "::error::islamicazkar.net/app does not serve this deploy's page yet"; exit 1; }
+          # The landing page in its three languages, and its script and styles.
+          for p in "" ar/ fr/; do curl -fsS "https://islamicazkar.net/$p?check=$GITHUB_RUN_ID" | grep -q "landing.js?v=$V" || { echo "::error::/$p is not this deploy's landing page"; exit 1; }; done
+          curl -fsS "https://islamicazkar.net/ar/" | grep -q 'dir="rtl"' && echo "landing pages: en, ar, fr"
+          curl -fsS "https://islamicazkar.net/landing.css?v=$V" | grep -q "Manrope" && curl -fsSI "https://islamicazkar.net/fonts/manrope-latin.woff2" | grep -qi "200" && echo "landing styles and font served"
           curl -fsS "https://islamicazkar.net/app.js?v=$V" | grep -q "function record()" && echo "live app.js: $V"
           # Sync between devices: create a code, then sync with it.
           NEW=$(curl -sS -X POST https://islamicazkar.net/sync/new -H 'content-type: application/json' -d '{"days":{}}')

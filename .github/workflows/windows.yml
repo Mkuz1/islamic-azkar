@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
   push:
     branches: [main, "main-*"]
-    paths: ["IslamicAzkar/windows/**", "website/app.js", "website/style.css", "website/data/**", "store/windows/UPLOAD", ".github/workflows/windows.yml"]
+    paths: ["IslamicAzkar/windows/**", "website/app/**", "website/app.js", "website/style.css", "website/data/**", "store/windows/UPLOAD", ".github/workflows/windows.yml"]
 
 permissions:
   contents: write

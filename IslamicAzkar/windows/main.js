@@ -50,7 +50,7 @@ function createWindow() {
   // Only the app's own pages load here; anything else (store links, downloads) opens in the browser.
   win.webContents.on("will-navigate", (e, url) => { if (!url.startsWith(ORIGIN + "/")) { e.preventDefault(); openOutside(url); } });
   win.webContents.setWindowOpenHandler(({ url }) => { openOutside(url); return { action: "deny" }; });
-  win.loadURL(`${ORIGIN}/index.html`);
+  win.loadURL(`${ORIGIN}/app/index.html`);
 }
 
 /** Tells the person when a newer version is on GitHub (once per launch, quietly offline). */
