@@ -1,0 +1,30 @@
+# Read-only questions to the App Store Connect API (see tools/asc_probe.py). Run by hand or by
+# changing this file.
+name: App Store Connect probe
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, "main-*"]
+    paths: [".github/workflows/appstore-probe.yml", "tools/asc_probe.py"]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ask
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+          ISSUER: ${{ secrets.APPSTORE_ISSUER_ID }}
+          P8: ${{ secrets.APPSTORE_KEY_P8 }}
+        run: |
+          K=$(printf '%s' "$KEY_ID" | tr -d '[:space:]'); echo "::add-mask::$K"
+          mkdir -p ~/.appstoreconnect/private_keys
+          printf '%s\n' "$P8" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | grep -v '^$' > ~/.appstoreconnect/private_keys/AuthKey_$K.p8
+          python3 -m pip install -q pyjwt cryptography
+          KEY_ID=$K ISSUER=$(printf '%s' "$ISSUER" | tr -d '[:space:]') python3 tools/asc_probe.py screenshot-types
