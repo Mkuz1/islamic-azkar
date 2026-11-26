@@ -44,5 +44,5 @@
   const sio = new IntersectionObserver(es => es.forEach(e => {
     if (e.isIntersecting) links.forEach(a => a.hash === "#" + e.target.id ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"));
   }), { rootMargin: "-45% 0px -50% 0px" });
-  ["features", "how", "faq"].forEach(id => { const s = document.getElementById(id); if (s) sio.observe(s); });
+  ["read", "features", "how", "faq"].forEach(id => { const s = document.getElementById(id); if (s) sio.observe(s); });
 })();

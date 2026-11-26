@@ -35,6 +35,28 @@ def images(raw):
     print("images refreshed")
 
 
+def cat_names():
+    """The category names of the web app (website/app.js), in the order ar, en, fr."""
+    src = open(os.path.join(WEB, "app.js"), encoding="utf-8").read()
+    maps = [dict(re.findall(r'(\w+): "([^"]*)"', m)) for m in re.findall(r"cat: \{([^}]*)\}", src)]
+    return dict(zip(("ar", "en", "fr"), maps))
+
+
+def reading():
+    d = json.load(open(os.path.join(WEB, "data", "azkar.json"), encoding="utf-8"))
+    ch = {c["id"]: c for c in d["chapters"]}
+    return {"morning": len(d["morning"]), "evening": len(d["evening"]), "sleep": len(ch[28]["items"]), "prayer": len(ch[25]["items"]),
+            "cats": [(c["key"], len(c["chapters"])) for c in d["categories"]], "guide": bool(d.get("guides"))}
+
+
+def plural(form, n):
+    """English and French: one form with {n}. Arabic: (one, two, 3 to 10, 11 and more)."""
+    if isinstance(form, str):
+        return form.format(n=n)
+    one, two, few, many = form
+    return one if n == 1 else two if n == 2 else (few if 3 <= n % 100 <= 10 else many).format(n=n)
+
+
 def counts():
     d = json.load(open(os.path.join(WEB, "data", "azkar.json"), encoding="utf-8"))
     return {"items": sum(len(c["items"]) for c in d["chapters"]), "chapters": len(d["chapters"])}
@@ -44,6 +66,7 @@ AR_DIGITS = str.maketrans("0123456789", "٠١٢٣٤٥٦٧٨٩")
 
 T = {
 "en": dict(
+    read_nav="Read azkar", read_h="Read the azkar here", read_p="No download needed. Open any reading in your browser, with the counter, transliteration, meaning and your record.", read_all="Open the full reader", read_cats="All categories", r_morning="Morning azkar", r_evening="Evening azkar", r_sleep="Before sleep", r_prayer="After prayer", r_n="{n} azkar", r_ch="{n} chapters", r_guide="Umrah step by step",
     dir="ltr", path="/", title="Islamic Azkar: morning and evening azkar with their sources",
     desc="The complete Fortress of the Muslim in Arabic with transliteration and meaning in English and French. A counter, your azkar record, prayer times and widgets. Free, no ads, no account.",
     skip="Skip to content", features="Features", how="How it works", faq="Questions", download="Download free", menu="Menu", close="Close menu", home="Islamic Azkar home",
@@ -83,6 +106,7 @@ T = {
     ded_tr="SADAQA JARIYAH", ded_names='<p class="names">On behalf of <span class="nw">Mohamad Al-Koussa</span>, <span class="nw">Dima Ghannoum</span> and their families</p>', ded_dua="O Allah, place it in the scale of their good deeds.", ded_hadith="“When a person dies, their deeds end except for three: an ongoing charity…” Muslim",
     ded_label="Sadaqa jariyah", ded="This app is a sadaqa jariyah on behalf of Mohamad Al-Koussa, Dima Ghannoum and their families. Please remember them in your duas.", support="Support", privacy="Privacy", delete="Delete your data"),
 "ar": dict(
+    read_nav="اقرأ الأذكار", read_h="اقرأ الأذكار هنا", read_p="لا حاجة إلى التنزيل. افتح أي ورد في متصفحك، مع العدّاد والنطق والمعنى وسجلّك.", read_all="افتح القارئ كاملًا", read_cats="كل الأقسام", r_morning="أذكار الصباح", r_evening="أذكار المساء", r_sleep="أذكار النوم", r_prayer="أذكار بعد الصلاة", r_n=("ذكر واحد", "ذكران", "{n} أذكار", "{n} ذكرًا"), r_ch=("باب واحد", "بابان", "{n} أبواب", "{n} بابًا"), r_guide="دليل العمرة خطوة بخطوة",
     dir="rtl", path="/ar/", title="أذكار إسلامية: أذكار الصباح والمساء بمصادرها",
     desc="حصن المسلم كاملًا بالعربية مع النطق والمعنى بالإنجليزية والفرنسية. عدّاد وسجلّ للأذكار ومواقيت الصلاة وأدوات للشاشة. مجاني بلا إعلانات ولا حساب.",
     skip="تخطَّ إلى المحتوى", features="المزايا", how="طريقة الاستخدام", faq="أسئلة", download="تنزيل مجاني", menu="القائمة", close="إغلاق القائمة", home="أذكار إسلامية، الصفحة الرئيسية",
@@ -122,6 +146,7 @@ T = {
     ded_tr="", ded_names='<p class="names ar" lang="ar">عن محمد الكوسا وديمة غنوم وعائلاتهم</p>', ded_dua="", ded_hadith="",
     ded_label="صدقة جارية", ded="هذا التطبيق صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم، فلا تنسوهم من صالح دعائكم.", support="الدعم", privacy="الخصوصية", delete="احذف بياناتك"),
 "fr": dict(
+    read_nav="Lire les adhkar", read_h="Lisez les adhkar ici", read_p="Rien à télécharger. Ouvrez n'importe quelle lecture dans votre navigateur, avec le compteur, la translittération, la traduction et votre historique.", read_all="Ouvrir le lecteur complet", read_cats="Toutes les catégories", r_morning="Adhkar du matin", r_evening="Adhkar du soir", r_sleep="Avant de dormir", r_prayer="Après la prière", r_n="{n} adhkar", r_ch="{n} chapitres", r_guide="La Oumra pas à pas",
     dir="ltr", path="/fr/", title="Islamic Azkar : les adhkar du matin et du soir avec leurs sources",
     desc="Toute la Citadelle du musulman en arabe, avec translittération et traduction en français et en anglais. Un compteur, votre historique, les horaires de prière et des widgets. Gratuit, sans publicité, sans compte.",
     skip="Aller au contenu", features="Fonctions", how="Mode d'emploi", faq="Questions", download="Télécharger", menu="Menu", close="Fermer le menu", home="Accueil Islamic Azkar",
@@ -173,7 +198,18 @@ def page(lang):
     cur = ' aria-current="true"'
     langs = "".join(f'<a href="{T[l]["path"]}" hreflang="{l}" lang="{l}"{cur if l == lang else ""}>{n}</a>'
                     for l, n in (("en", "EN"), ("ar", "ع"), ("fr", "FR")))
-    app = "/app/" + ("" if lang == "ar" else f"?lang={lang}")
+    app = f"/app/?lang={lang}"
+    rd, names = reading(), cat_names()[lang]
+    tiles = "".join(
+        f'<a class="rtile" href="{app}#/read/{href}">{icon(ic)}<span class="title-2">{e(t[key])}</span>'
+        f'<span class="body-6 muted">{num(plural(t["r_n"], rd[k]))}</span><span class="go">{icon("arrow-right", flip=True)}</span></a>'
+        for k, key, href, ic in (("morning", "r_morning", "morning", "sun"), ("evening", "r_evening", "evening", "moon"),
+                                 ("sleep", "r_sleep", "c28", "bed"), ("prayer", "r_prayer", "c25", "mosque")))
+    crow = lambda href, name, meta: (f'<a class="crow" href="{href}"><span class="title-3">{e(name)}</span>'
+                                     f'<span class="body-6 muted">{meta}</span>{icon("caret-right", flip=True)}</a>')
+    cats = "".join(crow(f"{app}#/cat/{k}", names.get(k, k), num(plural(t["r_ch"], n)) if n > 1 else "") for k, n in rd["cats"])
+    if rd["guide"]:
+        cats += crow(f"{app}#/umrah", t["r_guide"], "")
     li = lambda items: "".join(f'<li>{icon("check")}<span><b>{num(e(b))}</b>{num(e(r))}</span></li>' for b, r in items)
     facts = "".join(f'<div><b>{num(n.format(**c))}</b><span class="body-6 muted">{e(l)}</span></div>' for n, l in t["facts"])
     steps = "".join(f'<div class="step"><span class="n caption-3">{e(t["step"])} {num(str(i + 1))}</span>'
@@ -212,14 +248,14 @@ def page(lang):
 
 <nav class="nav" aria-label="{e(t["menu"])}">
   <a class="brand" href="{t["path"]}" aria-label="{e(t["home"])}"><img src="/img/icon.png" alt="" width="32" height="32"><span class="ar" lang="ar">أذكار</span></a>
-  <div class="nav-links button-sm"><a href="#features">{e(t["features"])}</a><a href="#how">{e(t["how"])}</a><a href="#faq">{e(t["faq"])}</a></div>
+  <div class="nav-links button-sm"><a href="#read">{e(t["read_nav"])}</a><a href="#features">{e(t["features"])}</a><a href="#how">{e(t["how"])}</a><a href="#faq">{e(t["faq"])}</a></div>
   <div class="langs button-sm" aria-label="Language">{langs}</div>
   <a class="btn btn-primary button-sm" href="#download">{icon("download-simple")}{e(t["download"])}</a>
   <button class="menu-btn" id="menu-btn" type="button" aria-label="{e(t["menu"])}" aria-expanded="false" aria-controls="menu"><i></i><i></i><i></i></button>
 </nav>
 <div class="menu" id="menu" aria-hidden="true">
   <button class="menu-close" id="menu-close" type="button" aria-label="{e(t["close"])}">{icon("x")}</button>
-  <a href="#features">{e(t["features"])}</a><a href="#how">{e(t["how"])}</a><a href="#faq">{e(t["faq"])}</a><a href="#download">{e(t["download"])}</a>
+  <a href="#read">{e(t["read_nav"])}</a><a href="#features">{e(t["features"])}</a><a href="#how">{e(t["how"])}</a><a href="#download">{e(t["download"])}</a>
   <div class="langs button-md" aria-label="Language">{langs}</div>
 </div>
 
@@ -242,6 +278,16 @@ def page(lang):
   </header>
 
   <div class="facts reveal" aria-label="{e(t["facts_label"])}">{facts}</div>
+
+  <section class="read" id="read" aria-labelledby="read-title">
+    <div class="read-head reveal">
+      <div><h2 class="heading-2" id="read-title">{e(t["read_h"])}</h2><p class="body-3 muted">{e(t["read_p"])}</p></div>
+      <a class="btn btn-primary button-md" href="{app}">{icon("book-open")}{e(t["read_all"])}</a>
+    </div>
+    <div class="rtiles reveal">{tiles}</div>
+    <h3 class="title-2 cats-title reveal">{e(t["read_cats"])}</h3>
+    <div class="cats reveal">{cats}</div>
+  </section>
 
   <section class="tagline" aria-label="{e(t["features"])}"><p id="tagline">{e(t["tagline"])}</p></section>
 

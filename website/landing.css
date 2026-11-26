@@ -137,6 +137,26 @@ p { margin: 0; text-wrap: pretty; }
 .facts div { display: flex; flex-direction: column; gap: 4px; }
 .facts b { font-size: 36px; line-height: 40px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 
+/* Read the azkar on the site: the daily readings and every category open the web app (/app/) */
+.read { padding-block: 64px 32px; display: flex; flex-direction: column; gap: 24px; }
+.read-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.read-head > div { display: flex; flex-direction: column; gap: 12px; max-width: 680px; }
+.rtiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.rtile { position: relative; display: flex; flex-direction: column; gap: 8px; padding: 24px; border-radius: 16px; border: 1px solid var(--line);
+  background: var(--surface); transition: transform 500ms var(--ease), border-color 300ms var(--ease), background-color 300ms var(--ease); }
+.rtile > .ic { width: 32px; height: 32px; color: var(--gold); margin-bottom: 8px; }
+.rtile .go { position: absolute; top: 24px; inset-inline-end: 24px; display: inline-flex; color: var(--muted); transition: transform 500ms var(--ease), color 300ms var(--ease); }
+.rtile:hover { border-color: rgba(214, 179, 106, .6); transform: translateY(-2px); }
+.rtile:hover .go { color: var(--gold); transform: translateX(calc(4px * var(--dir))); }
+.rtile:active { transform: scale(0.98); }
+.cats-title { margin-top: 16px; }
+.cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; background: rgba(8, 35, 26, .55); }
+.crow { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 16px 24px;
+  border-top: 1px solid rgba(214, 179, 106, .14); transition: background-color 300ms var(--ease); }
+.crow:hover { background: var(--surface); }
+.crow .ic { width: 16px; height: 16px; color: var(--muted); }
+.crow .title-3 { min-width: 0; }
+
 /* Tagline reveal */
 .tagline { padding-block: 96px; }
 .tagline p { font-size: 48px; line-height: 48px; font-weight: 600; letter-spacing: -0.02em; max-width: 880px; }
@@ -210,6 +230,9 @@ a.platform:hover .go { transform: translateX(calc(4px * var(--dir))); color: var
 .ded-card .hadith { font-family: var(--arabic); font-size: 20px; line-height: 36px; color: rgba(255, 255, 255, .55); }
 .ded-card .hmean { color: rgba(169, 184, 177, .8); font-size: 14px; line-height: 20px; max-width: 460px; }
 @media (max-width: 720px) {
+  .cats { grid-template-columns: minmax(0, 1fr); }
+  .rtile { padding: 16px; }
+  .rtile .go { top: 16px; inset-inline-end: 16px; }
   .ded-card { padding: 32px 16px; border-radius: 24px; }
   .ded-card .big { font-size: 60px; line-height: 96px; }
   .ded-card .names, .ded-card .names.ar { font-size: 24px; line-height: 36px; }
@@ -229,6 +252,8 @@ footer a:hover { color: var(--text); }
 
 @media (max-width: 1080px) { .nav-links { display: none; } }
 @media (max-width: 960px) {
+  .rtiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero { grid-template-columns: minmax(0, 1fr); padding-block: 128px 64px; gap: 48px; }
   .stage { justify-self: center; }
   .feature, .download, .faq { grid-template-columns: minmax(0, 1fr); gap: 40px; }
