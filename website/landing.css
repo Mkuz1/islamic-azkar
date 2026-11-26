@@ -188,6 +188,15 @@ a.platform:hover .go { transform: translateX(calc(4px * var(--dir))); color: var
 .faq dd { margin: 0; color: var(--muted); }
 .faq dd a { color: var(--text); text-decoration: underline; text-underline-offset: 4px; }
 
+/* Dedication: the people this sadaqa jariyah is for */
+.dedication { padding-block: 64px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 16px; }
+.dedication .label { display: inline-flex; align-items: center; gap: 8px; color: var(--accent); }
+.dedication .label .ic { width: 16px; height: 16px; }
+.ded-ar { font-size: 36px; line-height: 64px; font-weight: 700; color: var(--accent); text-align: left; }
+[dir="rtl"] .ded-ar { text-align: right; }
+.ded-text { max-width: 680px; }
+@media (max-width: 720px) { .ded-ar { font-size: 30px; line-height: 48px; } }
+
 /* Final call and footer */
 .final { padding-block: 96px; display: flex; flex-direction: column; align-items: flex-start; gap: 24px; border-top: 1px solid var(--line); }
 footer { padding-block: 32px 48px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 16px 24px; justify-content: space-between; color: var(--muted); }

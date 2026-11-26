@@ -79,7 +79,8 @@ T = {
           ("How are prayer times calculated?", "On your device, for your location or a chosen city, with nine methods including Umm al Qura and Dubai, and Hanafi Asr."),
           ("How do I delete my data?", 'Only synced records are kept on our server, and you can erase them at <a href="/delete/">islamicazkar.net/delete</a> at any time.')],
     final="Start tomorrow morning<br>with your azkar ready",
-    foot="Islamic Azkar · a sadaqa jariyah", support="Support", privacy="Privacy", delete="Delete your data"),
+    foot="Islamic Azkar · a sadaqa jariyah on behalf of Mohamad Al-Koussa, Dima Ghannoum and their families",
+    ded_label="Sadaqa jariyah", ded="This app is a sadaqa jariyah on behalf of Mohamad Al-Koussa, Dima Ghannoum and their families. Please remember them in your duas.", support="Support", privacy="Privacy", delete="Delete your data"),
 "ar": dict(
     dir="rtl", path="/ar/", title="أذكار إسلامية: أذكار الصباح والمساء بمصادرها",
     desc="حصن المسلم كاملًا بالعربية مع النطق والمعنى بالإنجليزية والفرنسية. عدّاد وسجلّ للأذكار ومواقيت الصلاة وأدوات للشاشة. مجاني بلا إعلانات ولا حساب.",
@@ -116,7 +117,8 @@ T = {
           ("كيف تُحسب مواقيت الصلاة؟", "على جهازك، لموقعك أو لمدينة تختارها، بتسع طرق منها أم القرى ودبي، مع العصر على المذهب الحنفي."),
           ("كيف أحذف بياناتي؟", 'لا يُحفظ على خادمنا إلا سجلّ من فعّل المزامنة، ويمكنك حذفه متى شئت من <a href="/delete/">islamicazkar.net/delete</a>.')],
     final="ابدأ صباح الغد<br>وأذكارك جاهزة",
-    foot="أذكار إسلامية · صدقة جارية", support="الدعم", privacy="الخصوصية", delete="احذف بياناتك"),
+    foot="أذكار إسلامية · صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم",
+    ded_label="صدقة جارية", ded="هذا التطبيق صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم، فلا تنسوهم من صالح دعائكم.", support="الدعم", privacy="الخصوصية", delete="احذف بياناتك"),
 "fr": dict(
     dir="ltr", path="/fr/", title="Islamic Azkar : les adhkar du matin et du soir avec leurs sources",
     desc="Toute la Citadelle du musulman en arabe, avec translittération et traduction en français et en anglais. Un compteur, votre historique, les horaires de prière et des widgets. Gratuit, sans publicité, sans compte.",
@@ -153,7 +155,8 @@ T = {
           ("Comment sont calculés les horaires de prière ?", "Sur votre appareil, pour votre position ou une ville choisie, avec neuf méthodes dont Umm al Qura et Dubaï, et l'Asr hanafite."),
           ("Comment supprimer mes données ?", 'Seul l\'historique synchronisé est conservé sur notre serveur, et vous pouvez l\'effacer à tout moment sur <a href="/delete/">islamicazkar.net/delete</a>.')],
     final="Commencez demain matin<br>avec vos adhkar prêts",
-    foot="Islamic Azkar · une sadaqa jariya", support="Assistance", privacy="Confidentialité", delete="Supprimer vos données"),
+    foot="Islamic Azkar · une sadaqa jariya au nom de Mohamad Al-Koussa, Dima Ghannoum et leurs familles",
+    ded_label="Sadaqa jariya", ded="Cette application est une sadaqa jariya au nom de Mohamad Al-Koussa, Dima Ghannoum et leurs familles. Pensez à eux dans vos douas.", support="Assistance", privacy="Confidentialité", delete="Supprimer vos données"),
 }
 
 
@@ -298,6 +301,12 @@ def page(lang):
   <section class="faq" id="faq" aria-labelledby="faq-title">
     <h2 class="heading-2 reveal" id="faq-title">{e(t["faq"])}</h2>
     <dl class="reveal">{faqs}</dl>
+  </section>
+
+  <section class="dedication reveal" aria-label="{e(t["ded_label"])}">
+    <span class="caption-3 label">{icon("sparkle")}{e(t["ded_label"])}</span>
+    <p class="ar ded-ar" lang="ar">صدقة جارية عن محمد الكوسا وديمة غنوم وعائلاتهم</p>
+    {"" if lang == "ar" else f'<p class="body-3 muted ded-text">{e(t["ded"])}</p>'}{f'<p class="body-3 muted ded-text">فلا تنسوهم من صالح دعائكم.</p>' if lang == "ar" else ""}
   </section>
 
   <section class="final reveal" aria-labelledby="final-title">
