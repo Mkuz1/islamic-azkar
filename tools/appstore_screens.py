@@ -21,7 +21,8 @@ DEVICES = {
     "iPhone-6.9": ((1320, 2868), 0.135, 0.022),
     "iPhone-6.3": ((1206, 2622), 0.135, 0.022),
     "iPad-13": ((2064, 2752), 0.045, 0.016),
-    "iPhone-Duo": ((1878, 2670), 0.075, 0.018),
+    "iPhone-Duo-folded": ((1398, 2034), 0.10, 0.02),       # outer display (App Store "iPhone Duo")
+    "iPhone-Duo-unfolded": ((2007, 2853), 0.06, 0.018),    # inner display
 }
 
 # Store order, screen, and the copy for each language: (headline, sub-line).
