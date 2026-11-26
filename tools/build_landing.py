@@ -90,7 +90,9 @@ T = {
     steps=[("Open the suggested reading", "After Fajr the morning azkar are marked Now; after Asr, the evening ones."), ("Read and tap to count", "Each dhikr shows how many times to say it and counts with you."), ("Finish with a prayer", "A short dua closes the reading and your record adds the day.")],
     dl_h="Get Islamic Azkar free", dl_p="Every version has the same azkar and keeps your record in sync. Downloads always fetch the newest release.",
     free=["No ads", "No account, no tracking", "Sadaqa jariyah"],
-    p_apple=("iPhone, iPad, Mac and Apple TV", "Coming to the App Store after Apple's review"),
+    p_apple=("iPhone, iPad and Mac", "Coming to the App Store after Apple's review"),
+    p_tv=("Apple TV", "Free on the App Store"),
+    more=('More apps by MK', 'More free apps by MK', 'Mushaf, MK Launcher, MK PDF, MK Timetables, MK IPTV and more, for iPhone, iPad, Mac, Windows, Android, TV and the web.', 'Visit www.koussa.net →'),
     p_android=("Android and Google TV", "Direct download · Android 8 or later"),
     p_windows=("Windows 10 and 11", "Installer, no administrator rights needed"),
     p_mac=("Mac, direct download", "Signed and notarized by Apple · macOS 15 or later"),
@@ -130,7 +132,9 @@ T = {
     steps=[("افتح الورد المقترح", "بعد الفجر تظهر أذكار الصباح بعلامة «الآن»، وبعد العصر أذكار المساء."), ("اقرأ واضغط لتعدّ", "يُظهر كل ذكر عدد مرات قوله، ويعدّ معك."), ("اختم بدعاء", "دعاء قصير يختم الورد، ويُضاف اليوم إلى سجلّك.")],
     dl_h="حمّل أذكار إسلامية مجانًا", dl_p="في كل النسخ الأذكار نفسها، ويُزامَن سجلّك بينها. التنزيلات تأتي دائمًا بأحدث إصدار.",
     free=["بلا إعلانات", "بلا حساب ولا تتبّع", "صدقة جارية"],
-    p_apple=("آيفون وآيباد وماك وApple TV", "قريبًا على App Store بعد مراجعة Apple"),
+    p_apple=("آيفون وآيباد وماك", "قريبًا على App Store بعد مراجعة Apple"),
+    p_tv=("Apple TV", "مجانًا على App Store"),
+    more=('تطبيقات أخرى من MK', 'تطبيقات مجانية أخرى من MK', 'المصحف، MK Launcher، MK PDF، MK Timetables، MK IPTV وغيرها، لآيفون وآيباد وماك وويندوز وأندرويد والتلفاز والويب.', 'زوروا www.koussa.net ←'),
     p_android=("أندرويد وGoogle TV", "تنزيل مباشر · أندرويد ٨ أو أحدث"),
     p_windows=("ويندوز ١٠ و١١", "مثبّت لا يحتاج صلاحيات المسؤول"),
     p_mac=("ماك، تنزيل مباشر", "موقّع وموثّق من Apple · macOS 15 أو أحدث"),
@@ -170,7 +174,9 @@ T = {
     steps=[("Ouvrez la lecture proposée", "Après Fajr, les adhkar du matin sont marqués Maintenant ; après Asr, ceux du soir."), ("Lisez et touchez pour compter", "Chaque dhikr indique combien de fois le dire et compte avec vous."), ("Terminez par une invocation", "Une courte douâ conclut la lecture et votre historique ajoute le jour.")],
     dl_h="Téléchargez Islamic Azkar gratuitement", dl_p="Chaque version contient les mêmes adhkar et synchronise votre historique. Les téléchargements donnent toujours la dernière version.",
     free=["Sans publicité", "Sans compte ni suivi", "Sadaqa jariya"],
-    p_apple=("iPhone, iPad, Mac et Apple TV", "Bientôt sur l'App Store, après la validation d'Apple"),
+    p_apple=("iPhone, iPad et Mac", "Bientôt sur l'App Store, après la validation d'Apple"),
+    p_tv=("Apple TV", "Gratuit sur l'App Store"),
+    more=('Autres applications de MK', "D'autres applications gratuites de MK", 'Mushaf, MK Launcher, MK PDF, MK Timetables, MK IPTV et bien d’autres, pour iPhone, iPad, Mac, Windows, Android, la TV et le web.', 'Voir www.koussa.net →'),
     p_android=("Android et Google TV", "Téléchargement direct · Android 8 ou plus récent"),
     p_windows=("Windows 10 et 11", "Installateur sans droits d'administrateur"),
     p_mac=("Mac, téléchargement direct", "Signé et notarié par Apple · macOS 15 ou plus récent"),
@@ -340,6 +346,7 @@ def page(lang):
     </div>
     <div class="platforms reveal">
       <div class="platform">{icon("apple-logo")}<span><span class="title-3">{e(t["p_apple"][0])}</span><br><span class="body-6 soon">{e(t["p_apple"][1])}</span></span><span></span></div>
+      {plat("television-simple", "p_tv", "https://apps.apple.com/app/id6835170109")}
       {plat("android-logo", "p_android", "/download/android")}
       {plat("windows-logo", "p_windows", "/download/windows")}
       {plat("apple-logo", "p_mac", "/download/mac")}
@@ -372,6 +379,8 @@ def page(lang):
     <a class="btn btn-primary button-md" href="#download">{icon("download-simple")}{e(t["download"])}</a>
   </section>
 
+<style>.mk-more{{box-sizing:border-box;max-width:1120px;margin:64px auto 32px;padding:0 20px}}.mk-more a{{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;padding:20px 24px;border:1px solid color-mix(in srgb,currentColor 16%,transparent);border-radius:16px;color:inherit;text-decoration:none;transition:background-color .2s,border-color .2s}}.mk-more a:hover{{background:color-mix(in srgb,currentColor 5%,transparent);border-color:color-mix(in srgb,currentColor 30%,transparent)}}.mk-more a:focus-visible{{outline:2px solid currentColor;outline-offset:2px}}.mk-more .t{{display:block;font-weight:600;font-size:17px;line-height:24px}}.mk-more .d{{display:block;margin-top:2px;opacity:.72;font-size:14px;line-height:20px}}.mk-more .go{{flex:none;font-weight:600;font-size:14px;line-height:20px;white-space:nowrap}}</style>
+<aside class="mk-more" aria-label="{e(t["more"][0])}"><a href="https://www.koussa.net/"><span><span class="t">{e(t["more"][1])}</span><span class="d">{e(t["more"][2])}</span></span><span class="go">{e(t["more"][3])}</span></a></aside>
   <footer class="body-6">
     <span>{e(t["foot"])}</span>
     <nav aria-label="{e(t["support"])}"><a href="/support/">{e(t["support"])}</a><a href="/privacy/">{e(t["privacy"])}</a><a href="/delete/">{e(t["delete"])}</a></nav>
