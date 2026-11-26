@@ -69,18 +69,9 @@ jobs:
             local DISPLAYS; DISPLAYS=$(xcrun simctl io "$D" screenshot /tmp/probe.png 2>&1 | grep -o -- '--display=[0-9]*' | cut -d= -f2 | tr '\n' ' ' || true)
             echo "displays: ${DISPLAYS:-one}"
             if [[ "$NAME" == *Duo* ]]; then
-              # The fold state is only in the Simulator app's menus: open it on this device.
-              XC=$(dirname "$(dirname "$(xcode-select -p)")")
-              echo "--- apps inside Xcode:"; find "$XC" -maxdepth 6 -name "*.app" 2>/dev/null | grep -viE "/Platforms/.*/Library/Developer/CoreSimulator/Profiles" | head -30
-              echo "--- simctl commands:"; xcrun simctl help 2>&1 | sed -n '/Subcommands/,$p' | head -60
-              SIMAPP=$(find "$XC" -maxdepth 6 -name "Simulator.app" -o -maxdepth 6 -name "Device Hub.app" 2>/dev/null | head -1)
-              echo "simulator app: ${SIMAPP:-none}"
-              [ -n "$SIMAPP" ] && { open -a "$SIMAPP" --args -CurrentDeviceUDID "$D"; sleep 25; }
-              BID=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "$SIMAPP/Contents/Info.plist" 2>/dev/null || echo com.apple.iphonesimulator)
-              PNAME=$(basename "$SIMAPP" .app); echo "bundle $BID, process $PNAME"
-              sed -i '' "s/application id \"com.apple.iphonesimulator\"/application id \"$BID\"/; s/process \"Simulator\"/process \"$PNAME\"/" $GITHUB_WORKSPACE/tools/sim_menu.applescript
-              MENU=$GITHUB_WORKSPACE/tools/sim_menu.applescript
-              echo "--- Simulator menu items about folding:"; osascript "$MENU" list 2>&1 | grep -iE "fold|posture|hinge|open|close" || osascript "$MENU" list 2>&1 | head -60
+              echo "--- simctl ui:"; xcrun simctl help ui 2>&1 | head -60
+              for opt in fold folded posture hinge device_state display state; do echo "ui $opt: $(xcrun simctl ui "$D" $opt 2>&1 | head -3 | tr '\n' ' ')"; done
+              MENU=/dev/null
               alive() { xcrun simctl spawn "$D" launchctl list 2>/dev/null | grep -c "$BUNDLE" || true; }
               lit() { python3 -c "from PIL import Image; import sys; e=Image.open(sys.argv[1]).convert('L').getextrema(); print('lit' if e[1]-e[0]>10 else 'dark')" "$1" 2>/dev/null || echo "?"; }
               python3 -m pip install -q --break-system-packages pillow 2>/dev/null || python3 -m pip install -q pillow
@@ -89,7 +80,8 @@ jobs:
               xcrun simctl launch "$D" $BUNDLE -ciScreen reader -ciLang en >/dev/null; sleep 8
               for step in 1-unfold:Unfold 2-fold:Fold 3-unfold:Unfold; do
                 tag=${step%%:*}; word=${step#*:}
-                echo "$tag: $(osascript "$MENU" click "$word" 2>&1)"; sleep 6
+                st=$([ "$word" = Fold ] && echo folded || echo unfolded)
+                echo "$tag: $(xcrun simctl ui "$D" posture $st 2>&1 | head -2 | tr '\n' ' ') | $(xcrun simctl ui "$D" fold $st 2>&1 | head -2 | tr '\n' ' ')"; sleep 6
                 for n in $DISPLAYS; do xcrun simctl io "$D" screenshot --display=$n "raw/fold-test/$tag-display$n.png" >/dev/null 2>&1; done
                 echo "$tag: app running=$(alive) inner=$(lit raw/fold-test/$tag-display3.png) outer=$(lit raw/fold-test/$tag-display1.png)"
               done
