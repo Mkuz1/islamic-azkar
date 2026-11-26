@@ -14,6 +14,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WEB = os.path.join(ROOT, "website")
 SCREENS = ["reader", "tasbih", "record", "widgets"]
 SITE = "https://islamicazkar.net"
+SITE_NAME = {"en": "Islamic Azkar", "ar": "أذكار إسلامية", "fr": "Islamic Azkar"}
+LOCALE = {"en": "en_US", "ar": "ar_AR", "fr": "fr_FR"}
 
 
 def icon(name, flip=False):
@@ -227,6 +229,13 @@ def page(lang):
     alternates = "\n".join(f'<link rel="alternate" hreflang="{l}" href="{SITE}{T[l]["path"]}">' for l in T) + f'\n<link rel="alternate" hreflang="x-default" href="{SITE}/">'
     jsonld = json.dumps({"@context": "https://schema.org", "@type": "FAQPage", "inLanguage": lang, "mainEntity": [
         {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": re.sub(r"<[^>]+>", "", a)}} for q, a in t["faqs"]]}, ensure_ascii=False)
+    appld = json.dumps({"@context": "https://schema.org", "@type": "SoftwareApplication", "name": SITE_NAME[lang],
+        "alternateName": ["Islamic Azkar", "أذكار إسلامية", "Hisn al-Muslim"], "description": t["desc"], "inLanguage": lang,
+        "url": SITE + t["path"], "image": SITE + "/img/og.jpg", "applicationCategory": "LifestyleApplication",
+        "operatingSystem": "Android, iOS, iPadOS, macOS, tvOS, Windows, Web",
+        "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "sameAs": ["https://apps.apple.com/app/id6835170109"],
+        "author": {"@type": "Organization", "name": "MK Apps", "url": "https://www.koussa.net/"}}, ensure_ascii=False)
     return f'''<!doctype html>
 <html lang="{lang}" dir="{t["dir"]}">
 <head>
@@ -237,17 +246,30 @@ def page(lang):
 <meta name="theme-color" content="#08231a">
 <link rel="canonical" href="{SITE}{t["path"]}">
 {alternates}
-<link rel="icon" href="/img/icon.png">
-<link rel="apple-touch-icon" href="/img/icon.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/img/icon-192.png" type="image/png" sizes="192x192">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{e(SITE_NAME[lang])}">
 <meta property="og:title" content="{e(t["title"])}">
 <meta property="og:description" content="{e(t["desc"])}">
-<meta property="og:image" content="{SITE}/img/og.jpg">
 <meta property="og:url" content="{SITE}{t["path"]}">
-<meta property="og:type" content="website">
-<meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="{SITE}/img/og.jpg">
+<meta property="og:image:secure_url" content="{SITE}/img/og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{e(t["title"])}">
+<meta property="og:locale" content="{LOCALE[lang]}">
+{"".join(f'<meta property="og:locale:alternate" content="{LOCALE[l]}">' + chr(10) for l in T if l != lang)}<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{e(t["title"])}">
+<meta name="twitter:description" content="{e(t["desc"])}">
+<meta name="twitter:image" content="{SITE}/img/og.jpg">
 <link rel="preload" href="/fonts/manrope-latin.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/landing.css">
 <script type="application/ld+json">{jsonld}</script>
+<script type="application/ld+json">{appld}</script>
 </head>
 <body>
 <a class="skip button-sm" href="#main">{e(t["skip"])}</a>
